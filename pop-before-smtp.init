@@ -4,18 +4,21 @@
 
 progname=pop-before-smtp
 pgm=/usr/sbin/$progname
-log=/var/log/$progname
-pid=/var/run/$progname.pid
+log=/var/adm/$progname
+test -f /var/log/messages && log=/var/log/$progname
+pid=/var/adm/$progname.pid
+test -d /var/run && pid=/var/run/$progname.pid
+mail=/var/log/maillog
+test -f $mail || mail=/var/log/messages
+test -f $mail || mail=/var/adm/messages
 die(){ echo "$progname: $*">&2; exit 1; }
 
-. /etc/rc.d/init.d/functions
-
 case "$1" in
- start) echo -n Starting pop-before-smtp
-	$pgm --debug >$log 2>&1 & echo $! >$pid
-	echo_success; echo ''
+ start) echo -n Starting pop-before-smtp...
+	$pgm --logfile=$mail >$log 2>&1 & echo $! >$pid
+	echo done
 	;;
-  stop) echo -n Stopping pop-before-smtp
+  stop) echo -n Stopping pop-before-smtp...
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -23,18 +26,18 @@ case "$1" in
 	)
 	if test $? -eq 0; then
 		rm -f $pid
-		echo_success
+		echo done
 	else
-		echo_failure
+		echo failed
 	fi
-	echo ''
 	;;
 
 status)	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
 	kill -0 $p || die "$pgm[$p] is no longer running"
-	ps -up $p
+	/usr/bin/ps -fp $p
 	;;
 restart) $0 stop; $0 start;;
       *) die "syntax: `basename $0` start|stop|restart|status";;
 esac
+

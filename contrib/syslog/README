@@ -1,0 +1,10 @@
+README - this file
+pop-before-smtp - result of applying pop-before-smtp-1.25-syslog.patch to pop-before-smtp-1.25-Orig
+pop-before-smtp-1.25-Orig - as-shipped release 1.25 of pop-before-smtp
+pop-before-smtp-1.25-syslog.patch patch from Stig Hackvan
+pop-before-smtp-init-1.25-Orig - as-shipped original 1.25 init script
+pop-before-smtp.init - result of applying pop-before-smtp-1.25-syslog.patch to init script
+
+Contributed by Stig Hackvan. Note that this patch also incidentally
+switches the tail option to File::Tail so pop-before-smtp won't
+re-read the maillog on startup.

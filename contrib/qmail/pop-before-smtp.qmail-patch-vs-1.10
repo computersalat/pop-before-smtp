@@ -1,0 +1,141 @@
+--- pop-before-smtp	Wed Apr  5 11:35:21 2000
++++ pop-before-smtp.qmail	Sat Nov 18 14:10:57 2000
+@@ -2,6 +2,7 @@
+ use strict;
+ 
+ # pop-before-smtp 1.10 Bennett Todd <bet@rahul.net> Freely Redistributable
++# modified to work with qmail's tcpserver configuration files.  -- Stig Hackvan <stig@hackvan.com>
+ # 1.10 2000-04-05 added regexp for qmail's pop3d thanks to Frank Auciello
+ #                 <frank@torontowired.com>
+ # 1.9 2000-03-21 added support for files in mynetworks, tested by Andy Dills
+@@ -36,7 +37,8 @@
+   nohup pop-before-smtp [--[no]write] [--[no]debug] \
+ 	[--logfile=filename] \
+ 	[--dbfile=filename] \
+-	[--grace=seconds] &
++	[--tcprules] \
++	[--grace=seconds] [ netmask ... ] &
+ 
+ =head1 DESCRIPTION
+ 
+@@ -145,15 +147,28 @@
+ #          'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)$';
+ 
+ my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
++my $tcprules = 0;
++
++if ( -d '/var/qmail' ) {
++  warn "assuming qmail ...";
++  # the qmail invocation incantation to go along with this is ...
++  #
++  # /usr/local/bin/tcpserver -x/etc/tcprules.d/smtp -u519 -g519 0 smtp /var/qmail/bin/qmail-smtpd &
++  #
++  $dbfile = '/etc/tcprules.d/smtp'; # tcprules output file
++  $tcprules = 1;
++}
++ 
+ my $grace = 1800; # 30 minutes --- grace period
+ 
+ GetOptions(
+ 	"write!" => \$write,
+ 	"debug!" => \$debug,
++	"tcprules!" => \$tcprules,
+ 	"dbfile=s" => \$dbfile,
+ 	"grace=i" => \$grace,
+-) or die "syntax: $0 [--[no]write] [--[no]debug] [--logfile=filename] " .
+-	"[--dbfile=filename] [--grace=seconds]\n";
++) or die "syntax: $0 [--[no]write] [--[no]debug] [--[no]tcprules] " .
++	"[--logfile=filename]  [--dbfile=filename] [--grace=seconds] [netmask ...]\n";
+ 
+ # These parameters control how closely the watcher tries to follow the
+ # logfile, which affects how much resources it consumes, and how quickly
+@@ -188,24 +203,49 @@
+ 	}
+ 	return @r;
+ }
+-my @mynets = cleanup_nets(`postconf mynetworks`);
++my @mynets = ( @ARGV ? @ARGV : cleanup_nets(`postconf mynetworks`) );
++print "mynets = @mynets\n";
+ while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
+ 	for (reverse @tmp) {
+ 		splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
+ 	}
+ }
++print "mynets = @mynets\n";
+ 	
+ Net::Netmask->new($_)->storeNetblock() for @mynets;
+ 
++if ( $tcprules ) {
++  # convert 10.1.3.0/28 to 10.1.3.0-15 
++  #     and 10.1.0.0/16 to 10.1.
++  # because tcprules doesn't understand nnn.nnn.nnn.nnn/bb netmask formats
++  @mynets = map { if ( m,(.*)/(\d+), ) { 
++		     	$_ = $1; 
++			my $netbits = (32 - $2);
++			while ( int($netbits / 8) ) {	# for every 8 bits, chop a quad
++				s/(.*)\..*/$1/; 
++				$netbits -= 8; 
++			}
++			s/(\d+)$/$1.sprintf("-%d",($1 + (2 ** $netbits) - 1))/e if ($netbits > 0);
++			m/(\..*){3}/ or s/$/./;
++	          } 
++	 	  $_;
++		} @mynets;
++  print "mynets = @mynets\n";
++}
+ my (%t, @q);
++my $dbh;
+ 
+ use vars qw(%db);
+-my $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH or
++unless ( $tcprules ) {
++  $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH or
+ 	die "$0: cannot dbopen $dbfile: $!\n" if $write;
+ delete $db{$_} for keys %db;
++}
+ 
+ $| = 1 if $debug;
+ 
++my $db_changed = 1;
++
+ while (1) {
+ 	$_ = $fi->read;
+ 	my ($timestamp, $ipaddr) = m/$pat/o or next;
+@@ -217,16 +257,34 @@
+ 	print "\taccepted --- not in mynetworks\n" if $debug;
+ 	push @q, [$ipaddr, $ts];
+ 	$t{$ipaddr} = $ts;
+-	$db{$ipaddr} = "ok" if $write;
+-	$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+-	print "\twritten ok\n" if $write and $debug;
++	if ( $write and not $db{$ipaddr} ) {
++	  $db{$ipaddr} = "ok";
++	  if ( $tcprules ) {
++	    $db_changed = 1;
++	  } else {
++	    $dbh->sync and die "$0: sync $dbfile: $!\n";
++	    print "\twritten ok\n" if $debug;
++	  }
++	}
+ 	while ($q[0][1] < time) {
+ 		print "purging ts=".localtime($q[0][1])." ip=$q[0][0]\n" if $debug;
+ 		if ($q[0][1] == $t{$q[0][0]}) {
+ 			delete $t{$q[0][0]};
+ 			delete $db{$q[0][0]} if $write;
++			if ( $tcprules ) {
++			  $db_changed = 1; 
++			} else {
+ 			$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+ 		}
++		}
+ 		shift @q;
++	}
++	if ( $tcprules and $db_changed ) {
++            open (RULES, "| /usr/local/bin/tcprules $dbfile $dbfile.tmp") or die "forking tcprules: $!";
++            map { print RULES "$_:allow,RELAYCLIENT=''\n" } @mynets, keys %db;
++	    print RULES ":allow\n";
++            close (RULES) or die "closing tcprules pipe: $!";
++	    print "\twrote tcp rules to $dbfile\n" if $debug;
++	    $db_changed = 0;
+ 	}
+ }

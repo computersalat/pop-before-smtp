@@ -64,7 +64,8 @@ dbfile path, feel free to edit that into the file as well.
 
 If you're not using Postfix, you'll hopefully find your SMTP software
 mentioned near the end of the config file.  Comment out the two surrounding
-=cut lines for the section you want to enable.
+=cut lines for the section you want to enable.  For instance, sendmail
+users would enable the "Sendmail SMTP" section.
 
 3. Test the pop-before-smtp daemon.
 
@@ -121,17 +122,21 @@ smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 
 For Sendmail:
 
-You need to tweak your sendmail.cf file to include a couple new items.
-Remember that sendmail is very particular about tabs, so grab the info
-from this file:
+You need to tweak your setup (often your sendmail.cf file) to include a
+couple new items.  Remember that sendmail is very particular about tabs,
+so grab the info from this file:
 
     http://popbsmtp.sourceforge.net/sendmail.txt
 
 and copy the lines you need verbatim (don't use the clipboard).
 
-If someone has details of how to configure this via macro files (so that
-someone could incorporate the changes into the sendmail.mc file), please
-get in touch with me.
+If you're generating your sendmail.cf file from macros, Toby Wahlers
+recommends this approach:
+
+ - Make a backup of cf/m4/proto.m4, e.g. proto.m4.orig
+ - Update proto.m4 with the required sendmail.cf changes, in the correct
+   locations.
+ - Generate your new sendmail.cf file.
 
 For other SMTP software, please let me know what it requires so I can
 include it here.

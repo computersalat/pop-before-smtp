@@ -16,7 +16,7 @@ use vars qw(
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
     $tail_init_func $tail_getline_func
-    $PID_pat $IP_pat $OK_pat $END_pat
+    $PID_pat $IP_pat $OK_pat $FAIL_pat
 );
 
 #
@@ -509,18 +509,18 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 # an earlier line and the check the validation by comparing the PID values.
 # The regex $IP_pat is used to match the IP number and cache it.  The regex
 # $OK_pat is used to match a success message that follows from the same PID.
-# If $END_pat is not defined, there can be no intermediate log messages
-# with the same PID prior to the $OK_pat.  If $END_pat is defined, we'll
+# If $FAIL_pat is not defined, there can be no intermediate log messages
+# with the same PID prior to the $OK_pat.  If $FAIL_pat is defined, we'll
 # continue trying to match the $OK_pat value on matching PID lines until we
-# either match the $END_pat (in which case the IP is ignored) or the $OK_pat
-# (in which case the IP is accepted).  Thus, $END_pat can be either a
+# either match the $FAIL_pat (in which case the IP is ignored) or the $OK_pat
+# (in which case the IP is accepted).  Thus, $FAIL_pat can be either a
 # failure log line or a "this PID is finished" log line common to both
 # success and failure.  These patterns are only applied to lines that match
 # the $PID_pat regex.
 
     my %popIPs;
 
-    $END_pat = '.' if !defined $END_pat;
+    $FAIL_pat = '.' if !defined $FAIL_pat;
 
     # The maillog line to match is in $_.
     sub custom_match
@@ -538,7 +538,7 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 			    delete $popIPs{$pid};
 			    return ($ts, $ip);
 			}
-			if (/$END_pat/o) {
+			if (/$FAIL_pat/o) {
 			    delete $popIPs{$pid};
 			}
 			last;

@@ -105,4 +105,21 @@ unpack directory and go:
 
 	perl ./Makefile.PL && sudo make install
 
--Bennett
+----- Note on the pop-before-smtp file-locking code -----
+
+The default DB_File support in pop-before-smtp uses a simple type of
+flocking that, while it has been shown to have a flaw, it still works
+fine for us because the flaw does not affect us.  Here are the details:
+
+Our code first ties the hash, and then uses the opened file handle to lock
+the file.  The problem with this method is that the tie routine has already
+read some data into the read-ahead buffer before the exclusive lock is
+granted.  If there were multiple programs writing to the DB, this could
+lead to database corruption (if the data in the first block were to change
+in between the first read and the time we get our exclusive lock).  Since
+pop-before-smtp is the only application updating the DB, the delayed flock
+scenario can not cause corruption of the database, so we're safe.
+
+As for the reader(s) of the DB, I've checked that Postfix does the proper
+open, lock, _then_ read order of events, so it will not read any corrupt
+data either.

@@ -211,7 +211,7 @@ sub getline_FileTail
 
 # For Dovecot POP3/IMAP
 #$pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Login: \S+ \[(\d+\.\d+\.\d+\.\d+)\]';
+#    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server
 #$pat = '^(... .. .... ..:..:..).* IMAP ' .

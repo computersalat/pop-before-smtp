@@ -92,9 +92,9 @@ use vars qw(
 #$pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
 #    'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
-# For Courier-IMAP:
-#$pat = '^(... .. ..:..:..) \S+ imaplogin: ' .
-#    'LOGIN, user=\S+, ip=\[(\d+\.\d+\.\d+\.\d+)\]$';
+# For Courier-POP3 and Courier-IMAP:
+#$pat = '^(... .. ..:..:..) \S+ (?:courierpop3|imap)login: ' .
+#    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]$';
 
 # For qmail's pop3d:
 #$pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .

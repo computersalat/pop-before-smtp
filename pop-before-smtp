@@ -212,8 +212,8 @@ use Net::Netmask;
 use Date::Parse;
 use Date::Format;
 use Getopt::Long;
-use Fcntl ':flock';
-use POSIX 'setsid';
+use Fcntl qw(:DEFAULT :flock :seek);
+use POSIX qw(setsid);
 
 use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
@@ -550,11 +550,11 @@ sub tail_init
     &tail_open;
     $::tail_buf = '';
     if ($file_tail{'tail'} >= 0) {
-	if (defined sysseek(TAIL, -$file_tail{'tail'}*128, 2)) {
+	if (defined sysseek(TAIL, -$file_tail{'tail'}*128, SEEK_END)) {
 	    &tail_getline; # dump partial line
 	}
 	else {
-	    sysseek(TAIL, 0, 0);
+	    sysseek(TAIL, 0, SEEK_SET);
 	}
     }
 }
@@ -574,7 +574,7 @@ sub tail_getline
 	my $i = $file_tail{'interval'};
 	while (1) {
 	    last if sysread(TAIL, $::tail_buf, 2048, length($::tail_buf));
-	    sysseek(TAIL, 0, 1);
+	    sysseek(TAIL, 0, SEEK_CUR);
 	    if ($slept >= $file_tail{'resetafter'}) {
 		$slept = 0;
 		my $new_inode;

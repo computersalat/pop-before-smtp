@@ -4,6 +4,7 @@
 	- Updated the pod doc to have all the latest options, to list what
 	  all the options do, to order the info a little better, and to not
 	  make it sound like Postfix is the only SMTP software we work with.
+	- Fixed the usage message, and tweaked the Getopt config a bit.
 
 	* TODO:
 	- Added a new doc-related item.

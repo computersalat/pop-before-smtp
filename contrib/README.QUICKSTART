@@ -124,7 +124,7 @@ main.cf, add this one as it works pretty well:
 
 smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 	check_client_access hash:/etc/postfix/pop-before-smtp,
-	check_relay_domains
+	reject_unauth_destination
 
 For Sendmail:
 

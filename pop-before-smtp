@@ -158,7 +158,7 @@ like this:
 
   smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
         check_client_access hash:/etc/postfix/pop-before-smtp,
-        check_relay_domains
+        reject_unauth_destination
 
 For those using a recent sendmail (at least version 8.9), you can add this
 to your cf file:

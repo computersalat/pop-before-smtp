@@ -28,15 +28,6 @@ an on-disk hash (DB) that is watched by your SMTP software (e.g. Postfix). It
 then expires these entries when 30 minutes have elapsed after the last POP/IMAP
 access from that IP.
 
-You edit the supplied pop-before-smtp-conf.pl file to customize things for your
-local system, such as scanning for the right POP/IMAP authorization, setting
-various options, etc.
-
-When starting up, pop-before-smtp builds an internal table of all netblocks
-natively permitted by your SMTP software (for Postfix it looks at the output of
-"postconf mynetworks"). This allows us to filter out local IP addresses that
-are already authorized and thus need no special help from us.
-
 =head1 OPTIONS
 
 =item --config=FILE
@@ -120,6 +111,15 @@ tie/sync/flock subroutines (see the BerkeleyDB example in the config file).
 Also remember that if you're using Postfix, the example main.cf section we
 include below will need you to change the "hash:" prefix to the appropriate
 prefix for your DB type.
+
+You edit the supplied pop-before-smtp-conf.pl file to customize things for your
+local system, such as scanning for the right POP/IMAP authorization, setting
+various options, etc.
+
+When starting up, pop-before-smtp builds an internal table of all netblocks
+natively permitted by your SMTP software (for Postfix it looks at the output of
+"postconf mynetworks"). This allows us to filter out local IP addresses that
+are already authorized and thus need no special help from us.
 
 This daemon likes a couple of helpers. Here's a nice init script:
 

@@ -13,11 +13,11 @@
 	* pop-before-smtp-conf.pl:
 	- Added a Qpopper pattern that works when Qpopper is doing its
 	  own logging (i.e. without syslog).
-	- Added support for an $END_pat that works when $PID_pat,
+	- Added support for an $FAIL_pat that works when $PID_pat,
 	  $IP_pat, and $OK_pat are defined (but is optional).  This
 	  lets a user match a more verbose sequence of log lines where
 	  the OK_pat line is not the first PID-matching message after
-	  the IP_pat line.
+	  the IP_pat line (see the config file for more details).
 
 2004-11-08  Wayne Davison  <wayned@users.sourceforge.net>
 

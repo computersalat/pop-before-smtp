@@ -88,7 +88,7 @@ Run these commands:
 
 % cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
 % cp pop-before-smtp /usr/sbin/
-% cp pop-before-smtp-config.pl /etc
+% cp pop-before-smtp-conf.pl /etc
 
 5. Start the pop-before-smtp daemon:
 

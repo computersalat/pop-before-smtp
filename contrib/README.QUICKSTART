@@ -3,10 +3,12 @@ get-started-quick procedure for pop-before-smtp. Bennett Todd
 trivially modified it to reflect the renaming of the init script,
 from popbsmtp.init to pop-before-smtp.init.
 
-Please send criticisms and corrections to Bennett Todd, who is
-maintaining the copy in the pop-before-smtp distrib, and please send
-thanks and kudos to Darron Froese, whose creative work this document
-is.
+Please send criticisms and corrections to the popbsmtp mailing list:
+
+<URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
+
+Please send thanks and kudos to Darron Froese, whose creative work this
+document is.
 
 ------------------------------------------------------------------------------
 
@@ -19,18 +21,15 @@ Do these things as root:
 [root@machine]# perl -MCPAN -e 'install Date::Parse'
 [root@machine]# perl -MCPAN -e 'install Net::Netmask'
 
-That will install the necessary Perl modules from CPAN automatically -
-as
-long as you have Internet connectivity and a Perl that knows about
-CPAN.
+That will install the necessary Perl modules from CPAN automatically -- as
+long as you have Internet connectivity and a Perl that knows about CPAN.
 
 Then:
 
 # cp pop-before-smtp.init /etc/rc.d/init.d/
 # cp pop-before-smtp /usr/sbin/
 
-Then open up the pop-before-smtp script in your favorite text editor
-and
+Then open up the pop-before-smtp script in your favorite text editor and
 change a few things:
 
 1. Look for this:
@@ -38,15 +37,12 @@ change a few things:
 # File to watch for pop3d/imapd records
 my $logfile = '/var/log/mail.log';
 
-Make sure that the file in /var/log/ is the correct file that your
-email
+Make sure that the file in /var/log/ is the correct file that your email
 server logs to when someone has authenticated - mine is usually
 /var/log/maillog.
 
-2. Take a look at the $pat definitions and uncomment the one for the
-mail
-server that you're running - if you're running Linux it's probably
-going to
+2. Take a look at the $pat definitions and uncomment the one for the mail
+server that you're running - if you're running Linux it's probably going to
 be the $pat denoted by: # For UW ipop3d/imapd
 
 Make sure that the two lines below it are uncommented.
@@ -56,30 +52,24 @@ Make sure that the two lines below it are uncommented.
 # /etc/rc.d/init.d/pop-before-smtp.init start
 
 Take a look in /etc/postfix to make sure that there's a file called
-"pop-before-smtp.db" - it should have a fairly recent modification
-date (as
-it should have just been created).
+"pop-before-smtp.db" - it should have a fairly recent modification date
+(as it should have just been created).
 
-4. Look in your /etc/postfix/main.cf for
-"smtpd_recipient_restrictions" -
+4. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
 add this somewhere into that line:
 
 check_client_access hash:/etc/postfix/pop-before-smtp
 
-If you don't already have an "smtpd_recipient_restrictions" in your
-main.cf
-- add this one as it works pretty good:
+If you don't already have an "smtpd_recipient_restrictions" in your main.cf
+-- add this one as it works pretty good:
 
-smtpd_recipient_restrictions =
-permit_mynetworks,reject_non_fqdn_recipient,
+smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
     check_client_access hash:/etc/postfix/pop-before-smtp,
     check_relay_domains
 
-5. Reload postfix and make sure that it's working by checking your
-email -
+5. Reload postfix and make sure that it's working by checking your email --
 then checking to see the modification date on the
-/etc/postfix/pop-before-smtp.db has changed - and relay to your
-heart's
+/etc/postfix/pop-before-smtp.db has changed -- and relay to your heart's
 content.
 
 Let me repeat - this *is* the easy way. ;-)

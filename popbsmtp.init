@@ -22,6 +22,7 @@ case "$1" in
 	kill -0 $p && die "$pid won't die"
 	echo_success; echo ''
 	;;
+ reload) kill -HUP `cat $pid`;;
 restart) $0 stop; $0 start;;
-      *) die "syntax: `basename $0` start|stop|reset";;
+      *) die "syntax: `basename $0` start|stop|restart|reload";;
 esac

@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.9 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.9a Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.9a 2000-03-21 test version with support for reloading mynetworks on HUP
 # 1.9 2000-03-21 added support for files in mynetworks, tested by Andy Dills
 # 1.8 2000-03-21 tweaked UW regexp based on further feedback from Andy Dills
 # 1.7 2000-03-20 added regexp for courier-imap
@@ -182,14 +183,20 @@ sub cleanup_nets {
 	}
 	return @r;
 }
-my @mynets = cleanup_nets(`postconf mynetworks`);
-while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
-	for (reverse @tmp) {
-		splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
+
+my $nets;
+
+$SIG{HUP} = sub {
+	$nets = {};
+	my @mynets = cleanup_nets(`postconf mynetworks`);
+	while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
+		for (reverse @tmp) {
+			splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
+		}
 	}
+	Net::Netmask->new($_)->storeNetblock($nets) for @mynets;
 }
-	
-Net::Netmask->new($_)->storeNetblock() for @mynets;
+&{$SIG{HUP}};
 
 my (%t, @q);
 
@@ -207,7 +214,7 @@ while (1) {
 	$ts += $grace;
 	next if $ts < time;
 	print "read ts=$timestamp ip=$ipaddr\n" if $debug;
-	next if findNetblock($ipaddr);
+	next if findNetblock($ipaddr, $nets);
 	print "\taccepted --- not in mynetworks\n" if $debug;
 	push @q, [$ipaddr, $ts];
 	$t{$ipaddr} = $ts;

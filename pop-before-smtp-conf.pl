@@ -15,6 +15,7 @@ use vars qw(
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
     $tail_init_func $tail_getline_func
+    $PID_pat $IP_pat $OK_pat $END_pat
 );
 
 #
@@ -114,7 +115,7 @@ sub getline_FileTail
 # *after* the initial comment line(s).
 #
 # Note also that the servers that require multiple log lines be read to
-# get all the needed info have a setup with 3 "my" variables instead of
+# get all the needed info have a setup with 3 *_pat variables instead of
 # a single "$pat" variable.  Uncomment all 3 and we'll define a multi-
 # line-matching custom_match() subroutine for you.
 #
@@ -170,15 +171,15 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ vm-pop3d\[\d+\]: ' .
 #    'User .+ logged in from (\d+\.\d+\.\d+\.\d+)';
 
-# Older vm-pop3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
-#my $PID_pat = '^(... .. ..:..:..) \S+ vm-pop3d\[(\d+)\]: ';
-#my $IP_pat = $PID_pat . 'Connect from (\d+\.\d+\.\d+\.\d+)$';
-#my $OK_pat = $PID_pat . 'User .+ logged in';
+# Older vm-pop3d -- needs to match 2 log entries (uncomment all 3 *_pat lines).
+#$PID_pat = '^(... .. ..:..:..) \S+ vm-pop3d\[(\d+)\]: ';
+#$IP_pat = $PID_pat . 'Connect from (\d+\.\d+\.\d+\.\d+)$';
+#$OK_pat = $PID_pat . 'User .+ logged in';
 
-# For popa3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
-#my $PID_pat = '^(... .. ..:..:..) \S+ popa3d\[(\d+)\]: ';
-#my $IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)$';
-#my $OK_pat = $PID_pat . 'Authentication passed for ';
+# For popa3d -- needs to match 2 log entries (uncomment all 3 *_pat lines).
+#$PID_pat = '^(... .. ..:..:..) \S+ popa3d\[(\d+)\]: ';
+#$IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)$';
+#$OK_pat = $PID_pat . 'Authentication passed for ';
 
 # For *patched* popa3d (see the patch in the contrib/popa3d dir).
 #$pat = '^(... .. ..:..:..) \S+ popa3d\[\d+\]: ' .
@@ -194,10 +195,10 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
 
-# For spop3d w/o --enabled-logextend (uncomment all 3 "my" lines).
-#my $PID_pat = '^(... .. ..:..:..) \S+ spop3d\[(\d+)\]: ';
-#my $IP_pat = $PID_pat . 'connect from (\d+\.\d+\.\d+\.\d+)';
-#my $OK_pat = $PID_pat . 'user \S+ authenticated';
+# For spop3d w/o --enabled-logextend (uncomment all 3 *_pat lines).
+#$PID_pat = '^(... .. ..:..:..) \S+ spop3d\[(\d+)\]: ';
+#$IP_pat = $PID_pat . 'connect from (\d+\.\d+\.\d+\.\d+)';
+#$OK_pat = $PID_pat . 'user \S+ authenticated';
 
 # Pattern for teapop (http://www.toontown.org/teapop/) by Patrick Prasse.
 #$pat = '^(... .. ..:..:..) \S+ teapop\[\d+\]: ' .

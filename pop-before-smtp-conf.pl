@@ -73,7 +73,9 @@ if (!-f $file_tail{'name'}) {
 # =cut lines to use this syslog section, or put a reference to your own
 # custom logging function into $log_func.
 
-use Sys::Syslog;
+use Sys::Syslog qw(:DEFAULT setlogsock);
+# Try uncommenting this if you get no syslog output:
+#setlogsock('unix');  # Valid arg values: inet, unix, stream, console.
 openlog('pop-before-smtp', 'pid', 'mail');
 $log_func = \&syslog;
 =cut #============================= syslog =============================END=

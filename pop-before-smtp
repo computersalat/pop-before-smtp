@@ -114,8 +114,6 @@ included in the base Perl release as of this writing, and one of
 those depends on another, so make sure you've downloaded and
 installed suitably recent versions of:
 
-    File::Tail
-    Time::HiRes (required by File::Tail)
     Net::Netmask
     Date::Parse & Date::Format (both in TimeDate)
 
@@ -173,13 +171,6 @@ to your cf file:
 
 and then enable the sendmail SMTP section in the config file.
 
-=head1 TROUBLESHOOTING
-
-Andy Dills <andy@xecu.net> reports that on his Solaris system,
-File::Tail was hanging in the middle of reading a 15MB logfile. When
-he removed "tail => -1" from the options (so the tail would start at
-the end of the file, rather than at the beginning) that fixed it.
-
 =head1 DOWNLOAD, SUPPORT, etc.
 
 See the website http://popbsmtp.sf.net/ for the latest version.
@@ -190,7 +181,7 @@ See the mailing list (referenced on the website) for support.
 pop-before-smtp keeps two data structures for all currently-allowed hosts: a
 queue, and a hash. The queue contains [ipaddr, time] records, while the hash
 contains ipaddr => time. Every time the daemon wakes up to deal with something
-else from the File::Tail handle, it peeks a the front of the queue, and when
+else from the logfile handle, it peeks a the front of the queue, and when
 the timestamp of the record there has expired (is > 30 minutes old) it tosses
 it, and if the timestamp in the hash equals the timestamp in the queue, it
 deletes the hash entry and the on-disk db file entry.

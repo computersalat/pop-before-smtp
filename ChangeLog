@@ -1,3 +1,21 @@
+2002-04-24  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* README:
+	- Got rid of the "(untested)" caveat for the getfromcpan script and
+	  mention that it works well if run as a non-root user.
+	- Tweaked the file-locking comments some more.
+
+	* pop-before-smtp.spec:
+	- Use -q with %setup.
+	- Weeded out a few things from the %doc dir.
+
+	* contrib/getfromcpan:
+	- Commented-out the code that deletes the RPMs.
+	- Mentioned our changes and updated the version to 1.2.
+
+	* contrib/README.QUICKSTART:
+	- Removed a comment that getfromcpan removes the RPMs it builds.
+
 2002-04-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

@@ -1,3 +1,9 @@
+2004-08-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/README.QUICKSTART:
+	- Improved the test section, including a way to make sure that
+	  your site hasn't become an open relay.
+
 2004-08-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

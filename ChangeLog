@@ -1,3 +1,11 @@
+2003-09-21  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Neatened up, consolidated, and enhanced the Qpopper patterns.  Also
+	  eliminated the various "from" comments near each pattern (since they
+	  were unfair in their incompleteness and also potentially distracting
+	  to newbies).
+
 2003-09-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

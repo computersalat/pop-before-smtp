@@ -13,6 +13,11 @@
 	  the file gets compressed.
 	- Put the ChangeLog in the doc dir.
 
+	* pop-before-smtp.init, contrib/init-redhat-{alex,bet}:
+	- Tweaked a few things to increase the similarity between the
+	  various init scripts while still preserving the significant
+	  differences.
+
 2002-04-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

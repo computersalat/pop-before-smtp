@@ -259,7 +259,11 @@ Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
 EOT
 
 $file_tail{'tail'} = -1 if $reprocess;
-set_output_log($logto) if defined $logto;
+
+if (defined $logto) {
+    set_output_log($logto);
+    $SIG{'HUP'} = sub { set_output_log($logto); }
+}
 
 $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;

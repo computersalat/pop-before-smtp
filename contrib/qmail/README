@@ -1,4 +1,0 @@
-README - this file
-pop-before-smtp-1.10-Orig - as-shipped 1.10 pop-before-smtp
-pop-before-smtp-1.10-patched-for-qmail - result of applying pop-before-smtp.qmail-patch-vs-1.10 to above as-shipped original
-pop-before-smtp.qmail-patch-vs-1.10 - patch for pop-before-smtp to manage qmail's tcprules file

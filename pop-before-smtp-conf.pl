@@ -179,6 +179,10 @@ $log_func = \&syslog;
 #$pat = '^(... .. ..:..:..) \S+ teapop\[\d+\]: ' .
 #    'Successful login for \S+ .+ \[(\d+\.\d+\.\d+\.\d+)\]$';
 
+# For Dovecot POP3/IMAP
+#$pat = '^(... .. ..:..:..) www (?:imap|pop3)-login: ' .
+#    'Login: \S+ \[(\d+\.\d+\.\d+\.\d+)\]';
+
 # For Apple IMAP MAIL Server
 #$pat = '^(... .. .... ..:..:..).* IMAP ' .
 #    'User "[^"]+" log on successful from (\d+\.\d+\.\d+\.\d+)';

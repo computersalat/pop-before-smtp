@@ -103,7 +103,7 @@ if (!-f $file_tail{'name'}) {
 #    'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
-#$pat = '^(... .. ..:..:..) \S+ (?:courierpop3|imap)login: ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:login|d): ' .
 #    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]$';
 
 # For qmail's pop3d:

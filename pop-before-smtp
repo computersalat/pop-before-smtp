@@ -1,10 +1,9 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# Check the website <URL:http://bent.latency.net/pop-before-smtp/> for
-# the latest version, and the mailing list for discussing this program
-# and asking for help at
-# <URL:https://lists.oven.com/mailman/listinfo/pop-before-smtp>
+# Check the website <URL:http://popbsmtp.sf.net/> for the latest version,
+# and the mailing list for discussing this program and asking for help at
+# <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
 # pop-before-smtp 1.29 Bennett Todd <bet@rahul.net> Freely Redistributable
 # 1.29 2001-01-19 Re-added chkconfig-supporting comments to init script
@@ -271,8 +270,8 @@ the end of the file, rather than at the beginning) that fixed it.
 
 =head1 DOWNLOAD
 
-See the website http://people.oven.com/bet/pop-before-smtp/ for the
-latest version, and the mailing list for support.
+See the website http://popbsmtp.sf.net/ for the latest version, and
+the mailing list for support.
 
 =head1 AUTHOR
 

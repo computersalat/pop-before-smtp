@@ -42,16 +42,6 @@ install pop-before-smtp.init $RPM_BUILD_ROOT/etc/rc.d/init.d/pop-before-smtp
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-[ $1 = 1 ] || exit 0
-
-/sbin/chkconfig --add pop-before-smtp
-
-%preun
-[ $1 = 0 ] || exit 0
-
-/sbin/chkconfig --del pop-before-smtp
-
 %files
 %defattr(-,root,root)
 
@@ -61,6 +51,16 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
 %attr(0644,root,root) %config(noreplace) /etc/pop-before-smtp-conf.pl
 %attr(0755,root,root) /etc/rc.d/init.d/pop-before-smtp
+
+%post
+[ $1 = 1 ] || exit 0
+
+/sbin/chkconfig --add pop-before-smtp
+
+%preun
+[ $1 = 0 ] || exit 0
+
+/sbin/chkconfig --del pop-before-smtp
 
 %changelog
 * Sun Dec 15 2002 Wayne Davison <wayned@users.sourceforge.net>

@@ -1,79 +1,114 @@
-Darron Froese provided this excellent and clear tutorial
-get-started-quick procedure for pop-before-smtp. Bennett Todd
-trivially modified it to reflect the renaming of the init script,
-from popbsmtp.init to pop-before-smtp.init.
+Darron Froese <darron@froese.org> provided this excellent and clear
+tutorial get-started-quick procedure for pop-before-smtp.  Bennett Todd and
+Wayne Davison have made some changes to keep it up-to-date with the newer
+releases.
 
 Please send criticisms and corrections to the popbsmtp mailing list:
 
 <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
 Please send thanks and kudos to Darron Froese, whose creative work this
-document is.
+document is.  (His home page:  http://darron.froese.org/ .)
 
 ------------------------------------------------------------------------------
 
 This *is* the easy way - it actually doesn't get any easier than this.
 
-Do these things as root:
+Do these things:
 
-[root@machine]# perl -MCPAN -e 'install Time::HiRes'
-[root@machine]# perl -MCPAN -e 'install File::Tail'
-[root@machine]# perl -MCPAN -e 'install Date::Parse'
-[root@machine]# perl -MCPAN -e 'install Net::Netmask'
+1. Install the necessary perl modules that pop-before-smtp requires.
+
+If you want to install the perl modules as RPMs, take a look at the script
+in contrib named getfromcpan.  It fetches the perl modules, turns them into
+RPMs, and then (if you run it as root) installs them (removing the built
+RPMs as the last step).  (I prefer to build the RPMs as a non-root user and
+then install the RPMs as root.)  The script works either way (it looks for
+your ~/.rpmmacros file to determine what "topdir" to use).
+
+For the non-RPM way, run these commands as root:
+
+% perl -MCPAN -e 'install Time::HiRes'
+% perl -MCPAN -e 'install File::Tail'
+% perl -MCPAN -e 'install Date::Parse'
+% perl -MCPAN -e 'install Net::Netmask'
 
 That will install the necessary Perl modules from CPAN automatically -- as
 long as you have Internet connectivity and a Perl that knows about CPAN.
 
-Then:
+2. Edit the pop-before-smtp-conf.pl file to customize it for your system.
 
-# cp pop-before-smtp.init /etc/rc.d/init.d/
-# cp pop-before-smtp /usr/sbin/
+Look for this:
 
-Then open up the pop-before-smtp script in your favorite text editor and
-change a few things:
+# Set the log file we will watch for pop3d/imapd records.
+#$file_tail{'name'} = '/var/log/maillog';
 
-1. Look for this:
+If the mentioned file is not the correct one that your email server uses to
+log when someone has authenticated, you can uncomment the second line and
+tweak its value (note that the code immediately following these lines might
+find your logfile automatically -- it searches for several other values).
 
-# File to watch for pop3d/imapd records
-my $logfile = '/var/log/mail.log';
+Take a look at the $pat definitions in the pop-before-smtp-conf.pl file
+and uncomment the one for the mail server that you're running - if you're
+running Linux it's probably going to be the $pat denoted by: "# For UW
+ipop3d/imapd" (this is also the defaut if no $pat is umcommented in the
+config file).  Make sure you uncomment all the lines from the "$pat = "
+start down to the nearest ';' for your pattern of choice (this is usually
+2-3 lines).
 
-Make sure that the file in /var/log/ is the correct file that your email
-server logs to when someone has authenticated - mine is usually
-/var/log/maillog.
+If you're using a postfix that needs a custom DB style or a different
+dbfile path, feel free to edit that into the file as well.
 
-2. Take a look at the $pat definitions and uncomment the one for the mail
-server that you're running - if you're running Linux it's probably going to
-be the $pat denoted by: # For UW ipop3d/imapd
+If you're not using postfix, you'll hopefully find the your SMTP software
+mentioned near the end of the config file.  Comment out the preceding =pod
+line for the section you want to enable.  The instructions in the rest of
+this file assume you're using postfix, so you'll have to translate the
+postfix-specific steps into something appropriate for your SMTP software.
 
-Make sure that the two lines below it are uncommented.
+3. Test the pop-before-smtp daemon.
 
-3. Then start the pop-before-smtp daemon:
+Run this to ensure that your $pat choice is right:
 
-# /etc/rc.d/init.d/pop-before-smtp.init start
+% ./pop-before-smtp --config=./pop-before-smtp-conf.pl --debug --nowrite
+ --reprocess
+
+(That should be all one line.) You should see messages about what IPs the
+script finds and which ones it considers local and non-local.  (Press
+Ctrl-C to abort the script when you've seen enough.)  If you didn't see any
+IP mentions, either you don't have any POP/IMAP connections in the file, or
+you don't have the right $pat variable uncommented.  Check the maillog file
+manually to see what's up and then retest until things look good.
+
+5. Install the script and its support files.
+
+Run these commands:
+
+% cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
+% cp pop-before-smtp /usr/sbin/
+% cp pop-before-smtp-config.pl /etc
+
+6. Start the pop-before-smtp daemon:
+
+% /etc/rc.d/init.d/pop-before-smtp start
 
 Take a look in /etc/postfix to make sure that there's a file called
 "pop-before-smtp.db" - it should have a fairly recent modification date
 (as it should have just been created).
 
-4. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
+7. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
 add this somewhere into that line:
 
 check_client_access hash:/etc/postfix/pop-before-smtp
 
-If you don't already have an "smtpd_recipient_restrictions" in your main.cf
--- add this one as it works pretty good:
+If you don't already have an "smtpd_recipient_restrictions" in your
+main.cf, add this one as it works pretty good:
 
 smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
-    check_client_access hash:/etc/postfix/pop-before-smtp,
-    check_relay_domains
+	check_client_access hash:/etc/postfix/pop-before-smtp,
+	check_relay_domains
 
-5. Reload postfix and make sure that it's working by checking your email --
-then checking to see the modification date on the
-/etc/postfix/pop-before-smtp.db has changed -- and relay to your heart's
-content.
+8. Reload postfix and make sure that it's working by checking your email,
+then checking to see the modification date on the file
+/etc/postfix/pop-before-smtp.db has changed.  If so, you can relay to your
+heart's content.
 
 Let me repeat - this *is* the easy way. ;-)
--- 
-Darron
-darron@froese.org
-<http://darron.froese.org/>

@@ -7,12 +7,12 @@ cvs co -P $* popbsmtp
 cd popbsmtp
 
 # Support making the tar file with a temporary patch.
-if test -f patch ; then
+if test -f ../patch ; then
     patch -p0 <../patch
 fi
 
 ver=`sed -ne 's/^# pop-before-smtp \([^ ]*\).*/\1/p' pop-before-smtp`
-rm -rf CVS */CVS */*/CVS .cvsignore */.cvsignore */*/.cvsignore pkg
+rm -rf pkg CVS */CVS */*/CVS .cvsignore */.cvsignore */*/.cvsignore
 
 cd ..
 

@@ -134,8 +134,12 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
 #    'User .+ logged in with mailbox .+ from (\d+\.\d+\.\d+\.\d+)$';
 
-# A fairly modern Qpopper pattern.
+# A fairly modern Qpopper pattern, when using syslog.
 #$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper[^[]*\[\d+\]: \([^)]*\) ' .
+#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
+
+# The same Qpopper pattern as above, but matches Qpopper's own logging.
+#$pat = '^(... .. ..:..:..) \[popper\] \([^)]*\) ' .
 #    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # For Qpopper POP/APOP Server (matches in.qpopper, qpopper, and popper).
@@ -492,6 +496,15 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 # Some pop services don't put the IP on the line that lets us know that a
 # user was properly authenticated.  For these programs, we scan the IP off
 # an earlier line and the check the validation by comparing the PID values.
+# The regex $IP_pat is used to match the IP number and cache it.  The regex
+# $OK_pat is used to match a success message that follows from the same PID.
+# If $END_pat is not defined, there can be no intermediate log messages
+# with the same PID prior to the $OK_pat.  If $END_pat is defined, we'll
+# continue trying to match the $OK_pat value on matching PID lines until we
+# either match the $END_pat (in which case the IP is ignored) or the $OK_pat
+# (in which case the IP is accepted).  Thus, $END_pat can be either a
+# failure log line or a "this PID is finished" log line common to both success
+# and failure.
 
     my %popIPs;
 
@@ -507,9 +520,12 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 		foreach my $key (keys %popIPs) {
 		    if ($pid == $key) {
 			my $ip = $popIPs{$pid};
-			delete $popIPs{$pid};
 			if (/$OK_pat/o) {
+			    delete $popIPs{$pid};
 			    return ($ts, $ip);
+			}
+			if (!defined($END_pat) || /$END_pat/o) {
+			    delete $popIPs{$pid};
 			}
 			last;
 		    }

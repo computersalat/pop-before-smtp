@@ -242,7 +242,7 @@ my $dbh;
 # our sync function.
 sub tie_BerkeleyDB
 {
-    $dbh = tie %db,'BerkeleyDB::Hash', -Filename=>"$dbfile.db" -Flags=>DB_CREATE
+    $dbh = tie %db,'BerkeleyDB::Hash',-Filename=>"$dbfile.db",-Flags=>DB_CREATE
 	or die "$0: cannot dbopen $dbfile: $!\n";
 }
 

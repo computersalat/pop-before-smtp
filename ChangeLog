@@ -1,5 +1,10 @@
 2005-01-05  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp-conf.pl:
+	- Turn on "use strict".
+	- A few minor changes to make all the config sections work
+	  with "use strict".
+
 	* contrib/popa3d/popa3d-0.6.4.patch:
 	- Updated a syslog define's name (SYSLOG_PRI_ERROR).
 

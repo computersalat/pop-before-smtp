@@ -6,7 +6,8 @@ use strict;
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
 # pop-before-smtp 1.30pre1
-# Copyright (c) 1999, 2000, 2001 Bennett Todd.  Freely Redistributable.
+# Copyright (C) 1999, 2000, 2001 Bennett Todd, and (C) 2002 Wayne Davison.
+# Freely Redistributable.
 
 =head1 NAME
 
@@ -132,6 +133,7 @@ use File::Tail;
 use DB_File;
 use Net::Netmask;
 use Date::Parse;
+use Date::Format;
 use Getopt::Long;
 use Fcntl ':flock';
 
@@ -353,8 +355,7 @@ sub flock_DB
 sub log_to_stdout
 {
     my $level = shift;
-    my($ts) = localtime($now) =~ /^\w\w\w (.*)\d\d\d\d$/;
-    print $ts, @_, "\n";
+    print time2str('%b %e %T ', $now), @_, "\n";
 }
 
 sub set_output_log

@@ -1,6 +1,13 @@
 # This config file is a perl library that can override various aspects of the
 # pop-before-smtp script's setup.  Install it as /etc/pop-before-smtp-conf.pl
 
+# There's a lot of stuff in here, so don't get overwhelmed.  Most people can
+# use the default setup (if you're using postfix and UW pop/imap).  Other folks
+# just need to choose the right $pat variable and perhaps uncomment a section
+# (near the end of the file) with the support for your particular SMTP program
+# (if you're not using postfix).  See the contrib/README.QUICKSTART file for
+# how to install and test your setup.
+
 use vars qw(
     $pat $write $flock $debug $reprocess $grace %file_tail
     @mynets %db $dbfile $dbvalue
@@ -180,7 +187,7 @@ sub custom_match
 
 use BerkeleyDB;
 
-#$mynet_func = \&mynet_postfix;
+#$mynet_func = \&mynet_postfix; # Use the default
 $tie_func = \&tie_BerkeleyDB;
 $sync_func = \&sync_BerkeleyDB;
 $flock = 0;
@@ -266,7 +273,7 @@ $dbvalue = 'allow,RELAYCLIENT';
 $mynet_func = \&mynet_courier;
 $tie_func = \&tie_courier;
 $sync_func = \&sync_courier;
-#$flock_func = \&flock_courier; # Same as flock_DB()
+#$flock_func = \&flock_DB; # Use the default
 
 sub mynet_courier
 {

@@ -31,7 +31,7 @@ Internally, it keeps two data structures for all currently-allowed hosts; a
 queue, and a hash. The queue contains [ipaddr, time] records, while the hash
 contains ipaddr => time. Every time the daemon wakes up to deal with something
 else from the File::Tail handle, it peeks a the front of the queue, and while
-the timestamp of the record there has expired (is > 1800 seconds old) it
+the timestamp of the record there has expired (is > 30 minutes old) it
 tosses it, and if the timestamp in the hash is also expired and equals the
 timestamp in the queue it deletes the hash entry and the on-disk db file
 entry.
@@ -136,15 +136,8 @@ use Getopt::Long;
 use Fcntl ':flock';
 
 use vars qw(
-    $pat
-    $write
-    $flock
-    $debug
-    $reprocess
-    $dbfile
-    $grace
-    %file_tail
-    $log_func
+    $pat $write $flock $debug $reprocess $grace %file_tail
+    %db $dbfile $tie_func $sync_func $flock_func $log_func
 );
 
 # Default values, possibly overridden in the config file.
@@ -157,7 +150,7 @@ $flock = 1; # we do the exclusive file locking when updating
 $debug = 0; # no debug messages
 $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
-$grace = 1800; # 30-minute grace period
+$grace = 30*60; # 30-minute grace period
 
 # See the pop-before-smtp-conf.pl file for what these values mean.
 %file_tail = (
@@ -202,8 +195,11 @@ GetOptions(
     "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE]\n    " .
     "[--grace=SECONDS]\n";
 
-$flock = 0 unless $write; # flocking makes no sense if you're not writing
-
+$tie_func = \&tie_DB unless $tie_func;
+$sync_func = sub { } if !$write;
+$sync_func = \&sync_DB unless $sync_func;
+$flock_func = sub { } if !$flock || !$write;
+$flock_func = \&flock_DB unless $flock_func;
 $log_func = sub { } unless $log_func;
 
 my $fi = File::Tail->new(%file_tail);
@@ -222,16 +218,15 @@ foreach (cleanup_nets(`postconf mynetworks`)) {
 }
 
 my (%t, @q);
-my (%db, $dbh);
 
 if ($write) {
-    $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH
-	or die "$0: cannot dbopen $dbfile: $!\n";
-    my $fd = $dbh->fd;
-    open(DB_FH, "+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n";
-    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
-    delete $db{$_} for keys %db;
-    flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
+    $tie_func->();
+    $flock_func->(1);
+    foreach (keys %db) {
+	delete $db{$_};
+	$log_func->('debug', "removed old ip=$_ from DB") if $debug;
+    }
+    $flock_func->(0);
 }
 
 my $db_changed = 0;
@@ -268,7 +263,7 @@ while (1) {
     my $already_enabled = exists($t{$ipaddr});
     $t{$ipaddr} = $ts;
     next if $already_enabled;
-    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
+    $flock_func->(1);
     $db{$ipaddr} = "ok" if $write;
     $log_func->('info', "added $ipaddr to DB");
     $db_changed = 1;
@@ -279,7 +274,7 @@ continue {
 	    my($ipaddr,$ts) = @{shift @q};
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {
-		    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
+		    $flock_func->(1);
 		    $db_changed = 1;
 		}
 		delete $t{$ipaddr};
@@ -288,8 +283,8 @@ continue {
 	    }
 	}
 	if ($db_changed) {
-	    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
-	    flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
+	    $sync_func->();
+	    $flock_func->(0);
 	    $db_changed = 0;
 	}
 	$last_expire_check = $now;
@@ -324,6 +319,35 @@ sub cleanup_nets
 	}
     }
     @nets;
+}
+
+my $dbh;
+
+# We set the global %db to the opened database hash.  We also set $dbh for
+# our sync_DB function, and DB_FH for our flock_DB function.
+sub tie_DB
+{
+    $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH
+	or die "$0: cannot dbopen $dbfile: $!\n";
+    if ($flock) {
+	my $fd = $dbh->fd;
+	open(DB_FH,"+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n";
+    }
+}
+
+sub sync_DB
+{
+    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+}
+
+sub flock_DB
+{
+    if ($_[0]) {
+	flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n";
+    }
+    else {
+	flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n";
+    }
 }
 
 sub log_to_stdout

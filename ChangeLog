@@ -1,3 +1,9 @@
+2002-07-12  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Detaint the value from the sendmail.pid file.
+	- Made the sendmail-signaling optional.
+
 2002-06-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

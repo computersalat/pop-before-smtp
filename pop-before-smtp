@@ -1,7 +1,10 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.20 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.21 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.21 2000-09-20 Olivier Castan <ocastan@cybercable.fr> reported a bug
+#                 in the debugging code, it reported purges it wasn't
+#                 acting on because the grace period hadn't expired
 # 1.20 2000-09-18 Robert L Mathews pointed out that I'd neglected to
 #                 skip the update of the db file if the client was already
 #                 authorized; this update adds that optimization.
@@ -369,8 +372,8 @@ while (1) {
 	$db{$ipaddr} = "ok" if $write;
 	print "\twritten ok\n" if $write and $debug;
 	while ($q[0][1] < time) {
-		print "purging ts=".localtime($q[0][1])." ip=$q[0][0]\n" if $debug;
 		if ($q[0][1] == $t{$q[0][0]}) {
+			print "purging ts=".localtime($q[0][1])." ip=$q[0][0]\n" if $debug;
 			delete $t{$q[0][0]};
 			delete $db{$q[0][0]} if $write;
 		}

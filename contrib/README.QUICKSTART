@@ -129,19 +129,28 @@ then retest until things look good.
 
 5. Start the pop-before-smtp daemon:
 
-% /etc/rc.d/init.d/pop-before-smtp start
+You should enable the pop-before-smtp script to run at boot time.  On
+RedHat systems you'd do this by running this:
+
+    chkconfig pop-before-smtp on
+
+Then, start the script going:
+
+% /etc/init.d/pop-before-smtp start
 
 Verify that the DB file has been created.  If you're not sure where to
 look, run "pop-before-smtp --dumpconfig" and look at the "dbfile" value.
 The actual created filename may have a suffix on it (such as ".db"), so
 append a '*' on the end of the name when you look for it.  Some examples:
 
-    ls -l /etc/postfix/pop-before-smtp*
+    ls -l /etc/mail/pop*
+    ls -l /etc/postfix/pop*
     ls -l /var/lib/pop-before-smtp/hosts*
-    ls -l /etc/mail/popauth*
 
 This file should have a fairly recent modification date (as it should have
-just been created).
+just been created).  If it does not, see the debugging info on this page:
+
+    http://popbsmtp.sourceforge.net/debug.shtml
 
 
 6. Setup your SMTP software to look for this new DB file.

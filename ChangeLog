@@ -1,3 +1,10 @@
+2003-09-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Log the @mynets array if --debug was specified.
+	- Check each item in @mynets and log an error for any that
+	  don't parse.
+
 2003-07-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

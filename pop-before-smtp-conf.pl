@@ -217,6 +217,8 @@ sub getline_FileTail
 # several patterns (allowing you to match multiple pop/imap servers
 # at the same time).
 
+my $pat2 = '... define an extra pattern here ...';
+
 # Add as many patterns to the @match array as you like:
 my @match = ( $pat, $pat2 );
 

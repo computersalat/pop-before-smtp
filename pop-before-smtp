@@ -193,7 +193,7 @@ elsif (-f $config_file) {
 GetOptions(
     'config=s' => sub {die "--config=$_[1] must be the first option.\n"},
     "write!" => \$write,
-    "debug!" => sub {$debug = 1; $log_func = \&log_to_stdout unless $log_func},
+    "debug!" => sub { $debug = 1; $log_func = \&log_to_stdout },
     "flock!" => \$flock,
     "watchlog|logfile=s" => \$file_tail{'name'},
     'logto=s' => sub { set_output_log($_[1]) },

@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.10 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.11 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.11 2000-04-13 added flocks from Robert L Mathews <rob@tigertech.com>
 # 1.10 2000-04-05 added regexp for qmail's pop3d thanks to Frank Auciello
 #                 <frank@torontowired.com>
 # 1.9 2000-03-21 added support for files in mynetworks, tested by Andy Dills
@@ -111,6 +112,7 @@ use DB_File;
 use Net::Netmask;
 use Date::Parse;
 use Getopt::Long;
+use Fcntl ':flock';
 
 ##################################
 #                                #
@@ -202,7 +204,11 @@ my (%t, @q);
 use vars qw(%db);
 my $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH or
 	die "$0: cannot dbopen $dbfile: $!\n" if $write;
+my $fd = $dbh->fd;
+open(DB_FH, "+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n" if $write;
+flock (DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $write;
 delete $db{$_} for keys %db;
+flock (DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $write;
 
 $| = 1 if $debug;
 
@@ -217,6 +223,7 @@ while (1) {
 	print "\taccepted --- not in mynetworks\n" if $debug;
 	push @q, [$ipaddr, $ts];
 	$t{$ipaddr} = $ts;
+	flock (DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $write;
 	$db{$ipaddr} = "ok" if $write;
 	$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
 	print "\twritten ok\n" if $write and $debug;
@@ -229,4 +236,5 @@ while (1) {
 		}
 		shift @q;
 	}
+	flock (DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n"  if $write;
 }

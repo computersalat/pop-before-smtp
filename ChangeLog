@@ -1,5 +1,10 @@
 2002-04-27  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version number to 1.30.
+
+2002-04-27  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* contrib/init-debian:
 	- A slightly modified version of Debian's init file (taken from their
 	  package).

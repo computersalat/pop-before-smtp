@@ -68,7 +68,7 @@ if (!-f $file_tail{'name'}) {
 #$file_tail{'resetafter'} = 30;
 #$file_tail{'tail'} = -1;
 
-=cut #============================= syslog ===========================START=
+=cut #============================ syslog =============================START=
 # If you want to output a log file of what pop-before-smtp is doing, you have
 # a few choices: either set $logto above, comment-out the two surrounding
 # =cut lines to use this syslog section, or put a reference to your own
@@ -79,9 +79,9 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 #setlogsock('unix');  # Valid arg values: inet, unix, stream, console.
 openlog('pop-before-smtp', 'pid', 'mail');
 $log_func = \&syslog;
-=cut #============================= syslog =============================END=
+=cut #============================ syslog ===============================END=
 
-############################ START OF PATTERNS #############################
+############################# START OF PATTERNS #############################
 #
 # Pick one of these values for the $pat variable OR define a subroutine
 # named "custom_match" to handle a more complex match scenario (there's
@@ -95,7 +95,7 @@ $log_func = \&syslog;
 # a single "$pat" variable.  Uncomment all 3 and we'll define a multi-
 # line-matching custom_match() subroutine for you.
 #
-############################ START OF PATTERNS #############################
+############################# START OF PATTERNS #############################
 
 # For UW ipop3d/imapd and their secure versions. This is the DEFAULT.
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
@@ -175,10 +175,10 @@ $log_func = \&syslog;
 #$pat = '^(... .. .... ..:..:..).* IMAP ' .
 #    'User "[^"]+" log on successful from (\d+\.\d+\.\d+\.\d+)';
 
-############################# END OF PATTERNS ##############################
+############################## END OF PATTERNS ##############################
 
 
-=cut #======================= Match Many Patterns ====================START=
+=cut #====================== Match Many Patterns ======================START=
 # Comment-out (or remove) the two surrounding =cut lines to use this function.
 
 # This is an example of using the custom_match() function to match
@@ -199,16 +199,16 @@ sub custom_match
     }
     ( );
 }
-=cut #======================= Match Many Patterns ======================END=
+=cut #====================== Match Many Patterns ========================END=
 
-########################## Alternate DB/SMTP support #######################
+######################### Alternate DB/SMTP support #########################
 #
 # If you need to use something other than DB_File, define your own tie,
 # sync, and (optionally) flock functions.
 #
-########################## Alternate DB/SMTP support #######################
+######################### Alternate DB/SMTP support #########################
 
-=cut #------------------------ Postfix NDBM_File ---------------------START-
+=cut #----------------------- Postfix NDBM_File -----------------------START-
 # If you comment-out (or remove) the two surrounding =cut lines, we'll use
 # NDBM_File instead of DB_File.
 
@@ -225,9 +225,9 @@ sub tie_NDBM
     tie %db, 'NDBM_File', $dbfile, O_RDWR|O_CREAT, 0664
 	or die "$0: cannot dbopen $dbfile: $!\n";
 }
-=cut #------------------------ Postfix NDBM_File -----------------------END-
+=cut #----------------------- Postfix NDBM_File -------------------------END-
 
-=cut #======================== Postfix BerkeleyDB ====================START=
+=cut #====================== Postfix BerkeleyDB =======================START=
 # If you comment-out (or remove) the two surrounding =cut lines, we'll use
 # BerkeleyDB instead of DB_File.
 
@@ -252,9 +252,9 @@ sub sync_BerkeleyDB
 {
     $dbh->db_sync and die "$0: sync $dbfile: $!\n";
 }
-=cut #======================== Postfix BerkeleyDB ======================END=
+=cut #====================== Postfix BerkeleyDB =========================END=
 
-=cut #-------------------------- qmail tcprules ----------------------START-
+=cut #------------------------ qmail tcprules -------------------------START-
 # If you comment-out (or remove) the two surrounding =cut lines, we'll use
 # the tcprules program instead of maintaining a DB_File hash.
 
@@ -302,9 +302,9 @@ sub sync_tcprules
     close RULES or die "closing tcprules pipe: $!";
     $log_func->('debug', "wrote tcp rules to $dbfile") if $debug;
 }
-=cut #-------------------------- qmail tcprules ------------------------END-
+=cut #------------------------ qmail tcprules ---------------------------END-
 
-=cut #=========================== Courier SMTP =======================START=
+=cut #========================= Courier SMTP ==========================START=
 # If you comment-out (or remove) the two surrounding =cut lines, we'll
 # interface with Courier SMTP using DB_File.
 
@@ -344,9 +344,9 @@ sub sync_courier
     # Reload SMTP Daemon (isn't there a better way to do this?)
     system "$ESMTPD stop; $ESMTPD start";
 }
-=cut #=========================== Courier SMTP =========================END=
+=cut #========================= Courier SMTP ============================END=
 
-=cut #-------------------------- Sendmail SMTP -----------------------START-
+=cut #------------------------- Sendmail SMTP -------------------------START-
 # If you comment-out (or remove) the two surrounding =cut lines, we'll
 # interface with Sendmail SMTP using DB_File.  See the quickstart guide for
 # the sendmail.cf changes you'll need to make.  If you find that Sendmail
@@ -413,9 +413,9 @@ sub flock_sendmail
     flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
 	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
-=cut #-------------------------- Sendmail SMTP -------------------------END-
+=cut #------------------------- Sendmail SMTP ---------------------------END-
 
-=cut #========================== CDB_File SMTP =======================START=
+=cut #========================= CDB_File SMTP =========================START=
 # If you comment-out (or remove) the two surrounding =cut lines, we'll use
 # CDB_File instead od DB_File.
 
@@ -438,9 +438,9 @@ sub sync_CDB
     }
     $cdb->finish;
 }
-=cut #========================== CDB_File SMTP =========================END=
+=cut #========================= CDB_File SMTP ===========================END=
 
-############################## Support Routines ############################
+############################# Support Routines ##############################
 
 # This section takes care of defining a multi-line-match custom_match()
 # subroutine, but only if the user configured our 3 required patterns.

@@ -4,6 +4,10 @@
 	- Added the --logto=FILE option.
 	- Removed the day-of-the-week from the stdout timestamp.
 
+	* pop-before-smtp-conf.pl:
+	- Document the new set_output_log() function, and put the syslog()
+	  setup next to it.
+
 2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

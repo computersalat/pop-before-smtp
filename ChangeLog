@@ -21,6 +21,7 @@
 
 	* pop-before-smtp-config.pl:
 	- Moved the various user-selectable $pat values here.
+	- Added pattern for Perdition.
 	- Include the various overridable parameters that a user might want to
 	  tweak.
 	- Added an example custom_match() function for vm-pop3d support (since

@@ -348,6 +348,8 @@ sub sync_courier
 =pod #-------------------------- Sendmail SMTP -----------------------START-
 # If you comment-out (or remove) both the preceding =pod line and the
 # following =cut line, we'll interface with Sendmail SMTP using DB_File.
+# If you find that Sendmail isn't recognizing the changes to the DB file,
+# set $signal_sendmail to 1.
 
 use DB_File;
 
@@ -357,14 +359,18 @@ $dbfile = '/etc/mail/popauth'; # DB hash to write
 $mynet_func = \&mynet_sendmail;
 $tie_func = \&tie_sendmail;
 $sync_func = \&sync_sendmail;
-#$flock_func = \&flock_DB; # Use the default
+$flock_func = \&flock_sendmail;
 
-my $pid_file = '/var/run/sendmail.pid';
+my $signal_sendmail = 0;
+my($pid_file, $sendmail_pid);
 
-open(PID, $pid_file) || die "Unable to open $pid_file: $!";
-$_ = <PID>;
-my($sendmail_pid) = /(\d+)/;
-close PID;
+if ($signal_sendmail) {
+    $pid_file = '/var/run/sendmail.pid';
+    open(PID, $pid_file) || die "Unable to open $pid_file: $!";
+    $_ = <PID>;
+    ($sendmail_pid) = /(\d+)/;
+    close PID;
+}
 
 sub mynet_sendmail
 {
@@ -390,7 +396,7 @@ sub sync_sendmail
 {
     $dbh->sync and die "$0: sync $dbfile: $!\n";
 
-    until (kill(1, $sendmail_pid)) {
+    while ($signal_sendmail && !kill(1, $sendmail_pid)) {
 	open(PID, $pid_file) || die "Unable to open $pid_file: $!";
 	$_ = <PID>;
 	my($new_pid) = /(\d+)/;
@@ -400,6 +406,12 @@ sub sync_sendmail
 	}
 	$sendmail_pid = $new_pid;
     }
+}
+
+sub flock_sendmail
+{
+    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
+	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
 
 =cut #-------------------------- Sendmail SMTP -------------------------END-

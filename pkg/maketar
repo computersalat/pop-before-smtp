@@ -11,7 +11,7 @@ if test -f ../patch ; then
     patch -p0 <../patch
 fi
 
-ver=`sed -ne 's/^# pop-before-smtp \([^ ]*\).*/\1/p' pop-before-smtp`
+ver=`sed -ne "s/^my .VERSION = '\([^']*\).*/\1/p" pop-before-smtp`
 rm -rf pkg CVS */CVS */*/CVS .cvsignore */.cvsignore */*/.cvsignore
 
 cd ..

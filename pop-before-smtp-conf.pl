@@ -162,10 +162,14 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
 #    '(\d+\.\d+\.\d+\.\d+) \d+, \d+ \(\d+\), \d+ \(\d+\)';
 
-# For vm-pop3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
+# A Modern vm-pop3d can use a normal, 1-line pattern:
+#$pat = '^(... .. ..:..:..) \S+ vm-pop3d\[\d+\]: ' .
+#    'User .+ logged in from (\d+\.\d+\.\d+\.\d+)';
+
+# Older vm-pop3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
 #my $PID_pat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: ';
 #my $IP_pat = $PID_pat . 'Connect from (\d+\.\d+\.\d+\.\d+)$';
-#my $OK_pat = $PID_pat . 'User .+ logged in$';
+#my $OK_pat = $PID_pat . 'User .+ logged in';
 
 # For popa3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
 #my $PID_pat = '^(... .. ..:..:..) \S+ (?:popa3d)\[(\d+)\]: ';

@@ -1,3 +1,9 @@
+2004-02-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added an extra (optional) locking function for sendmail that
+	  uses fcntl().  (Code provided by Alain Knaff.)
+
 2004-01-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

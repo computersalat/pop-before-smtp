@@ -26,7 +26,7 @@ die(){ echo "$progname: $*">&2; exit 1; }
 case "$1" in
 start)
 	echo -n "Starting $progname: "
-	$pgm $dbfile $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
+	$pgm $dbfile $watchlog $logto --daemon=$pid
 	if test $? -eq 0; then
 		echo_success
 	else

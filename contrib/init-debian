@@ -31,7 +31,7 @@ set -e
 case "$1" in
 start)
 	echo -n "Starting $progname: "
-	$pgm $dbfile $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
+	$pgm $dbfile $watchlog $logto --daemon=$pid
 	echo "done."
 	if [ `/usr/sbin/postconf | grep -c /var/lib/pop-before-smtp/hosts` -lt 1 ]; then
 		echo "Warning: Postfix may not take advantage of pop-before-smtp currently"

@@ -1,3 +1,13 @@
+2002-04-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Updated the pod doc to have all the latest options, to list what
+	  all the options do, to order the info a little better, and to not
+	  make it sound like Postfix is the only SMTP software we work with.
+
+	* TODO:
+	- Added a new doc-related item.
+
 2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

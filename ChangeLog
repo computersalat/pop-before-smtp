@@ -2,6 +2,9 @@
 
 	* pop-before-smtp-conf.pl:
 	- Updated the Courier POP/IMAP pattern.
+	- Added backslashes to several $pat vars in front of the IP-dot chars.
+	- Added an example custom_match() subroutine that efficiently matches
+	  multiple regular expressions.
 
 2002-04-15  Wayne Davison  <wayned@users.sourceforge.net>
 

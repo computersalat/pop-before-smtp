@@ -204,6 +204,25 @@ sub custom_match
 #
 ########################## Alternate DB/SMTP support #######################
 
+=pod #------------------------ Postfix NDBM_File ---------------------START-
+# If you comment-out the preceding =pod line, we'll use NDBM_File instead
+# of DB_File.
+
+use NDBM_File;
+
+#$mynet_func = \&mynet_postfix; # Use the default
+$tie_func = \&tie_NDBM;
+$sync_func = sub { };
+$flock = 0;
+
+# We must tie the global %db using the global $dbfile.
+sub tie_NDBM
+{
+    tie %db, 'NDBM_File', $dbfile, O_RDWR|O_CREAT, 0664
+	or die "$0: cannot dbopen $dbfile: $!\n";
+}
+=cut #------------------------ Postfix NDBM_File -----------------------END-
+
 =pod #======================== Postfix BerkeleyDB ====================START=
 # If you comment-out the preceding =pod line, we'll use BerkeleyDB instead
 # of DB_File.

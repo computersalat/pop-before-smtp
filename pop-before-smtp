@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.6 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.7 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.7 2000-03-20 added regexp for courier-imap
 # 1.6 2000-03-13 added installation notes on prerequisites to the readme
 # 1.5 2000-02-21 added comment pointing to File::Tail for description of
 #                the options with which I'm initializing it
@@ -130,6 +131,10 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 # For Cyrus, Kenn Martin <kmartin@infoteam.com> used:
 # my $pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
 #           'login: \S+\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
+
+# For Courier-IMAP:
+#my $pat = '^(... .. ..:..:..) \S+ imaplogin: ' .
+#          'LOGIN, user=\S+, ip=\[(\d+\.\d+\.\d+\.\d+)\]$';
 
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period

@@ -11,60 +11,89 @@ use strict;
 
 =head1 NAME
 
-  pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
+pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
 =head1 SYNOPSIS
 
-  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
-      [--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE] \
-      [--grace=SECONDS] &
+ nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
+     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
+     [--logto=FILE] [--grace=SECONDS] &
 
 =head1 DESCRIPTION
 
-pop-before-smtp watches /var/log/maillog for lines written by UW popd/imapd
-describing successful login attempts, and installs entries for them in an
-on-disk hash (DB) that is watched by postfix. It expires the entries after a
-half-hour. The hash is named /etc/postfix/pop-before-smtp.db. The name, as
-specified in the dbfile option, does not include the .db on the end, that's
-tacked on to satisfy a wired-in assumption in postfix.
+pop-before-smtp watches your mail log file (e.g. /var/log/maillog) for lines
+written by your POP/IMAP software (e.g. UW popd/imapd) that indicate a
+successful login. When found, pop-before-smtp installs an entry for the IP in
+an on-disk hash (DB) that is watched by your SMTP software (e.g. Postfix). It
+then expires these entries when 30 minutes have elapsed after the last POP/IMAP
+access from that IP.
 
-Internally, it keeps two data structures for all currently-allowed hosts; a
-queue, and a hash. The queue contains [ipaddr, time] records, while the hash
-contains ipaddr => time. Every time the daemon wakes up to deal with something
-else from the File::Tail handle, it peeks a the front of the queue, and while
-the timestamp of the record there has expired (is > 30 minutes old) it
-tosses it, and if the timestamp in the hash is also expired and equals the
-timestamp in the queue it deletes the hash entry and the on-disk db file
-entry.
+You edit the supplied pop-before-smtp-conf.pl file to customize things for your
+local system, such as scanning for the right POP/IMAP authorization, setting
+various options, etc.
 
-It contains support for protecting writes to the db file by flock.
-As far as I know, the consequences of a collision (corrupt read in
-an smtpd) are relatively mild, and the likelihood of one is remote,
-but the performance impact of the locking seems to be negligible, so
-it's enabled by default. To disable the flocking, invoke with
---noflock. Please let me know if you feel the default should be
-changed, and if so why.
+When starting up, pop-before-smtp builds an internal table of all netblocks
+natively permitted by your SMTP software (for Postfix it looks at the output of
+"postconf mynetworks"). This allows us to filter out local IP addresses that
+are already authorized and thus need no special help from us.
 
-If invoked with --debug, it will emit a fair amount of nattering on
-stdout, which may be helpful in diagnosing problems, then again it
-may not. If invoked with --nowrite, it won't actually attempt to
-write the db hash file; if your maillog is world-readable this might
-allow you to try it out (with --debug) running as a non-privileged
-user.
+=head1 OPTIONS
 
-Edit the supplied pop-before-smtp-conf.pl file to change the wired-in logfile
-format, tail parameters, etc.
+=item --config=FILE
 
-When starting up, it builds an internal table of all netblocks natively
-permitted by Postfix (it looks at the output of "postconf mynetworks"); before
-adding each entry it checks to see if it would be permitted by that rule.
+Specify the config file to read instead of /etc/pop-before-smtp-conf.pl.
+Useful for testing a new configuration before you install it. This option
+must occur first on the command-line since it will be processed before
+reading the config file, and all other options will be processed after
+reading the config file.
+
+=item --[no]write
+
+Specify --nowrite if you don't want the DB file to be even opened, let alone
+updated. Useful for trying out pattern-matching rules, especially when used
+with --debug and --reprocess.  (If your maillog is world-readable, you can
+even run the test as a non-privileged user.)
+
+=item --[no]debug
+
+If you specify --debug, logging to stdout will be enabled, plus extra
+debug messages will be generated to help you diagnose local/remote IP
+distinctions. Specify --logto after this option if you want the messages
+to go somewhere other than stdout.  Often combined with --reprocess.
+
+=item --[no]flock
+
+Using --noflock will turn off the default file locking used on the DB file.
+
+=item --reprocess
+
+Parse the maillog file again, pretending that each line is happening again.
+Useful for testing, especially when combined with --debug and possibly
+--nowrite.
+
+=item --watchlog=FILE
+
+You can specify what maillog to watch for POP/IMAP events.
+
+=item --dbfile=FILE
+
+You can specify what DB file to update.
+
+=item --logto=FILE
+
+Turns on logging to the specified file (use "-" for stdout).
+
+=item --grace=SECONDS
+
+Set the number of seconds that an IP address is authorized after it
+successfully signs in via POP or IMAP.
 
 =head1 INSTALLATION
 
 This daemon directly requires three modules from CPAN, which are not
 included in the base Perl release as of this writing, and one of
 those depends on another, so make sure you've downloaded and
-installed suitably recent versions of
+installed suitably recent versions of:
 
     File::Tail
     Time::HiRes (required by File::Tail)
@@ -75,17 +104,19 @@ In addition, it depends on the DB_File module; if you don't have it
 included in your perl build already (presumably because Berkeley DB
 wasn't available when your Perl was configured and built) then you
 can provide it by downloading the CPAN DB_File module, available
-from http://www.cpan.org/authors/id/PMQS/DB_File-1.73.tar.gz.
-Alternatively, if your Postfix supports some other on-disk-hash
-table type (check supported map types with "postconf -m") then you
-can just change from "use DB_File" to the appropriate module for
-that hash type (listed in the AnyDBM_File pod documentation) and use
-that instead, remembering also to change the map type from "hash" in
-the below postfix main.cf config change. And if you change the map
-type, you'll also need to adjust the "tie" statement that uses it in
-this script, changing at least the second arg from DB_File to the
-name of the module you're using, and probably dropping the $DB_HASH
-argument out.
+from http://www.cpan.org/authors/id/PMQS/DB_File-1.803.tar.gz.
+Alternatively, if your SMTP software supports some other on-disk-hash
+table type (you can check Postfix's supported map types with "postconf -m")
+then you can just add an appropriate "use" statement for your hash type to the
+config file (look in the AnyDBM_File pod documentation) and then setup your own
+tie/sync/flock subroutines (see the BerkeleyDB example in the config file).
+Also remember that if you're using Postfix, the example main.cf section we
+include below will need you to change the "hash:" prefix to the appropriate
+prefix for your DB type.
+
+The default hash file is named /etc/postfix/pop-before-smtp.db. If you override
+this via the dbfile option, however, you would not include the .db on the end
+since the default tie function adds this for you.
 
 This daemon likes a couple of helpers. Here's a nice init script:
 
@@ -104,7 +135,8 @@ This daemon likes a couple of helpers. Here's a nice init script:
         ;;
     esac
 
-The integration in /etc/postfix/main.cf might look like this:
+For those using Postfix, the integration in /etc/postfix/main.cf might look
+like this:
 
   smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
         check_client_access hash:/etc/postfix/pop-before-smtp,
@@ -119,8 +151,24 @@ the end of the file, rather than at the beginning) that fixed it.
 
 =head1 DOWNLOAD
 
-See the website http://popbsmtp.sf.net/ for the latest version, and
-the mailing list for support.
+See the website http://popbsmtp.sf.net/ for the latest version.
+See the mailing list (referenced on the website) for support.
+
+=head1 INTERNALS
+
+pop-before-smtp keeps two data structures for all currently-allowed hosts: a
+queue, and a hash. The queue contains [ipaddr, time] records, while the hash
+contains ipaddr => time. Every time the daemon wakes up to deal with something
+else from the File::Tail handle, it peeks a the front of the queue, and when
+the timestamp of the record there has expired (is > 30 minutes old) it tosses
+it, and if the timestamp in the hash equals the timestamp in the queue, it
+deletes the hash entry and the on-disk db file entry.
+
+pop-before-smtp contains support for protecting writes to the db file by flock.
+As far as I know, the consequences of a collision (corrupt read in an smtpd)
+are relatively mild, and the likelihood of one is remote, but the performance
+impact of the locking seems to be negligible, so it's enabled by default. (To
+disable the flocking, invoke with --noflock.)
 
 =head1 AUTHORS
 

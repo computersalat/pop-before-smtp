@@ -6,9 +6,17 @@
 	- Don't force the extra expiration check quite so often.
 
 	* pop-before-smtp-conf.pl:
-	- Document the new set_output_log() function, and put the syslog()
+	- Mention the new set_output_log() function, and put the syslog()
 	  setup next to it.
 	- Added Courier-POP3 to the Courier-IMAP pattern.
+	- If the default watch-log path doesn't exist, try to figure out one
+	  that does.
+
+	* pop-before-smtp.init:
+	- Only intuit command-line options if there is no config file present.
+	- Added code for Mandrake's /var/log/mail/info log file.
+	- Got rid of hard-coded /usr/bin path to ps (ps is in /bin on many
+	  systems).
 
 2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 

@@ -1,7 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.13 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.13a Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.13a 2000-06-16 a side branch off 1.13, with a regexp for a non-syslog
+#                  maillog from qpopper, without timestamps, and logic
+#                  modified to use time() rather than trying to match the
+#                  timestamp from the logfile
 # 1.13 2000-06-13 yet another qpopper entry, this time from Chris
 #                 D.Halverson <cdh@CompleteIS.com>; matches a
 #                 logfile format he collected on a Solaris 2.6
@@ -137,8 +141,8 @@ my $logfile = '/var/log/maillog';
 # the timestamp and IP address
 
 # For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
-my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
-          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+# my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
+#           '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Cyrus, Kenn Martin <kmartin@infoteam.com> used:
 # my $pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
@@ -163,6 +167,8 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 # Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
 # my $pat = '^(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) \[\d+\] ' .
 #           ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
+
+my $pat = '^qpopper\[\d+\]: Stats:\s+\w+ \d+ \d+ \d+ \d+ \S+ (\d+\.\d+\.\d+\.\d+)$';
 
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period
@@ -228,11 +234,10 @@ $| = 1 if $debug;
 
 while (1) {
 	$_ = $fi->read;
-	my ($timestamp, $ipaddr) = m/$pat/o or next;
-	my $ts = str2time($timestamp) or next;
+	my ($ipaddr) = m/$pat/o or next;
+	my $ts = time;
 	$ts += $grace;
-	next if $ts < time;
-	print "read ts=$timestamp ip=$ipaddr\n" if $debug;
+	print "read ip=$ipaddr\n" if $debug;
 	next if findNetblock($ipaddr);
 	print "\taccepted --- not in mynetworks\n" if $debug;
 	push @q, [$ipaddr, $ts];

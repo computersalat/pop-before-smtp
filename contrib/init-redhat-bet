@@ -8,9 +8,13 @@ pid=/var/run/$progname.pid
 
 if test -f /etc/$progname-conf.pl; then
 	# If there is a config file, let it do its job.
-	logto=
+	:
 else
 	# Without a config file, try to intuit the proper options.
+	db=/etc/postfix/pop-before-smtp
+	#dbfile=--dbfile=$db
+	mail=/var/log/maillog
+	#watchlog=--watchlog=$mail
 	log=/var/log/$progname
 	logto=--logto=$log
 fi
@@ -21,8 +25,8 @@ die(){ echo "$progname: $*">&2; exit 1; }
 
 case "$1" in
 start)
-	echo -n "Starting $progname:"
-	$pgm $logto >/dev/null 2>&1 & echo $! >$pid
+	echo -n "Starting $progname: "
+	$pgm $dbfile $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
 	if test $? -eq 0; then
 		echo_success
 	else
@@ -31,7 +35,7 @@ start)
 	echo
 	;;
 stop)
-	echo -n "Shutting down $progname:"
+	echo -n "Stopping $progname: "
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -53,7 +57,7 @@ status)
 	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
 	kill -0 $p || die "$pgm[$p] is no longer running"
-	ps -fp $p
+	ps -up $p
 	;;
 *)
 	die "Usage: `basename $0` {start|stop|restart|status}"

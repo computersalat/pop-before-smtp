@@ -9,10 +9,11 @@ test -d /var/run && pid=/var/run/$progname.pid
 
 if test -f /etc/$progname-conf.pl; then
 	# If there is a config file, let it do its job.
-	watchlog=
-	logto=
+	:
 else
 	# Without a config file, try to intuit the proper options.
+	db=/etc/postfix/pop-before-smtp
+	#dbfile=--dbfile=$db
 	mail=/var/log/maillog
 	test -f $mail || mail=/var/log/mail/info
 	test -f $mail || mail=/var/log/messages
@@ -27,8 +28,8 @@ die(){ echo "$progname: $*">&2; exit 1; }
 
 case "$1" in
 start)
-	echo -n "Starting $progname..."
-	$pgm $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
+	echo -n "Starting $progname: "
+	$pgm $dbfile $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
 	if test $? -eq 0; then
 		echo done
 	else
@@ -36,7 +37,7 @@ start)
 	fi
 	;;
 stop)
-	echo -n "Stopping $progname..."
+	echo -n "Stopping $progname: "
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1

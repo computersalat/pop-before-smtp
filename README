@@ -33,16 +33,16 @@ Folks interested in running pop-before-smtp as a non-root user
 
 People more interested in getting it running as fast as possible
   without doing an RPM install, who have some environmental
-  prereqs properly in place --- working perl install with working
+  prereqs properly in place -- working perl install with working
   CPAN module, System V init scripts, daemon installing in
-  /usr/sbin/; should check out contrib/README.QUICKSTART. Also,
+  /usr/sbin/ -- should check out contrib/README.QUICKSTART. Also,
   the contrib/getfromcpan script contributed by Alexander Burke
   <alex@pdqsolutions.com> should make it enormously quicker and
   easier to package and install all the prerequisite Perl modules
   onto a Red Hat Linux system.
 
-If you prefer pop-before-smtp to log via syslog, check out the patch
-  in contrib/syslog.
+If you prefer pop-before-smtp to log via syslog, there's a commented-
+ out setup for it in the pop-before-smtp-config.pl file.
 
 Users of Microsoft Outlook Express 5.5 (and perhaps others as well),
   do not use Tools->Options->Send->"Send messages immediately", as

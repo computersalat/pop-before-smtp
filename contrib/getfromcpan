@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# getfromcpan version 1.0
+# getfromcpan version 1.1
 # Copyright (C) 2000 Alexander Burke <alex@pdqsolutions.com>
 #
 # You may do with this script as you like, as long as you leave the
@@ -9,81 +9,188 @@
 #
 # There is no warranty, implied or otherwise, for this software.
 # Although unlikely, it may eat all your files and emit a loud belch.
-# If this, or anything similar, occurs, I cannot and will not be held
-# responsible.
+# If this, or anything even remotely similar, occurs, I cannot and will
+# not be held responsible. This is nothing more than a quick hack, and
+# could be a lot tighter and/or more elegant. (Hint! :)
 #
-# Please send changes to Bennett Todd <bet@rahul.net> for inclusion in
-# the next version of pop-before-smtp.
+# Please send changes to Alexander Burke <alex@pdqsolutions.com> and
+# Bennett Todd <bet@rahul.net> for inclusion in the next version of
+# pop-before-smtp.
 #
 # This script gets the files required for pop-before-smtp from CPAN and
-# installs them.
-#
-# Certain assumptions are made, namely that you have wget installed and
-# are running on a Red Hat system.
+# installs them. Certain assumptions are made, namely that you have wget
+# installed and are running on a Red Hat system.
 #
 # Please note that updates to these modules on CPAN will result in
 # version number (and hence filename) changes which will break this
 # script. If wget gives you a 404 error when trying to get one of the
 # files from CPAN, that's probably what's happened.
 #
-#######################################################################
+# REVISION HISTORY:
+# v1.0  12-Nov-2000     Initial release
+# v1.1  19-Nov-2000     Addition of more sanity checks; small tweaks
+#
+############################################################################
 
+HIRES_VER=01.20 	# Time::Time-HiRes
+TIMEDATE_VER=1.11	# Time::TimeDate
+NETMASK_VER=1.9002	# Net::Netmask
+FILETAIL_VER=0.98	# File::File-Tail
 
-# Some quick sanity checks.
+if [ -f $HOME/.rpmmacros ]; then
+    TOPDIR=`sed -ne 's/%_topdir[ 	]*//p' <$HOME/.rpmmacros`
+    if [ ! -d $TOPDIR ]; then
+	echo "ERROR: couldn't figure out %_topdir in your .rpmmacros file"
+	exit 1
+    fi
+else
+    TOPDIR=/usr/src/redhat
+fi
+
+echo Using RPM topdir of $TOPDIR
+
+# Some quick sanity checks. This isn't designed to catch everything!
 if [ ! -f ./perlmod2rpm ]; then
-     echo "ERROR: perlmod2rpm not found in the current directory!"
-     exit 1
+      echo "ERROR: perlmod2rpm not found in the current directory!"
+      exit 1
 fi
 if [ ! -f `which wget` ]; then
-     echo "ERROR: wget not found!"
-     exit 1
+      echo "ERROR: wget not found!"
+      exit 1
 fi
 if [ ! -f `which rpm` ]; then
-     echo "ERROR: rpm not found!"
-     exit 1
+      echo "ERROR: rpm not found!"
+      exit 1
+fi
+if [ ! -d $TOPDIR/SOURCES ]; then
+      echo "ERROR: $TOPDIR/SOURCES not accessible!"
+      exit 1
+fi
+if [ ! -d $TOPDIR/RPMS ]; then
+      echo "ERROR: $TOPDIR/RPMS not accessible!"
+      exit 1
 fi
 
-# Preinstallation cleanup...
-rm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz File-Tail*.tar.gz
-
 # Let's copy perlmod2rpm to where we'll be using it, and go there.
-cp ./perlmod2rpm /usr/src/redhat/SOURCES
-cd /usr/src/redhat/SOURCES
+cp ./perlmod2rpm $TOPDIR/SOURCES
+cd $TOPDIR/SOURCES
+
+# Preinstallation cleanup.
+rm -f Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz File-Tail*.tar.gz
 
 # Okay, here we go.
 echo
-echo #######################################################################
-echo ### Getting and installing Time-HiRes...                            ###
-echo #######################################################################
+echo =======================================================================
+echo === Getting and building Time-HiRes...                              ===
+echo =======================================================================
 echo
-wget http://www.cpan.org/modules/by-module/Time/Time-HiRes-01.20.tar.gz
-./perlmod2rpm Time-HiRes-01.20.tar.gz
-rpm -ivh ../RPMS/i386/Time-HiRes-01.20-1.i386.rpm
+wget http://www.cpan.org/modules/by-module/Time/Time-HiRes-$HIRES_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+./perlmod2rpm Time-HiRes-$HIRES_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+if [ "$UID" == "0" ]; then
+    rpm -ivh ../RPMS/i?86/Time-HiRes-$HIRES_VER-1.i?86.rpm
+    RESULT=$?
+    if [ "$RESULT" != "0" ]; then
+	  echo "ERROR: Something went wrong! Aborting."
+	  exit 1
+    fi
+fi
 echo
-echo #######################################################################
-echo ### Getting and installing TimeDate...                              ###
-echo #######################################################################
+echo =======================================================================
+echo === Getting and building TimeDate...                                ===
+echo =======================================================================
 echo
-wget http://www.cpan.org/modules/by-module/Time/TimeDate-1.10.tar.gz
-./perlmod2rpm TimeDate-1.10.tar.gz
-rpm -ivh ../RPMS/i386/TimeDate-1.10-1.i386.rpm
+wget http://www.cpan.org/modules/by-module/Time/TimeDate-$TIMEDATE_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+./perlmod2rpm TimeDate-$TIMEDATE_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+if [ "$UID" == "0" ]; then
+    rpm -ivh ../RPMS/i?86/TimeDate-$TIMEDATE_VER-1.i?86.rpm
+    RESULT=$?
+    if [ "$RESULT" != "0" ]; then
+	  echo "ERROR: Something went wrong! Aborting."
+	  exit 1
+    fi
+fi
 echo
-echo #######################################################################
-echo ### Getting and installing Net-Netmask...                           ###
-echo #######################################################################
+echo =======================================================================
+echo === Getting and building Net-Netmask...                             ===
+echo =======================================================================
 echo
-wget http://www.cpan.org/modules/by-module/Net/Net-Netmask-1.8.tar.gz
-./perlmod2rpm Net-Netmask-1.8.tar.gz
-rpm -ivh ../RPMS/i386/Net-Netmask-1.8-1.i386.rpm
+wget http://www.cpan.org/modules/by-module/Net/Net-Netmask-$NETMASK_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+./perlmod2rpm Net-Netmask-$NETMASK_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+if [ "$UID" == "0" ]; then
+    rpm -ivh ../RPMS/i?86/Net-Netmask-$NETMASK_VER-1.i?86.rpm
+    RESULT=$?
+    if [ "$RESULT" != "0" ]; then
+	  echo "ERROR: Something went wrong! Aborting."
+	  exit 1
+    fi
+fi
 echo
-echo #######################################################################
-echo ### Getting and installing File-Tail...                             ###
-echo #######################################################################
+echo =======================================================================
+echo === Getting and building File-Tail...                               ===
+echo =======================================================================
 echo
-wget http://www.cpan.org/modules/by-module/File/File-Tail-0.95.tar.gz
-./perlmod2rpm File-Tail-0.95.tar.gz
-rpm -ivh ../RPMS/i386/File-Tail-0.95-1.i386.rpm
+wget http://www.cpan.org/modules/by-module/File/File-Tail-$FILETAIL_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+./perlmod2rpm File-Tail-$FILETAIL_VER.tar.gz
+RESULT=$?
+if [ "$RESULT" != "0" ]; then
+      echo "ERROR: Something went wrong! Aborting."
+      exit 1
+fi
+if [ "$UID" == "0" ]; then
+    rpm -ivh ../RPMS/i?86/File-Tail-$FILETAIL_VER-1.i?86.rpm
+    RESULT=$?
+    if [ "$RESULT" != "0" ]; then
+	  echo "ERROR: Something went wrong! Aborting."
+	  exit 1
+    fi
+fi
 
 # Let's clean up.
-rm perlmod2rpm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz \
-    File-Tail*.tar.gz
+rm -f perlmod2rpm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz \
+      File-Tail*.tar.gz
+
+if [ "$UID" == "0" ]; then
+    rm -f ../RPMS/i?86/Time-HiRes*.rpm ../RPMS/i?86/TimeDate*.rpm \
+	  ../RPMS/i?86/Net-Netmask*.rpm ../RPMS/i?86/File-Tail*.rpm
+fi
+
+echo
+echo =======================================================================
+echo === getfromcpan completed successfully.                             ===
+echo =======================================================================
+echo

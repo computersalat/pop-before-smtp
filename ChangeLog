@@ -1,6 +1,35 @@
 2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Moved the config items into a config file and added the
+	  --config=FILE option to override its default location.
+	- Enabled only one $pat variable by default (UW).
+	- Added the ability to use a custom_match() funciton to enable more
+	  complex watch-log matching.
+	- Changed the name of the --logfile option to --watchlog (though we
+	  still accept --logfile for backward compatibility).
+	- Added the --reprocess option (for debug processing of old log data).
+	- Changed the optional output-log messages to have a timestamp, be a
+	  little more concise, and support being easily overridden.  This
+	  makes it trivial to support syslog() output.
+	- Log what signal killed us (if logging).
+	- Write the "die" message to the output log (if logging).
+
+	* TODO:
+	- Mention a few items that I'd like to do.
+	- Got rid of the separate-config discussion (which is now done).
+
+	* pop-before-smtp-config.pl:
+	- Moved the various user-selectable $pat values here.
+	- Include the various overridable parameters that a user might want to
+	  tweak.
+	- Added an example custom_match() function for vm-pop3d support (since
+	  it requires parsing 2 lines to determine success).
+	- Added the necessary setup for using syslog() (commented out).
+
+2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
 	- Improved cleanup_nets() to weed-out comments from included files,
 	  De-taint the mynetworks include-file data, and to make the code a
 	  little simpler.

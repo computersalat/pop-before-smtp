@@ -132,7 +132,7 @@ sub getline_FileTail
 
 # For GNU pop3d
 #$pat = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
-#    'User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$';
+#    'User .+ logged in with mailbox .+ from (\d+\.\d+\.\d+\.\d+)$';
 
 # A fairly modern Qpopper pattern.
 #$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper[^[]*\[\d+\]: \([^)]*\) ' .
@@ -147,8 +147,8 @@ sub getline_FileTail
 #    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
 
 # For Cyrus (including a tweak for IP addrs that don't resolve):
-#$pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
-#    'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
+#$pat = '^(... .. ..:..:..) \S+ (?:pop3|imap)[ds]?\[\d+\]: ' .
+#    'login: [^[\s]*\s*\[[:f]*(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
 #$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:login|d|d-ssl): ' .

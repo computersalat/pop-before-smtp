@@ -1,3 +1,8 @@
+2002-05-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/README.QUICKSTART:
+	- Fixed a mistyping of the config file's name.
+
 2002-05-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

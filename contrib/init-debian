@@ -3,6 +3,7 @@
 # Written by Bennett Todd <bet@rahul.net> as part of the pop-before-smtp daemon
 # Customized by Jonas Smedegaard <dr@jones.dk> for use with Debian GNU systems
 # Updated for 1.30 by Wayne Davison <wayned@users.sourceforge.net>
+# Additional tweaks by Andrew Shugg <andrew@neep.com.au>
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 progname=pop-before-smtp
@@ -11,7 +12,7 @@ pid=/var/run/$progname.pid
 
 test -f $pgm || exit 0
 
-if test -f /etc/$progname-conf.pl; then
+if test -f /etc/$progname/$progname.conf; then
 	# If there is a config file, let it do its job.
 	:
 else
@@ -32,16 +33,17 @@ case "$1" in
 start)
 	echo -n "Starting $progname: "
 	$pgm $dbfile $watchlog $logto --daemon=$pid
-	echo "done."
-	if [ `/usr/sbin/postconf | grep -c /var/lib/pop-before-smtp/hosts` -lt 1 ]; then
-		echo "Warning: Postfix may not take advantage of pop-before-smtp currently"
-		echo "(read /usr/share/doc/pop-before-smtp/README.Debian for more info)!"
+	if test $? -eq 0; then
+		echo "done."
+	else
+		echo "failed."
+		exit 1
 	fi
 	;;
 stop)
 	echo -n "Stopping $progname: "
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
-		kill $p || exit 0; sleep 1
+		kill $p 2>/dev/null || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
 		kill -0 $p && die "$pid won't die"
 	)
@@ -53,17 +55,17 @@ stop)
 		exit 1
 	fi
 	;;
-restart|reload|force-reload)
+restart|force-reload)
 	$0 stop || true
 	$0 start
 	;;
 status)
 	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
-	kill -0 $p || die "$pgm[$p] is no longer running"
-	ps -up $p
+	kill -0 $p 2>/dev/null || die "$pgm[$p] is no longer running"
+	ps wup $p
 	;;
 *)
-	die "Usage: `basename $0` {start|stop|restart|reload|force-reload|status}"
+	die "Usage: `basename $0` {start|stop|restart|force-reload|status}"
 	;;
 esac

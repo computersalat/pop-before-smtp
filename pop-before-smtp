@@ -17,16 +17,16 @@ pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
      [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
-     [--logto=FILE] [--grace=SECONDS] &
+     [--logto=FILE] [--grace=SECONDS] [--info] &
 
 =head1 DESCRIPTION
 
 pop-before-smtp watches your mail log file (e.g. /var/log/maillog) for lines
 written by your POP/IMAP software (e.g. UW popd/imapd) that indicate a
 successful login. When found, pop-before-smtp installs an entry for the IP in
-an on-disk hash (DB) that is watched by your SMTP software (e.g. Postfix). It
-then expires these entries when 30 minutes have elapsed after the last POP/IMAP
-access from that IP.
+an on-disk hash (DB) that is watched by your SMTP software (e.g. Postfix,
+sendmail, qmail, etc.). It then expires these entries when 30 minutes have
+elapsed after the last POP/IMAP access from that IP.
 
 =head1 OPTIONS
 
@@ -88,6 +88,11 @@ Turns on logging to the specified file (use "-" for stdout).
 Set the number of seconds that an IP address is authorized after it
 successfully signs in via POP or IMAP.
 
+=item --info
+
+Output some config info and exit. This makes it easy to see what things like
+the dbfile, logto, and watchlog values are being set to in the config file.
+
 =back
 
 =head1 INSTALLATION
@@ -148,6 +153,13 @@ like this:
   smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
         check_client_access hash:/etc/postfix/pop-before-smtp,
         check_relay_domains
+
+For those using a recent sendmail (at least version 8.9), you can add this
+to your cf file:
+
+    HACK(`popauth')
+
+and then enable the sendmail SMTP section in the config file.
 
 =head1 TROUBLESHOOTING
 
@@ -211,6 +223,7 @@ $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
+my $dump_config;
 
 $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
@@ -248,19 +261,27 @@ elsif (-f $config_file) {
 
 GetOptions(
     'config=s' => sub { die "--config=$_[1] must be the first option.\n" },
-    "write!" => \$write,
-    "debug!" => sub { $debug = $_[1]; $logto = '-' if $debug },
-    "flock!" => \$flock,
+    'write!' => \$write,
+    'debug!' => sub { $debug = $_[1]; $logto = '-' if $debug },
+    'flock!' => \$flock,
     'reprocess!' => \$reprocess,
-    "watchlog|logfile=s" => \$file_tail{'name'},
-    "dbfile=s" => \$dbfile,
+    'watchlog|logfile=s' => \$file_tail{'name'},
+    'dbfile=s' => \$dbfile,
     'logto=s' => \$logto,
-    "grace=i" => \$grace,
+    'grace=i' => \$grace,
+    'info' => \$dump_config,
 ) or die <<EOT;
 Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]
     [--logto=FILE] [--grace=SECONDS]
 EOT
+
+if ($dump_config) {
+    print "watchlog: $file_tail{'name'}\n";
+    print "dbfile: $dbfile\n";
+    print "logto: $logto\n" if defined $logto;
+    exit;
+}
 
 $file_tail{'tail'} = -1 if $reprocess;
 

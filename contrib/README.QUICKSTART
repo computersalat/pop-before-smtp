@@ -121,9 +121,15 @@ smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 
 For Sendmail:
 
-Add this line to your sendmail.cf file:
+Add this line to your sendmail.mc file (which I assume you're using):
 
     HACK(`popauth')
+
+And then regenerate the sendmail.cf file from the .mc file.  You'll need
+to ensure that you have the popauth.m4 file in your hack subdir (e.g.
+/usr/share/sendmail-cf/hack).  If you don't, you can get it from here:
+
+    http://www.sendmail.org/~ca/email/rules/popauth.m4
 
 For other SMTP software, please let me know what it requires so I can
 include it here.

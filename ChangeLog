@@ -1,3 +1,8 @@
+2002-05-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Tweaked the qpopper patterns to make them a little more versatile.
+
 2002-05-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* contrib/README.QUICKSTART:

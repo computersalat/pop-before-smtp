@@ -99,6 +99,11 @@ $log_func = \&syslog;
 #    '(?:Login|Authenticated|Auth) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
+# Some folks need a little different match for UW ipop3d/imapd:
+#$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .
+#    '(?:Login|Authenticated|Auth) user=\S+ ' .
+#    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+
 # For GNU pop3d
 #$pat = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
 #    'User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$';

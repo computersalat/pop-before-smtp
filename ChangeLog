@@ -1,7 +1,7 @@
 2002-12-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
-	- Tweaked some comments.
+	- Tweaked some comments and some indentation.
 
 2002-12-23  Wayne Davison  <wayned@users.sourceforge.net>
 

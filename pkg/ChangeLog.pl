@@ -8,7 +8,7 @@ open(OUT, ">$OUTFILE.new") or die $!;
 
 print OUT <<EOT;
 <html><head>
-<title>Pop-before-smtp Changelog</title>
+<title>Pop-before-smtp ChangeLog</title>
 </head><body bgcolor=white text=black link=blue vlink=purple>
 
 <!--#include virtual="/top.html" -->
@@ -25,15 +25,15 @@ s/&/&amp;/g;
 s/</&lt;/g;
 s/>/&gt;/g;
 
-s%^(\d+.+)%</UL></UL><P>$1<UL>%gm;
-s%</UL></UL>%%;
-s%^\s*\*([\s\S]*?):%</UL><LI><B>$1</B>:<UL><LI>%gm;
-s/^\s*- /<LI>/gm;
+s#^(\d+.+)#</UL></UL><P>$1<UL>#gm;
+s#</UL></UL>##;
+s#^\s*\*([\s\S]*?): *#</UL><LI><B>$1</B>:<UL><LI>#gm;
+s/^\s*[-+] /<LI>/gm;
 s/<LI>\s*<LI>/<LI>/g;
 s/<BR>\s*<BR>/<BR>/g;
-s%(<UL>\s*)</UL>%$1%g;
+s#(<UL>\s*)</UL>#$1#g;
 
-s%((?:Released version|Upped the version (?:number )?to) \S+)%<FONT COLOR=red>$1</FONT>%g;
+s#((?:Released version|Upped the version (?:number )?to) \S+)#<FONT COLOR=red>$1</FONT>#g;
 
 print OUT $_, <<EOT;
 </UL></UL>

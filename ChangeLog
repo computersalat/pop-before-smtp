@@ -1,8 +1,13 @@
 2004-08-16  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* README:
+	- Don't try to duplicate install/configure info here -- just
+	  point people at the best sources for this info.
+
 	* contrib/README.QUICKSTART:
 	- Improved the test section, including a way to make sure that
 	  your site hasn't become an open relay.
+	- Improved the start section.
 
 2004-08-15  Wayne Davison  <wayned@users.sourceforge.net>
 

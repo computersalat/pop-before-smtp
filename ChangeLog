@@ -1,3 +1,8 @@
+2002-05-21  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added NDBM_File example section.
+
 2002-05-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

@@ -2,6 +2,7 @@
 
 	* pop-before-smtp:
 	- Updated the init-file example in the docs.
+	- Changed to --debug option to always set the $log_func.
 
 	* pop-before-smtp-conf.pl:
 	- Added an introductory comment.
@@ -26,6 +27,7 @@
 	* pop-before-smtp.spec:
 	- Added potential support for installing a custom config file.
 	- Put the unchanged config file into the doc dir.
+	- Tweaked the %post and %preun sections to not re-run on update.
 
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 

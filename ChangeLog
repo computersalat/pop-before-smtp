@@ -1,3 +1,12 @@
+2004-03-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/getfromcpan:
+	- Got rid of no-longer-needed modules and updated the versions
+	  of the rest.
+
+	* contrib/README.QUICKSTART:
+	- No need to mention Time::HiRes or File::Tail anymore.
+
 2004-03-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

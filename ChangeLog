@@ -1,3 +1,9 @@
+2004-04-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Include the config-file path in the output of the
+	  --dump-config option.
+
 2004-03-22  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

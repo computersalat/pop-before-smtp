@@ -1,5 +1,10 @@
 2002-04-17  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Started testing 1.30pre2.
+
+2002-04-17  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* pop-before-smtp:
 	- Added a couple comments.
 
@@ -37,6 +42,11 @@
 
 	* TODO:
 	- Added a new doc-related item.
+
+2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Started testing 1.30pre1.
 
 2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
 

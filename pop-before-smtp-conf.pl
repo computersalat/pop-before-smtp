@@ -145,6 +145,11 @@ $log_func = \&syslog;
 #    '(?:Auth:) (\d+\.\d+\.\d+\.\d+)(?:\-\>\d+\.\d+\.\d+\.\d+) ' .
 #    'user=(?:\"\S+\") server=(?:\"\S+\") port=(?:\"\S+\") status=(?:\"ok\")';
 
+# For solidpop3d (known as spop3d) from Adam Bartosik (moldovenu@interia.pl)
+# ** You should compile solidpop3d with --enable-extendlog **
+#$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
+#    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
+
 ############################# END OF PATTERNS ##############################
 
 

@@ -1,12 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.9c Bennett Todd <bet@rahul.net> Freely Redistributable
-# 1.9c 2000-03-23 drat, that flag can't be lexical (my), because it turns the
-#                 handler into a closure, not what I wanted. Uurk. Ok.
-# 1.9b 2000-03-23 HUP handler no longer tries to do anything more than set a
-#                 flag
-# 1.9a 2000-03-21 test version with support for reloading mynetworks on HUP
+# pop-before-smtp 1.10 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.10 2000-04-05 added regexp for qmail's pop3d thanks to Frank Auciello
+#                 <frank@torontowired.com>
 # 1.9 2000-03-21 added support for files in mynetworks, tested by Andy Dills
 # 1.8 2000-03-21 tweaked UW regexp based on further feedback from Andy Dills
 # 1.7 2000-03-20 added regexp for courier-imap
@@ -143,6 +140,10 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 #my $pat = '^(... .. ..:..:..) \S+ imaplogin: ' .
 #          'LOGIN, user=\S+, ip=\[(\d+\.\d+\.\d+\.\d+)\]$';
 
+# For qmail's pop3d:
+#my $pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
+#          'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)$';
+
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period
 
@@ -187,25 +188,14 @@ sub cleanup_nets {
 	}
 	return @r;
 }
-
-my $nets;
-
-sub nets_reloader {
-	$nets = {};
-	my @mynets = cleanup_nets(`postconf mynetworks`);
-	while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
-		for (reverse @tmp) {
-			splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
-		}
+my @mynets = cleanup_nets(`postconf mynetworks`);
+while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
+	for (reverse @tmp) {
+		splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
 	}
-	Net::Netmask->new($_)->storeNetblock($nets) for @mynets;
 }
-
-nets_reloader;
-
-use vars qw($hupped);
-$hupped = 0;
-$SIG{HUP} = sub { $hupped++ };
+	
+Net::Netmask->new($_)->storeNetblock() for @mynets;
 
 my (%t, @q);
 
@@ -217,17 +207,13 @@ delete $db{$_} for keys %db;
 $| = 1 if $debug;
 
 while (1) {
-	if ($hupped) {
-		nets_reloader;
-		$hupped = 0;
-	}
 	$_ = $fi->read;
 	my ($timestamp, $ipaddr) = m/$pat/o or next;
 	my $ts = str2time($timestamp) or next;
 	$ts += $grace;
 	next if $ts < time;
 	print "read ts=$timestamp ip=$ipaddr\n" if $debug;
-	next if findNetblock($ipaddr, $nets);
+	next if findNetblock($ipaddr);
 	print "\taccepted --- not in mynetworks\n" if $debug;
 	push @q, [$ipaddr, $ts];
 	$t{$ipaddr} = $ts;

@@ -1,3 +1,6 @@
+Change some comments that presume we're working with postfix to be more
+inclusive of other SMTP software.
+
 If the $fail_tail{'tail'} option is not -1 (meaning we don't reread the log
 file), perhaps we should leave the current IPs in the DB file on startup, and
 set them to expire after $grace elapses (timed from db mtime).

@@ -419,8 +419,8 @@ my $fi = File::Tail->new(
 sub cleanup_nets {
     my @r;
     for (@_) {
-        s/^\s+//;
-        s/\s+$//;
+        /^\s*(.*?)\s*$/;
+        $_ = $1;
         s/\s+/ /g;
         s/^mynetworks\s*=\s*//;
         push @r, split /[,\s]+/, $_;

@@ -1,7 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.12 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.13 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.13 2000-06-13 yet another qpopper entry, this time from Chris
+#                 D.Halverson <cdh@CompleteIS.com>; matches a
+#                 logfile format he collected on a Solaris 2.6
+#                 system w/ Qpopper 3.0b29.
 # 1.12 2000-06-09 added popper entry to match logfile rec from Alex
 #                 Burke <alex@pdqsolutions.com>
 # 1.11 2000-06-08 added qpopper support thanks to Daniel Meredith
@@ -155,6 +159,10 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 # Alex Burke's popper install
 # my $pat = '^(... .. ..:..:..) \S+ popper\[\d+\]: Stats: \S+ ' .
 #           '(?:\d+ ){4}(?:\S+ )?(\d+.\d+.\d+.\d+)$';
+
+# Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
+# my $pat = '^(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) \[\d+\] ' .
+#           ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
 
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period

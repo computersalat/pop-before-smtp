@@ -1,10 +1,18 @@
+2005-01-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/popa3d/popa3d-0.6.4.patch:
+	- Updated a syslog define's name (SYSLOG_PRI_ERROR).
+
 2004-11-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
 	- Added a Qpopper pattern that works when Qpopper is doing its
 	  own logging (i.e. without syslog).
 	- Added support for an $END_pat that works when $PID_pat,
-	  $IP_pat, and $OK_pat are defined (but is optional).
+	  $IP_pat, and $OK_pat are defined (but is optional).  This
+	  lets a user match a more verbose sequence of log lines where
+	  the OK_pat line is not the first PID-matching message after
+	  the IP_pat line.
 
 2004-11-08  Wayne Davison  <wayned@users.sourceforge.net>
 

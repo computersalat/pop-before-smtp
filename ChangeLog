@@ -1,3 +1,8 @@
+2003-04-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added pattern for Apple IMAP MAIL Server.
+
 2003-04-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

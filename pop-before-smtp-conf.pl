@@ -157,7 +157,7 @@ $log_func = \&syslog;
 ############################# END OF PATTERNS ##############################
 
 
-=pod #===================== Match Multiple Patterns ==================START=
+=pod #======================= Match Many Patterns ====================START=
 # Comment-out (or remove) both the preceding =pod line and the following
 # =cut line to use this function.
 
@@ -175,37 +175,57 @@ sub custom_match
     }
     ( );
 }
-=cut #===================== Match Multiple Patterns ====================END=
+=cut #======================= Match Many Patterns ======================END=
 
 =pod #---------------------- vm-pop3d Match Support ------------------START-
 # Comment-out (or remove) both the preceding =pod line and the following
-# =cut line to use this function.
+# =cut line of this section AND the Multi-line Match Support section to use
+# this functionality.
 
 # vm-pop3d support by <andy@kahncentral.net>.  Tweaked by Wayne Davison.
 
-# vm-pop3d requires 2 logfile lines to be checked before the user is verified.
-# The first line contains the IP and the second lets us know if the user
-# successfully logged in or not.
-
-my $vmIpPat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: '.
+my $IP_pat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: '.
        'Connect from (\d+\.\d+\.\d+\.\d+)$';
-my $vmUserPat = '\S+ (?:vm-pop3d)\[(\d+)\]: User (\S|\s)+ logged in$';
+my $user_pat = '\S+ (?:vm-pop3d)\[(\d+)\]: User (\S|\s)+ logged in$';
+=cut #---------------------- vm-pop3d Match Support --------------------END-
 
-my($vmTime, $vmPid, $vmIp);
+=pod #======================= popa3d Match Support ===================START=
+# Comment-out (or remove) both the preceding =pod line and the following
+# =cut line of this section AND the Multi-line Match Support section to use
+# this functionality.
+
+# An unpatched popa3d requires 2 logfile lines to be checked before the
+# user is verified.  Alternately, see the patch in the contrib/popa3d dir.
+
+my $IP_pat = '^(... .. ..:..:..) \S+ (?:popa3d)\[(\d+)\]: '.
+    'Session from (\d+\.\d+\.\d+\.\d+)$';
+my $user_pat = '\S popa3d\[(\d+)\]: Authentication passed for \S+$';
+=cut #======================= popa3d Match Support =====================END=
+
+=pod #--------------------- Multi-line Match Support -----------------START-
+# Comment-out (or remove) both the preceding =pod line and the following
+# =cut line to use this function.  Make sure you've also defined the $IP_pat
+# and $user_pat variables (see above for two examples).
+
+# Some pop services don't put the IP on the line that lets us know that a
+# user was properly authenticated.  For these programs, we scan the IP off
+# an earlier line and the check the validation by comparing the PID values.
+
+my($pop_time, $pop_PID, $pop_IP);
 
 # The maillog line to match is in $_.
 sub custom_match
 {
-    if (/$vmIpPat/o) {
-	($vmTime, $vmPid, $vmIp) = ($1, $2, $3);
+    if (/$IP_pat/o) {
+	($pop_time, $pop_PID, $pop_IP) = ($1, $2, $3);
     }
-    elsif (defined($vmPid) && /$vmUserPat/o && $1 == $vmPid) {
-	undef $vmPid;
-	return ($vmTime, $vmIp);
+    elsif (defined($pop_PID) && /$user_pat/o && $1 == $pop_PID) {
+	undef $pop_PID;
+	return ($pop_time, $pop_IP);
     }
     ( );
 }
-=cut #---------------------- vm-pop3d Match Support --------------------END-
+=cut #--------------------- Multi-line Match Support -------------------END-
 
 
 ########################## Alternate DB/SMTP support #######################

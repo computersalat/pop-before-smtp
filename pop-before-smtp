@@ -17,7 +17,7 @@ pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
      [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
-     [--logto=FILE] [--grace=SECONDS] [--dumpconfig] &
+     [--logto=FILE] [--grace=SECONDS] [--dumpconfig] [--daemon=PIDFILE]
 
 =head1 DESCRIPTION
 
@@ -93,6 +93,12 @@ successfully signs in via POP or IMAP.
 Output some config info and exit. This makes it easy to see what things like
 the dbfile, logto, and watchlog values are being set to in the config file.
 
+=item --daemon=PIDFILE
+
+Become a daemon by forking, redirecting STDIN/STDOUT/STDERR to /dev/null,
+calling setsid, calling chdir('/'), and writing out the process ID of the
+forked process into the specified PIDFILE.
+
 =back
 
 =head1 INSTALLATION
@@ -139,7 +145,7 @@ This daemon likes a couple of helpers. Here's a nice init script:
     pid=/var/run/$progname.pid
     die(){ echo "$progname: $*">&2; exit 1; }
     case "$1" in
-    start) $pgm --logto=$log >/dev/null 2>&1 & echo $! >$pid;;
+    start) $pgm --logto=$log --daemon=$pid;;
     stop) p=`cat $pid`; test -n "$p" || exit 0
         kill $p || exit 0; sleep 1
         kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -204,6 +210,7 @@ use Date::Parse;
 use Date::Format;
 use Getopt::Long;
 use Fcntl ':flock';
+use POSIX 'setsid';
 
 use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
@@ -223,7 +230,7 @@ $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
-my $dump_config;
+my($daemon_pidfile, $dump_config);
 
 $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
@@ -261,6 +268,7 @@ elsif (-f $config_file) {
 
 GetOptions(
     'config=s' => sub { die "--config=$_[1] must be the first option.\n" },
+    'daemon=s' => \$daemon_pidfile,
     'write!' => \$write,
     'debug!' => sub { $debug = $_[1]; $logto = '-' if $debug },
     'flock!' => \$flock,
@@ -273,7 +281,7 @@ GetOptions(
 ) or die <<EOT;
 Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]
-    [--logto=FILE] [--grace=SECONDS]
+    [--logto=FILE] [--grace=SECONDS] [--dumpconfig] [--daemon=PIDFILE]
 EOT
 
 if ($dump_config) {
@@ -281,6 +289,22 @@ if ($dump_config) {
     print "dbfile: $dbfile\n";
     print "logto: $logto\n" if defined $logto;
     exit;
+}
+if (defined $daemon_pidfile) {
+    chdir('/') or die "Can't chdir to /: $!";
+    open(STDIN, '/dev/null') or die "Can't read /dev/null: $!";
+    open(STDOUT, '>/dev/null') or die "Can't write to /dev/null: $!";
+    my $pid = fork;
+    die "Can't fork: $!" unless defined $pid;
+    if ($pid) {
+	open(PF, ">$daemon_pidfile")
+	    or die "Can't write to $daemon_pidfile: $!";
+	print PF "$pid\n";
+	close PF;
+	exit;
+    }
+    open(STDERR, '>&STDOUT');
+    setsid;
 }
 
 $file_tail{'tail'} = -1 if $reprocess;

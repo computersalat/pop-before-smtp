@@ -106,30 +106,6 @@ The integration in /etc/postfix/main.cf might look like this:
         check_client_access hash:/etc/postfix/pop-before-smtp,
         check_relay_domains
 
-A minor issue in the design of this daemon is that for simplicity
-and performance, it makes no attempt to provide a select loop, or
-to otherwise allow periodic checking to clean out old entries even
-if no new ones come in. The $grace interval cleanups of old entries
-only occur when this daemon has just logged a new entry successfully
---- it passed all the pattern and postconf mynetworks checks. If
-you get very few users checking their email with pop, an entry
-could stay in the db file for far longer than $grace. Of course
-it would still require a remarkable coincidence for a spammer to
-exploit this, but if you want to prevent this, you can run another
-daemon that's just a trivial shell loop. Compose a string that
-looks like a valid POP login entry from your daemon, for someone
-coming from the (impossible, but won't get weeded by mynetworks)
-255.255.255.255 addr. Arrange for it to be logged once a minute,
-or however often you want, to ensure that the daemon enters the
-grace-period check/clean loop at least that often. E.g. using Daniel
-Roesen's cucipop format, you could have:
-
-        pat='x 255.255.255.255 0, 0 (0), 0 (0)'
-        while true; do
-                sleep 60 # or however long
-                logger -p mail.info -t cucipop -i "$pat"
-        done
-
 =head1 TROUBLESHOOTING
 
 Andy Dills <andy@xecu.net> reports that on his Solaris system,

@@ -1,6 +1,15 @@
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Added the ability to override our tie, sync, and flock functions
+	  from the config file.
+
+	* pop-before-smtp-conf.pl:
+	- Added a sample BerkeleyDB setup (commented out).
+
+2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
 	- Removed the dashes from the current (pre-release) version number.
 
 	* pop-before-smtp.spec:

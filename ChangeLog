@@ -3,10 +3,12 @@
 	* pop-before-smtp:
 	- Added the --logto=FILE option.
 	- Removed the day-of-the-week from the stdout timestamp.
+	- Don't force the extra expiration check quite so often.
 
 	* pop-before-smtp-conf.pl:
 	- Document the new set_output_log() function, and put the syslog()
 	  setup next to it.
+	- Added Courier-POP3 to the Courier-IMAP pattern.
 
 2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 

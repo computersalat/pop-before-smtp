@@ -4,21 +4,33 @@
 
 progname=pop-before-smtp
 pgm=/usr/sbin/$progname
-log=/var/adm/$progname
-test -f /var/log/messages && log=/var/log/$progname
 pid=/var/adm/$progname.pid
 test -d /var/run && pid=/var/run/$progname.pid
-mail=/var/log/maillog
-test -f $mail || mail=/var/log/messages
-test -f $mail || mail=/var/adm/messages
+
+if test -f /etc/pop-before-smtp-conf.pl; then
+	# If there is a config file, let it do its job.
+	watchlog=
+	logto=
+else
+	# Without a config file, try to intuit the proper options.
+	mail=/var/log/maillog
+	test -f $mail || mail=/var/log/mail/info
+	test -f $mail || mail=/var/log/messages
+	test -f $mail || mail=/var/adm/messages
+	watchlog=--watchlog=$mail
+	log=/var/adm/$progname
+	test -f /var/log/messages && log=/var/log/$progname
+	logto=--logto=$log
+fi
+
 die(){ echo "$progname: $*">&2; exit 1; }
 
 case "$1" in
- start) echo -n Starting pop-before-smtp...
-	$pgm --logfile=$mail >$log 2>&1 & echo $! >$pid
+start)	echo -n Starting pop-before-smtp...
+	$pgm $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
 	echo done
 	;;
-  stop) echo -n Stopping pop-before-smtp...
+stop)	echo -n Stopping pop-before-smtp...
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -31,11 +43,10 @@ case "$1" in
 		echo failed
 	fi
 	;;
-
 status)	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
 	kill -0 $p || die "$pgm[$p] is no longer running"
-	/usr/bin/ps -fp $p
+	ps -fp $p
 	;;
 restart) $0 stop; $0 start;;
       *) die "syntax: `basename $0` start|stop|restart|status";;

@@ -138,7 +138,7 @@ use Getopt::Long;
 use Fcntl ':flock';
 
 use vars qw(
-    $pat $write $flock $debug $reprocess $grace %file_tail
+    $pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
 );
@@ -193,10 +193,10 @@ elsif (-f $config_file) {
 GetOptions(
     'config=s' => sub {die "--config=$_[1] must be the first option.\n"},
     "write!" => \$write,
-    "debug!" => sub { $debug = 1; $log_func = \&log_to_stdout; select(STDOUT) },
+    "debug!" => sub { $debug = $_[1]; $logto = '-' if $debug },
     "flock!" => \$flock,
     "watchlog|logfile=s" => \$file_tail{'name'},
-    'logto=s' => sub { set_output_log($_[1]) },
+    'logto=s' => sub { $logto = $_[1] },
     "dbfile=s" => \$dbfile,
     "grace=i" => \$grace,
     "reprocess!" => \$reprocess,
@@ -204,9 +204,11 @@ GetOptions(
     "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE]\n    " .
     "[--grace=SECONDS]\n";
 
+set_output_log($logto) if defined $logto;
+
 $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;
-$log_func = sub { } unless $log_func;
+$log_func = sub { } if !$log_func;
 
 my $fi = File::Tail->new(%file_tail);
 

@@ -2,10 +2,10 @@
 # pop-before-smtp script's setup.  Install it as /etc/pop-before-smtp-conf.pl
 
 # There's a lot of stuff in here, so don't get overwhelmed.  Most people can
-# use the default setup (if you're using postfix and UW pop/imap).  Other folks
+# use the default setup (if you're using Postfix and UW pop/imap).  Other folks
 # just need to choose the right $pat variable and perhaps uncomment a section
 # (near the end of the file) with the support for your particular SMTP program
-# (if you're not using postfix).  See the contrib/README.QUICKSTART file for
+# (if you're not using Postfix).  See the contrib/README.QUICKSTART file for
 # how to install and test your setup.
 
 use vars qw(
@@ -79,7 +79,7 @@ if (!-f $file_tail{'name'}) {
 #
 # Pick one of these values for the $pat variable OR define a subroutine
 # named "custom_match" to handle a more complex match scenario (there's
-# and example below).  Feel free to delete all the stuff you don't need.
+# an example below).  Feel free to delete all the stuff you don't need.
 #
 ############################ START OF PATTERNS #############################
 
@@ -95,7 +95,8 @@ if (!-f $file_tail{'name'}) {
 # There are many, many different logfile formats emitted by various
 # qpoppers. Here's an attempt to match any of them, but, for all
 # I know, it might also match failed logins or something else.
-#$pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$';
+#$pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: ' .
+#    '.*\s(\d+\.\d+\.\d+\.\d+)$';
 
 # For Cyrus, Kenn Martin <kmartin@infoteam.com>, with tweak
 # from William Yodlowsky for IP addrs that don't resolve:
@@ -112,11 +113,11 @@ if (!-f $file_tail{'name'}) {
 
 # For Qpopper POP/APOP Server
 #$pat = '^(... .. ..:..:..) \S+ (?:qpopper)\[\d+\]: Stats: \S+ ' .
-#    '(?:\d+ ){4}(\d+.\d+.\d+.\d+)';
+#    '(?:\d+ ){4}(\d+\.\d+\.\d+\.\d+)';
 
 # Alex Burke's popper install
 #$pat = '^(... .. ..:..:..) \S+ popper\[\d+\]: Stats: \S+ ' .
-#    '(?:\d+ ){4}(?:\S+ )?(\d+.\d+.\d+.\d+)$';
+#    '(?:\d+ ){4}(?:\S+ )?(\d+\.\d+\.\d+\.\d+)$';
 
 # Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
 #$pat = '^(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) \[\d+\] ' .
@@ -124,8 +125,8 @@ if (!-f $file_tail{'name'}) {
 
 # Nick Bauer <nickb@inc.net> has something completely different as
 # a qpopper logfile format
-#$pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) POP login ' .
-#    'by user "[^"]+" at \([^)]+\) (\d+.\d+.\d+.\d+)$';
+#$pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) ' .
+#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)$';
 
 # For cucipop, matching a sample from Daniel Roesen:
 #$pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
@@ -134,17 +135,35 @@ if (!-f $file_tail{'name'}) {
 # For popa3d with the patch from bartek marcinkiewicz <jr@rzeznia.eu.org>
 # (available in contrib/popa3d/):
 #$pat = '^(... .. ..:..:..) \S+ popa3d\[\d+\]: ' .
-#    'Authentication passed for \S+ -- \[(\d+.\d+.\d+.\d+)\]$';
+#    'Authentication passed for \S+ -- \[(\d+\.\d+\.\d+\.\d+)\]$';
 
 # A Perdition pattern supplie by Simon Matthews <simon@paxonet.com>.
-#my $pat = '^(... .. ..:..:..) \S+ perdition\[\d+\]: ' .
-#    '(?:Auth:) (\d+.\d+.\d+.\d+)(?:\-\>\d+.\d+.\d+.\d+) ' .
+#$pat = '^(... .. ..:..:..) \S+ perdition\[\d+\]: ' .
+#    '(?:Auth:) (\d+\.\d+\.\d+\.\d+)(?:\-\>\d+\.\d+\.\d+\.\d+) ' .
 #    'user=(?:\"\S+\") server=(?:\"\S+\") port=(?:\"\S+\") status=(?:\"ok\")';
 
 ############################# END OF PATTERNS ##############################
 
 
-=pod #----------------------------------------------------------------------
+=pod #===================== Match Multiple Patterns ========================
+
+# Add as many patterns as you like.
+my @match = ( $pat, $pat2 );
+
+$_ = qr/$_/ foreach @match; # Pre-compile the regular expressions.
+
+sub custom_match
+{
+    foreach my $regex (@match) {
+	# Return timestamp and IP for any (pre-compiled) pattern that matches.
+	return ($1, $2) if /$regex/;
+    }
+    ( );
+}
+
+=cut #===================== Match Multiple Patterns ========================
+
+=pod #---------------------- vm-pop3d Match Support ------------------------
 # vm-pop3d support by <andy@kahncentral.net>.
 #
 # Comment-out the above =pod line to use this function.
@@ -171,7 +190,7 @@ sub custom_match
     }
     ( );
 }
-=cut #----------------------------------------------------------------------
+=cut #---------------------- vm-pop3d Match Support ------------------------
 
 ############################# Alternate DB support #########################
 #

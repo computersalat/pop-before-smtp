@@ -1,6 +1,20 @@
 2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Fixed --nodebug (my changes had made it work the same as --debug).
+	- Added $logto variable to make overriding our output-log easier.
+	  E.g. the previous config might have called set_output_log(),
+	  which could fail (if we're not root) and trying to override it
+	  with --logto on the command-line wouldn't do so soon enough to
+	  avoid this.
+
+	* pop-before-smtp-conf.pl:
+	- Changed the code that used set_output_log() and \&log_to_stdout to
+	  set the new $logto var.
+
+2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
 	- Updated the init-file example in the docs.
 	- Changed to --debug option to always set the $log_func and to
 	  select(STDOUT).

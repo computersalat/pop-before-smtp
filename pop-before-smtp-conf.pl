@@ -44,6 +44,19 @@ use vars qw(
 #$file_tail{'resetafter'} = 30;
 #$file_tail{'tail'} = -1;
 
+#===========================================================================
+# If you want to output a log file of what pop-before-smtp is doing, you have a
+# few choices: either call set_output_log('FILE'), uncomment the syslog lines
+# below, or put a reference to your own custom logging function in $log_func.
+
+#set_output_log('/var/log/pop-before-smtp');
+
+# Uncomment these 3 lines to cause log messages to use syslog().
+#use Sys::Syslog;
+#openlog('pop-before-smtp', 'pid', 'mail');
+#$log_func = \&syslog;
+#===========================================================================
+
 # This logging function lets you see what pop-before-smtp is doing.  The
 # default is no logging.  We provide &log_to_stdout, and a syslog() setup
 # down near the end of this file.
@@ -149,14 +162,5 @@ sub custom_match
     ( );
 }
 =cut #----------------------------------------------------------------------
-
-
-#===========================================================================
-# Uncomment these 3 lines to cause log messages to use syslog().
-
-#use Sys::Syslog;
-#openlog('pop-before-smtp', 'pid', 'mail');
-#$log_func = \&syslog;
-#===========================================================================
 
 1;

@@ -1,3 +1,10 @@
+2002-11-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Modified mynet_postfix() to expand any $variables that postconf
+	  mentiones in its response.  This is a modified version of a patch
+	  submitted by Vector <vector@itpsg.com>.
+
 2002-11-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

@@ -203,7 +203,6 @@ currently being maintained by Wayne Davison <wayned@users.sourceforge.net>.
 
 =cut
 
-use File::Tail;
 use DB_File;
 use Net::Netmask;
 use Date::Parse;
@@ -216,6 +215,7 @@ use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
+    $tail_init_func $tail_getline_func
 );
 
 # Default values, possibly overridden in the config file.
@@ -236,6 +236,8 @@ $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
 $sync_func = \&sync_DB;
 $flock_func = \&flock_DB;
+$tail_init_func = \&tail_init;
+$tail_getline_func = \&tail_getline;
 
 # See the pop-before-smtp-conf.pl file for what these values mean.
 %file_tail = (
@@ -244,6 +246,7 @@ $flock_func = \&flock_DB;
     interval => 5,
     adjustafter => 3,
     tail => -1,
+    resetafter => 30,
 );
 
 # Build complete sanitary environment.
@@ -324,7 +327,7 @@ $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;
 $log_func = sub { } if !$log_func;
 
-my $fi = File::Tail->new(%file_tail);
+$tail_init_func->();
 
 $SIG{'INT'} = \&sig_handler;
 $SIG{'TERM'} = \&sig_handler;
@@ -348,7 +351,7 @@ for (@mynets) {
 	$netblock->storeNetblock();
     }
     else {
-	$log_func->('error', "Net::Netmask error parsing `$_': " . Net::Netmask::errstr);
+	$log_func->('error', "Net::Netmask error parsing `$_': " . &Net::Netmask::errstr);
     }
 }
 
@@ -378,7 +381,7 @@ my $db_changed = 0;
 my $expire_check_time = 0;
 
 while (1) {
-    $_ = $fi->read;
+    $_ = $tail_getline_func->();
     if ($reprocess) {
 	# To assist with debugging, pretend the current time is when this
 	# line's event happened.
@@ -512,6 +515,64 @@ sub flock_DB
 }
 
 # --- END --- The default Postfix/DB_File support functions
+
+# --- START --- The default logfile-reading functions
+
+sub tail_init
+{
+    &tail_open;
+    $::tail_buf = '';
+    if ($file_tail{'tail'} >= 0) {
+	if (defined sysseek(TAIL, -$file_tail{'tail'}*128, 2)) {
+	    &tail_getline; # dump partial line
+	}
+	else {
+	    sysseek(TAIL, 0, 0);
+	}
+    }
+}
+
+sub tail_open
+{
+    open(TAIL, $file_tail{'name'}) or die "Unable to open $file_tail{'name'}: $!";
+    $::tail_inode = (stat(TAIL))[1];
+}
+
+sub tail_getline
+{
+    while (1) {
+	return $1 if $::tail_buf =~ s/^(.*\n)//;
+	my $cnt = 1;
+	my $slept = 0;
+	my $i = $file_tail{'interval'};
+	while (1) {
+	    last if sysread(TAIL, $::tail_buf, 2048, length($::tail_buf));
+	    sysseek(TAIL, 0, 1);
+	    if ($slept >= $file_tail{'resetafter'}) {
+		$slept = 0;
+		my $new_inode;
+		foreach (1..5) {
+		    $new_inode = (stat($file_tail{'name'}))[1];
+		    last if $new_inode;
+		    sleep 2;
+		}
+		if ($::tail_inode != $new_inode) {
+		    &tail_open;
+		    $cnt = 1;
+		}
+	    }
+	    if ($cnt % $file_tail{'adjustafter'} == 0) {
+		$i += 2;
+		$i = $file_tail{'maxinterval'} if $i > $file_tail{'maxinterval'};
+	    }
+	    sleep $i;
+	    $cnt++;
+	    $slept += $i;
+	}
+    }
+}
+
+# --- END --- The default logfile-reading functions
 
 sub log_to_stdout
 {

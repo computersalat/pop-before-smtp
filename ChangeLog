@@ -1,3 +1,11 @@
+2002-04-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added SIGHUP support to reopen the log file (when --logto is used).
+
+	* pop-before-smtp-conf.pl:
+	- Updated the Courier POP/IMAP regex.
+
 2002-04-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* README:

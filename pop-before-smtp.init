@@ -12,7 +12,7 @@ die(){ echo "$progname: $*">&2; exit 1; }
 
 case "$1" in
  start) echo -n Starting pop-before-smtp
-	$pgm >$log 2>&1 & echo $! >$pid
+	$pgm --debug >$log 2>&1 & echo $! >$pid
 	echo_success; echo ''
 	;;
   stop) echo -n Stopping pop-before-smtp

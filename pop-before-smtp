@@ -1,8 +1,14 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.15 Bennett Todd <bet@rahul.net> Freely Redistributable
-# 1.15 2000-07-25 Changes requested by Daniel Roesen
+# pop-before-smtp 1.16 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.16 2000-08-10 William Yodlowsky <wyodlows@nj.devry.edu> provided the
+#                 beautifully trivial patch for Taint support
+#                 Darron Froese provided README.QUICKSTART.
+#                 Added pattern for gnu-pop3d, as $pat2, for
+#                 coexisting with UW (or some other) imapd;
+#                 made $debug default in init script
+# 1.15 2000-07-31 Changes requested by Daniel Roesen
 #                 <dr@bofh.de>: renamed init script
 #                 to a nice lengthy pop-before-smtp; yanked daemon
 #                 start/stop on rpm -i/rpm -e; added a
@@ -184,12 +190,20 @@ my $debug = 0;
 # File to watch for pop3d/imapd records
 my $logfile = '/var/log/maillog';
 
+# If postconf isn't somewhere on this PATH, do fix the PATH so it is
+$ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
+
 # This regex pull the lines I'm interested in out of $logfile, and yanks out
 # the timestamp and IP address
 
 # For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
+#Aug 10 19:21:18 fridge gnu-pop3d[21974]: User 'shirwah' logged in with mailbox 'shirwah' from 208.178.52.178
 my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
-          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]$';
+
+# Bennett Todd to add support for GNU pop3d
+my $pat2 = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
+	  'User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$';
 
 # There are many, many different logfile formats emitted by various
 # qpoppers. Here's an attempt to match any of them, but for all
@@ -229,7 +243,6 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 # For cucipop, matching a sample from Daniel Roesen:
 # my $pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
 #           '(\d+\.\d+\.\d+\.\d+) \d+, \d+ \(\d+\), \d+ \(\d+\)';
-
 
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period
@@ -309,7 +322,8 @@ $| = 1 if $debug;
 
 while (1) {
 	$_ = $fi->read;
-	my ($timestamp, $ipaddr) = m/$pat/o or next;
+	m/$pat/o or m/$pat2/o or next;
+	my ($timestamp, $ipaddr) = ($1, $2);
 	my $ts = str2time($timestamp) or next;
 	$ts += $grace;
 	next if $ts < time;

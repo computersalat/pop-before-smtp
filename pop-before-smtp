@@ -1,12 +1,13 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# Check the website <URL:http://popbsmtp.sf.net/> for the latest version,
-# and the mailing list for discussing this program and asking for help at
-# <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
+# Check the website <URL:http://popbsmtp.sourceforge.net/> for the latest
+# version, and the mailing list for discussing this program and asking for
+# help at <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 #
 # Copyright (C) 1999, 2000, 2001 Bennett Todd.
 # Also Copyright (C) 2002, 2003, 2004 Wayne Davison. Freely Redistributable.
+# See the file COPYING for details.
 
 my $VERSION = '1.35';
 
@@ -71,15 +72,17 @@ Useful for testing, especially when combined with --debug and possibly
 You can specify what maillog to watch for POP/IMAP events. The default in the
 script is /var/log/maillog, but the provided config file searches for an
 existing log file, also checking for /var/log/mail/info, /var/log/mail.log,
-/var/log/messages, or /var/adm/messages.
+/var/log/messages, or /var/adm/messages.  Run "pop-before-smtp --dumpconfig"
+to see the actual value for your system.
 
 =item --dbfile=FILE
 
-You can specify what DB file to update. The default value is
-"/etc/postfix/pop-before-smtp" which creates/updates a file with the same name
-but with ".db" appended (since the default tie function appends a ".db" onto
-the specified name for you). If your config file supersedes the tie function,
-you can choose to append a different suffix or no suffix at all.
+You can specify what DB file to update. The default value in the script is
+"/etc/mail/pop-before-smtp", but you should run "pop-before-smtp --dumpconfig"
+to see the actual value for your system.  Typically, the filename that is
+created/updated is this name with a ".db" suffix added (because the default
+tie function appends the ".db" onto the specified db name -- if you supply a
+custom tie function, it is free to choose to do something else).
 
 =item --logto=FILE
 
@@ -116,71 +119,31 @@ forked process into the specified PIDFILE.
 
 =head1 INSTALLATION
 
-This daemon directly requires four modules from CPAN, which are not
-included in the base Perl release as of this writing, and one of
-those depends on another, so make sure you've downloaded and
-installed suitably recent versions of:
-
-    Net::Netmask
-    Date::Parse & Date::Format (both in TimeDate)
-
-In addition, it depends on the DB_File module; if you don't have it
-included in your perl build already (presumably because Berkeley DB
-wasn't available when your Perl was configured and built) then you
-can provide it by downloading the CPAN DB_File module, available
-from http://www.cpan.org/authors/id/PMQS/DB_File-1.803.tar.gz.
-Alternatively, if your SMTP software supports some other on-disk-hash
-table type (you can check Postfix's supported map types with "postconf -m")
-then you can just add an appropriate "use" statement for your hash type to the
-config file (look in the AnyDBM_File pod documentation) and then setup your own
-tie/sync/flock subroutines (see the BerkeleyDB example in the config file).
-Also remember that if you're using Postfix, the example main.cf section we
-include below will need you to change the "hash:" prefix to the appropriate
-prefix for your DB type.
+This daemon directly requires four modules from CPAN, which are not included
+in the base Perl release as of this writing.  See the quickstart guide for
+more information (either look at the README.QUICKSTART file in the source or
+visit http://popbsmtp.sourceforge.net/quickstart.shtml).
 
 You should edit the supplied pop-before-smtp-conf.pl file to customize things
 for your local system, such as scanning for the right POP/IMAP authorization,
-setting various options, etc.
+setting various options, etc.  Again, the quickstart guide cover this.
 
 When starting up, pop-before-smtp builds an internal table of all netblocks
-natively permitted by your SMTP software (for Postfix it looks at the output of
-"postconf mynetworks"). This allows us to filter out local IP addresses that
-are already authorized and thus need no special help from us.
+natively permitted by your SMTP software (for Postfix it looks at the output
+of "postconf mynetworks"). This allows us to filter out local IP addresses
+that are already authorized and thus need no special help from us.
 
-This daemon likes a couple of helpers. Here's a nice init script:
+This daemon likes a couple of helpers. Several init scripts are included with
+the source and a version customized for your current OS may have been
+installed in the same package as the pop-before-smtp script.
 
-    #!/bin/sh
-    progname=`basename $0`
-    pgm=/usr/sbin/$progname
-    log=/var/log/$progname
-    pid=/var/run/$progname.pid
-    die(){ echo "$progname: $*">&2; exit 1; }
-    case "$1" in
-    start) $pgm --logto=$log --daemon=$pid;;
-    stop) p=`cat $pid`; test -n "$p" || exit 0
-        kill $p || exit 0; sleep 1
-        kill -9 $p 2>/dev/null || exit 0; sleep 1
-        kill -0 $p && die "$pid won't die"
-        ;;
-    esac
-
-For those using Postfix, the integration in /etc/postfix/main.cf might look
-like this:
-
-  smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
-        check_client_access hash:/etc/postfix/pop-before-smtp,
-        reject_unauth_destination
-
-For those using a recent sendmail (at least version 8.9), you can add this
-to your cf file:
-
-    HACK(`popauth')
-
-and then enable the sendmail SMTP section in the config file.
+Once pop-before-smtp has been started (and thus the database file has been
+created), you'll need to modify your MTA's configuration to read the IPs from
+the database file.  This is also covered in the quickstart guide.
 
 =head1 DOWNLOAD, SUPPORT, etc.
 
-See the website http://popbsmtp.sf.net/ for the latest version.
+See the website http://popbsmtp.sourceforge.net/ for the latest version.
 See the mailing list (referenced on the website) for support.
 
 =head1 INTERNALS
@@ -231,7 +194,7 @@ $write = 1; # open and change the DB
 $flock = 1; # we do the exclusive file-locking when updating
 $debug = 0; # no debug messages
 $reprocess = 0; # no debug reprocessing of watchlog
-$dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
+$dbfile = '/etc/mail/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
 my($daemon_pidfile, $dump_version, $dump_config, $list_ips);

@@ -10,6 +10,7 @@
 # contrib/README.QUICKSTART file for step-by-step instructions on how to
 # install and test your setup.
 
+use strict;
 use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
@@ -251,6 +252,7 @@ sub custom_match
 # If you comment-out (or remove) the two surrounding =cut lines, we'll use
 # NDBM_File instead of DB_File.
 
+use Fcntl;
 use NDBM_File;
 
 #$mynet_func = \&mynet_postfix; # Use the default
@@ -349,6 +351,7 @@ sub sync_tcprules
 
 my $ESMTPD = '/usr/lib/courier/sbin/esmtpd';
 
+use Fcntl qw(:DEFAULT :flock);
 use DB_File;
 
 $dbfile = '/etc/courier/smtpaccess'; # DB hash to write
@@ -357,7 +360,7 @@ $dbvalue = 'allow,RELAYCLIENT';
 $mynet_func = \&mynet_courier;
 $tie_func = \&tie_courier;
 $sync_func = \&sync_courier;
-#$flock_func = \&flock_DB; # Use the default
+$flock_func = \&flock_courier;
 
 sub mynet_courier
 {
@@ -376,6 +379,12 @@ sub tie_courier
     }
 }
 
+sub flock_courier
+{
+    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
+	or die "$0: flock_DB($_[0]) failed: $!\n";
+}
+
 sub sync_courier
 {
     $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
@@ -391,6 +400,7 @@ sub sync_courier
 # the sendmail.cf changes you'll need to make.  If you find that Sendmail
 # isn't recognizing the changes to the DB file, set $signal_sendmail to 1.
 
+use Fcntl qw(:DEFAULT :flock :seek);
 use DB_File;
 
 $dbfile = '/etc/mail/popauth'; # DB hash to write

@@ -89,7 +89,7 @@ $log_func = \&syslog;
 # For UW ipop3d/imapd and their secure versions. This is the DEFAULT.
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
 #    '(?:Login|Authenticated|Auth) user=\S+ ' .
-#    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
+#    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For GNU pop3d
 #$pat = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
@@ -112,7 +112,7 @@ $log_func = \&syslog;
 
 # For qmail's pop3d:
 #$pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
-#    'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)$';
+#    'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)';
 
 # For Qpopper POP/APOP Server
 #$pat = '^(... .. ..:..:..) \S+ qpopper\[\d+\]: Stats: \S+ ' .
@@ -120,16 +120,16 @@ $log_func = \&syslog;
 
 # Alex Burke's popper install
 #$pat = '^(... .. ..:..:..) \S+ q?popper\[\d+\]: Stats: \S+ ' .
-#    '(?:\d+ ){4}(?:\S+ )?(\d+\.\d+\.\d+\.\d+)$';
+#    '(?:\d+ ){4}(?:\S+ )?(\d+\.\d+\.\d+\.\d+)';
 
 # Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
 #$pat = '^(\w{3} \w{3} \d\d \d\d:\d\d:\d\d \d{4}) \[\d+\] ' .
 #    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
 
-# Nick Bauer <nickb@inc.net> has something completely different as
-# a qpopper logfile format
-#$pat = '^(... .. ..:..:..) \S+ qpopper\S*\[\d+\]: \([^)]*\) ' .
-#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)$';
+# Nick Bauer <nickb@inc.net> supplied the basis for this qpopper pattern.
+# Some extra tweaks support more recent variations.
+#$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper\S*\[\d+\]: \([^)]*\) ' .
+#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # For cucipop, matching a sample from Daniel Roesen:
 #$pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
@@ -138,7 +138,7 @@ $log_func = \&syslog;
 # For popa3d with the patch from bartek marcinkiewicz <jr@rzeznia.eu.org>
 # (available in contrib/popa3d/):
 #$pat = '^(... .. ..:..:..) \S+ popa3d\[\d+\]: ' .
-#    'Authentication passed for \S+ -- \[(\d+\.\d+\.\d+\.\d+)\]$';
+#    'Authentication passed for \S+ -- \[(\d+\.\d+\.\d+\.\d+)\]';
 
 # A Perdition pattern supplie by Simon Matthews <simon@paxonet.com>.
 #$pat = '^(... .. ..:..:..) \S+ perdition\[\d+\]: ' .

@@ -1,7 +1,10 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.18 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.19 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.19 2000-09-18 Robert L Mathews performed benchmarks demonstrating that
+#                 the performance cost of the flocks is negligible, so
+#                 I switched them to default to on.
 # 1.18 2000-09-17 added flocks from Robert L Mathews <rob@tigertech.com>
 # 1.17 2000-09-17 Brian Duggan <bduggan@oven.com> and Jeff Moore <jbm@oven.com>
 #                 worked out a fix for the sometimes-present nmsgs= at the end
@@ -96,13 +99,13 @@ tosses it, and if the timestamp in the hash is also expired and equals the
 timestamp in the queue it deletes the hash entry and the on-disk db file
 entry.
 
-It contains support, currently defaulting to _disabled_, for
-protecting writes to the db file by flock. As far as I know, the
-consequences of a collision (corrupt read in an smtpd) are
-relatively mild, and the likelihood of one is remote, while the
-performance consequences of the flocking I do not know. To enable
-the flocking, invoke with --flock. Please let me know if you feel
-the default should be changed, and if so why.
+It contains support for protecting writes to the db file by flock.
+As far as I know, the consequences of a collision (corrupt read in
+an smtpd) are relatively mild, and the likelihood of one is remote,
+but the performance impact of the locking seems to be negligible, so
+it's enabled by default. To disable the flocking, invoke with
+--noflock. Please let me know if you feel the default should be
+changed, and if so why.
 
 If invoked with --debug, it will emit a fair amount of nattering on
 stdout, which may be helpful in diagnosing problems, then again it
@@ -200,7 +203,7 @@ use Fcntl ':flock';
 
 # Flags
 my $write = 1;
-my $flock = 0;
+my $flock = 1;
 my $debug = 0;
 
 # File to watch for pop3d/imapd records

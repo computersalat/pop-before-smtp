@@ -387,6 +387,7 @@ $mynet_func = \&mynet_sendmail;
 $tie_func = \&tie_sendmail;
 $sync_func = \&sync_sendmail;
 $flock_func = \&flock_sendmail;
+#$flock_func = \&fcntl_sendmail;
 
 my $signal_sendmail = 0;
 my($pid_file, $sendmail_pid);
@@ -438,6 +439,13 @@ sub sync_sendmail
 sub flock_sendmail
 {
     flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
+	or die "$0: flock_DB($_[0]) failed: $!\n";
+}
+
+sub fcntl_sendmail
+{
+    my $lock = pack('s s l l i', $_[0]? F_WRLCK : F_UNLCK, SEEK_SET, 0, 0, 0);
+    fcntl(DB_FH, F_SETLKW, $lock)
 	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
 =cut #------------------------- Sendmail SMTP ---------------------------END-

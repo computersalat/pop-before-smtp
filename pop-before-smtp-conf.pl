@@ -439,8 +439,10 @@ sub sync_CDB
 }
 =cut #========================== CDB_File SMTP =========================END=
 
+############################## Support Routines ############################
+
 # This section takes care of defining a multi-line-match custom_match()
-# subroutine, but only if the user configured our required patterns.
+# subroutine, but only if the user configured our 3 required patterns.
 
 if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
     eval <<'EOT';

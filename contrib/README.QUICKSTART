@@ -20,10 +20,10 @@ Do these things:
 
 If you want to install the perl modules as RPMs, take a look at the script
 in contrib named getfromcpan.  It fetches the perl modules, turns them into
-RPMs, and then (if you run it as root) installs them & removes the built
-RPMs.  (I prefer to build the RPMs as a non-root user and then install the
-RPMs manually as root.)  The script works either way (and it looks for your
-~/.rpmmacros file to determine what "topdir" to use).
+RPMs, and then (if you run it as root) installs them.  (I prefer to build
+the RPMs as a non-root user and then install the RPMs manually as root.)
+The script works either way because it looks for your ~/.rpmmacros file to
+determine what "topdir" to use.
 
 Note that some systems already have pre-built packages for some or all of
 these RPMs already available, so you might want to check your distribution

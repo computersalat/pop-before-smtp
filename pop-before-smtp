@@ -139,7 +139,8 @@ use Fcntl ':flock';
 
 use vars qw(
     $pat $write $flock $debug $reprocess $grace %file_tail
-    %db $dbfile $tie_func $sync_func $flock_func $log_func
+    @mynets %db $dbfile $dbvalue
+    $mynet_func $tie_func $sync_func $flock_func $log_func
 );
 
 # Default values, possibly overridden in the config file.
@@ -152,7 +153,13 @@ $flock = 1; # we do the exclusive file locking when updating
 $debug = 0; # no debug messages
 $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
+$dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
+
+$mynet_func = \&mynet_postfix;
+$tie_func = \&tie_DB;
+$sync_func = \&sync_DB;
+$flock_func = \&flock_DB;
 
 # See the pop-before-smtp-conf.pl file for what these values mean.
 %file_tail = (
@@ -197,11 +204,8 @@ GetOptions(
     "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE]\n    " .
     "[--grace=SECONDS]\n";
 
-$tie_func = \&tie_DB unless $tie_func;
 $sync_func = sub { } if !$write;
-$sync_func = \&sync_DB unless $sync_func;
 $flock_func = sub { } if !$flock || !$write;
-$flock_func = \&flock_DB unless $flock_func;
 $log_func = sub { } unless $log_func;
 
 my $fi = File::Tail->new(%file_tail);
@@ -215,9 +219,8 @@ $| = 1;
 my $now = time;
 $log_func->('info', 'starting up');
 
-foreach (cleanup_nets(`postconf mynetworks`)) {
-    Net::Netmask->new($_)->storeNetblock();
-}
+@mynets = cleanup_nets($mynet_func->());
+Net::Netmask->new($_)->storeNetblock() for @mynets;
 
 my (%t, @q);
 
@@ -266,7 +269,7 @@ while (1) {
     $t{$ipaddr} = $ts;
     next if $already_enabled;
     $flock_func->(1);
-    $db{$ipaddr} = "ok" if $write;
+    $db{$ipaddr} = $dbvalue;
     $log_func->('info', "added $ipaddr to DB");
     $db_changed = 1;
 }
@@ -280,7 +283,7 @@ continue {
 		    $db_changed = 1;
 		}
 		delete $t{$ipaddr};
-		delete $db{$ipaddr} if $write;
+		delete $db{$ipaddr};
 		$log_func->('info', "removed $ipaddr from DB");
 	    }
 	}
@@ -302,7 +305,6 @@ sub cleanup_nets
     foreach (@_) {
 	# Detaint.  Also remove leading/trailing spaces.
 	($_) = /^\s*(.*?)\s*$/s;
-	s/^mynetworks\s*=\s*//;
 	foreach (split /[,\s]+/) {
 	    if (m#^/#) {
 		# Slurp the whole file into $_.
@@ -323,6 +325,13 @@ sub cleanup_nets
     @nets;
 }
 
+sub mynet_postfix
+{
+    $_ = `postconf mynetworks`;
+    s/^mynetworks\s*=\s*//;
+    $_;
+}
+
 my $dbh;
 
 # We set the global %db to the opened database hash.  We also set $dbh for
@@ -339,7 +348,7 @@ sub tie_DB
 
 sub sync_DB
 {
-    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+    $dbh->sync and die "$0: sync $dbfile: $!\n";
 }
 
 sub flock_DB

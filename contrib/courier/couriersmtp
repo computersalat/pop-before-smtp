@@ -1,5 +1,0 @@
-#!/bin/sh
-# Restart Courier esmtpd
-	/usr/lib/courier/sbin/esmtpd stop
-	/usr/lib/courier/sbin/esmtpd start
-exit 0

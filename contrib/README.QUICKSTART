@@ -20,10 +20,14 @@ Do these things:
 
 If you want to install the perl modules as RPMs, take a look at the script
 in contrib named getfromcpan.  It fetches the perl modules, turns them into
-RPMs, and then (if you run it as root) installs them (removing the built
-RPMs as the last step).  (I prefer to build the RPMs as a non-root user and
-then install the RPMs as root.)  The script works either way (it looks for
-your ~/.rpmmacros file to determine what "topdir" to use).
+RPMs, and then (if you run it as root) installs them & removes the built
+RPMs.  (I prefer to build the RPMs as a non-root user and then install the
+RPMs manually as root.)  The script works either way (and it looks for your
+~/.rpmmacros file to determine what "topdir" to use).
+
+Note that some systems already have pre-built packages for some or all of
+these RPMs already available, so you might want to check your distribution
+CDs or your favorite RPM/Apt site.
 
 For the non-RPM way, run these commands as root:
 
@@ -55,14 +59,14 @@ config file).  Make sure you uncomment all the lines from the "$pat = "
 start down to the nearest ';' for your pattern of choice (this is usually
 2-3 lines).
 
-If you're using a postfix that needs a custom DB style or a different
+If you're using Postfix and need to use a custom DB style or a different
 dbfile path, feel free to edit that into the file as well.
 
-If you're not using postfix, you'll hopefully find the your SMTP software
+If you're not using Postfix, you'll hopefully find your SMTP software
 mentioned near the end of the config file.  Comment out the preceding =pod
 line for the section you want to enable.  The instructions in the rest of
-this file assume you're using postfix, so you'll have to translate the
-postfix-specific steps into something appropriate for your SMTP software.
+this file assume you're using Postfix, so you'll have to translate the
+Postfix-specific steps into something appropriate for your SMTP software.
 
 3. Test the pop-before-smtp daemon.
 
@@ -100,15 +104,15 @@ add this somewhere into that line:
 check_client_access hash:/etc/postfix/pop-before-smtp
 
 If you don't already have an "smtpd_recipient_restrictions" in your
-main.cf, add this one as it works pretty good:
+main.cf, add this one as it works pretty well:
 
 smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 	check_client_access hash:/etc/postfix/pop-before-smtp,
 	check_relay_domains
 
-8. Reload postfix and make sure that it's working by checking your email,
-then checking to see the modification date on the file
-/etc/postfix/pop-before-smtp.db has changed.  If so, you can relay to your
-heart's content.
+8. Reload Postfix and make sure that it's working by checking your email
+(from a non-local IP, of course!), then checking to see the modification
+date on the file /etc/postfix/pop-before-smtp.db has changed.  If so, you
+can relay to your heart's content.
 
 Let me repeat - this *is* the easy way. ;-)

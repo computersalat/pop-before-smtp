@@ -1,6 +1,6 @@
 Summary: watch log for pop/imap auth, notify Postfix to allow relay
 Name: pop-before-smtp
-Version: 1.14
+Version: 1.15
 Release: 1
 Source: https://fridge.oven.com/~bet/src/pop-before-smtp-%{PACKAGE_VERSION}.tar.gz
 License: Freely Redistributable
@@ -29,21 +29,19 @@ echo I see nothing to build here to build
 
 %install
 mkdir -p $RPM_BUILD_ROOT/{etc/rc.d/init.d,usr/{sbin,man/man8}}
-install popbsmtp.init $RPM_BUILD_ROOT/etc/rc.d/init.d/popbsmtp
+install pop-before-smtp.init $RPM_BUILD_ROOT/etc/rc.d/init.d/pop-before-smtp
 install pop-before-smtp $RPM_BUILD_ROOT/usr/sbin/
 pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8
 
 %post
-/sbin/chkconfig popbsmtp reset
-/etc/rc.d/init.d/popbsmtp start
+/sbin/chkconfig --add pop-before-smtp
 
 %preun
-/etc/rc.d/init.d/popbsmtp stop
-/sbin/chkconfig --level 0123456 popbsmtp off
+/sbin/chkconfig --del pop-before-smtp
 
 %files
 %defattr(-,root,root)
 %doc README perlmod2rpm
 %doc /usr/man/man8/pop-before-smtp.8
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
-%attr(0755,root,root) /etc/rc.d/init.d/popbsmtp
+%attr(0755,root,root) /etc/rc.d/init.d/pop-before-smtp

@@ -1,7 +1,25 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.14 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.15 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.15 2000-07-25 Changes requested by Daniel Roesen
+#                 <dr@bofh.de>: renamed init script
+#                 to a nice lengthy pop-before-smtp; yanked daemon
+#                 start/stop on rpm -i/rpm -e; added a
+#                 commented-out pattern for cucipop; added documentation
+#                 for --nowrite and --debug; fixed init script to clean
+#                 up msgs for restart, added status option to init script,
+#                 added logic to remove the pidfile when the daemons is
+#                 successfully killed.
+#                 Also adopted regex tweak from wyodlows@nj.devry.edu so
+#                 that Cyrus users can pop from unresolvable ip addrs
+#                 (common w/ dialups).
+#                 Back to Daniel Roesen, after a request from him, documented
+#                 the trick of using a logger daemon to prod cleanups.
+#                 Also from him, fixed typo "reset" -> "restart" in syntax
+#                 msg in pop-before-smtp.init
+#                 Attempted yet another desperate effort to perhaps accomodate
+#                 all the different varients of qpopper in one $pat
 # 1.14 2000-06-19 will the varient qpopper logfile formats never cease?
 #                 this one from Nick Bauer <nickb@inc.net>
 # 1.13 2000-06-13 yet another qpopper entry, this time from Chris
@@ -66,6 +84,13 @@ tosses it, and if the timestamp in the hash is also expired and equals the
 timestamp in the queue it deletes the hash entry and the on-disk db file
 entry.
 
+If invoked with --debug, it will emit a fair amount of nattering on
+stdout, which may be helpful in diagnosing problems, then again it
+may not. If invoked with --nowrite, it won't actually attempt to
+write the db hash file; if your maillog is world-readable this might
+allow you to try it out (with --debug) running as a non-privileged
+user.
+
 Edit the source to change the wired-in logfile format, tail parameters, etc.
 
 When starting up, it builds an internal table of all netblocks natively
@@ -107,6 +132,30 @@ The integration in /etc/postfix/main.cf might look like this:
 	check_client_access hash:/etc/postfix/pop-before-smtp,
 	check_relay_domains
 
+A minor issue in the design of this daemon is that for simplicity
+and performance, it makes no attempt to provide a select loop, or
+to otherwise allow periodic checking to clean out old entries even
+if no new ones come in. The $grace interval cleanups of old entries
+only occur when this daemon has just logged a new entry successfully
+--- it passed all the pattern and postconf mynetworks checks. If
+you get very few users checking their email with pop, an entry
+could stay in the db file for far longer than $grace. Of course
+it would still require a remarkable coincidence for a spammer to
+exploit this, but if you want to prevent this, you can run another
+daemon that's just a trivial shell loop. Compose a string that
+looks like a valid POP login entry from your daemon, for someone
+coming from the (impossible, but won't get weeded by mynetworks)
+255.255.255.255 addr. Arrange for it to be logged once a minute,
+or however often you want, to ensure that the daemon enters the
+grace-period check/clean loop at least that often. E.g. using Daniel
+Roesen's cucipop format, you could have:
+
+        pat='x 255.255.255.255 0, 0 (0), 0 (0)'
+        while true; do
+                sleep 60 # or however long
+                logger -p mail.info -t cucipop -i "$pat"
+        done
+
 =head1 TROUBLESHOOTING
 
 Andy Dills <andy@xecu.net> reports that on his Solaris system,
@@ -142,9 +191,15 @@ my $logfile = '/var/log/maillog';
 my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
           '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
-# For Cyrus, Kenn Martin <kmartin@infoteam.com> used:
+# There are many, many different logfile formats emitted by various
+# qpoppers. Here's an attempt to match any of them, but for all
+# I know it might also match failed logins, or something else.
+# my $pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$'
+
+# For Cyrus, Kenn Martin <kmartin@infoteam.com>, with tweak
+# from William Yodlowsky for IP addrs that don't resolve:
 # my $pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
-#           'login: \S+\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
+#           'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-IMAP:
 #my $pat = '^(... .. ..:..:..) \S+ imaplogin: ' .
@@ -170,6 +225,11 @@ my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
 # a qpopper logfile format
 # my $pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) POP login ' .
 #           'by user "[^"]+" at \([^)]+\) (\d+.\d+.\d+.\d+)$'
+
+# For cucipop, matching a sample from Daniel Roesen:
+# my $pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
+#           '(\d+\.\d+\.\d+\.\d+) \d+, \d+ \(\d+\), \d+ \(\d+\)';
+
 
 my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 my $grace = 1800; # 30 minutes --- grace period
@@ -197,6 +257,20 @@ my $fi = File::Tail->new(
 	adjustafter => 3,
 	tail => -1,
 );
+
+# Daniel Roesen prefers this one; he feels that it does a better job
+# of being suitably prompt about noticing new logins, and that the
+# tuning that I chose is too likely to cause users to fail to be
+# able to send email.
+#
+# my $fi = File::Tail->new(
+#         name => $logfile,
+#         maxinterval => 2,
+#         interval => 1,
+#         adjustafter => 3,
+#         resetafter => 30,
+#         tail => -1,
+# );
 
 ################################
 #                              #

@@ -58,7 +58,7 @@ Using --noflock will turn off the default file locking used on the DB file.
 
 =item --reprocess
 
-Parse the maillog file again, pretending that each line is happening again.
+Parse the whole maillog file, pretending that each line is happening again.
 Useful for testing, especially when combined with --debug and possibly
 --nowrite.
 
@@ -112,9 +112,9 @@ Also remember that if you're using Postfix, the example main.cf section we
 include below will need you to change the "hash:" prefix to the appropriate
 prefix for your DB type.
 
-You edit the supplied pop-before-smtp-conf.pl file to customize things for your
-local system, such as scanning for the right POP/IMAP authorization, setting
-various options, etc.
+You should edit the supplied pop-before-smtp-conf.pl file to customize things
+for your local system, such as scanning for the right POP/IMAP authorization,
+setting various options, etc.
 
 When starting up, pop-before-smtp builds an internal table of all netblocks
 natively permitted by your SMTP software (for Postfix it looks at the output of
@@ -255,6 +255,7 @@ GetOptions(
     "[--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]\n    " .
     "[--logto=FILE] [--grace=SECONDS]\n";
 
+$file_tail{'tail'} = -1 if $reprocess;
 set_output_log($logto) if defined $logto;
 
 $sync_func = sub { } if !$write;
@@ -330,6 +331,7 @@ continue {
     if ($db_changed || $now > $last_expire_check + $grace) {
 	while (@q && $q[0][1] <= $now) {
 	    my($ipaddr,$ts) = @{shift @q};
+	    $log_func->('debug', "expiration event for ip=$_") if $debug;
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {
 		    $flock_func->(1);
@@ -406,12 +408,8 @@ sub sync_DB
 
 sub flock_DB
 {
-    if ($_[0]) {
-	flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n";
-    }
-    else {
-	flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n";
-    }
+    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
+	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
 
 sub log_to_stdout

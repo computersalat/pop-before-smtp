@@ -1,3 +1,8 @@
+2002-04-12  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Removed an old comment that got superseded.
+
 2002-04-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
@@ -52,10 +57,10 @@
 
 	* pop-before-smtp:
 	- Improved cleanup_nets() to weed-out comments from included files,
-	  De-taint the mynetworks include-file data, and to make the code a
+	  de-taint the mynetworks include-file data, and to make the code a
 	  little simpler.
-	- Make sure that we expire those whose access has lapsed in a timely
-	  manner.
+	- Changed the expiration code to better ensure that expired IPs don't
+	  hang around overly long.
 	- Updated the URL to the mailing list and the project's home page.
 	- Moved the change-log data into this ChangeLog file.
 

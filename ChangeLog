@@ -3,12 +3,19 @@
 	* pop-before-smtp:
 	- Added the ability to override our tie, sync, and flock functions
 	  from the config file.
+	- Use time2str() for our stdout-log timestamp.
 
 	* pop-before-smtp-conf.pl:
 	- Added a sample BerkeleyDB setup (commented out).
 
 	* TODO:
 	- Removed something done, added something new.
+
+	* COPYING:
+	- Tweaked the Copyright.
+
+	* README:
+	- Updated the info related to syslog setup.
 
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 

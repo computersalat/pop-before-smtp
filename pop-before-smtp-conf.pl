@@ -450,31 +450,31 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 # user was properly authenticated.  For these programs, we scan the IP off
 # an earlier line and the check the validation by comparing the PID values.
 
-my %popIPs;
+    my %popIPs;
 
-# The maillog line to match is in $_.
-sub custom_match
-{
-    if (/$PID_pat/o) {
-	my($ts, $pid) = ($1, $2);
-	if (/$IP_pat/o) {
-	    $popIPs{$pid} = $3;
-	}
-	else {
-	    foreach my $key (keys %popIPs) {
-		if ($pid == $key) {
-		    my $ip = $popIPs{$pid};
-		    delete $popIPs{$pid};
-		    if (/$OK_pat/o) {
-			return ($ts, $ip);
+    # The maillog line to match is in $_.
+    sub custom_match
+    {
+	if (/$PID_pat/o) {
+	    my($ts, $pid) = ($1, $2);
+	    if (/$IP_pat/o) {
+		$popIPs{$pid} = $3;
+	    }
+	    else {
+		foreach my $key (keys %popIPs) {
+		    if ($pid == $key) {
+			my $ip = $popIPs{$pid};
+			delete $popIPs{$pid};
+			if (/$OK_pat/o) {
+			    return ($ts, $ip);
+			}
+			last;
 		    }
-		    last;
 		}
 	    }
 	}
+	( );
     }
-    ( );
-}
 EOT
 }
 

@@ -1,5 +1,10 @@
 2002-12-15  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.32.
+
+2002-12-15  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* pop-before-smtp-conf.pl:
 	- Added multi-line match support for popa3d.
 

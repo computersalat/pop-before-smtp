@@ -221,7 +221,7 @@ use vars qw(
 # Default values, possibly overridden in the config file.
 
 $pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
-    '(?:Login|Authenticated|Auth) user=\S+ ' .
+    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
 $write = 1; # open and change the DB
 $flock = 1; # we do the exclusive file-locking when updating

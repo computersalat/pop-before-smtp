@@ -99,12 +99,12 @@ $log_func = \&syslog;
 
 # For UW ipop3d/imapd and their secure versions. This is the DEFAULT.
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
-#    '(?:Login|Authenticated|Auth) user=\S+ ' .
+#    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # Some folks need a little different match for UW ipop3d/imapd:
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .
-#    '(?:Login|Authenticated|Auth) user=\S+ ' .
+#    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For GNU pop3d

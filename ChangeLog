@@ -8,6 +8,9 @@
 	- Improved the slow-system expire check so that the last person
 	  doesn't consistently get 2*$grace seconds of authorization.
 
+	* contrib/README.QUICKSTART:
+	- Fixed a couple spelling errors and the numbering of the steps.
+
 	* TODO:
 	- Removed another completed todo-item.
 

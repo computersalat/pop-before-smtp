@@ -1,3 +1,8 @@
+2002-07-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Fixed the BerkeleyDB db_sync call.
+
 2002-07-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

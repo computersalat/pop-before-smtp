@@ -222,7 +222,7 @@ use vars qw(
 
 $pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
-    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
+    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 $write = 1; # open and change the DB
 $flock = 1; # we do the exclusive file-locking when updating
 $debug = 0; # no debug messages

@@ -73,11 +73,18 @@ Useful for testing, especially when combined with --debug and possibly
 
 =item --watchlog=FILE
 
-You can specify what maillog to watch for POP/IMAP events.
+You can specify what maillog to watch for POP/IMAP events. The default in the
+script is /var/log/maillog, but the provided config file searches for an
+existing log file, also checking for /var/log/mail/info, /var/log/mail.log,
+/var/log/messages, or /var/adm/messages.
 
 =item --dbfile=FILE
 
-You can specify what DB file to update.
+You can specify what DB file to update. The default value is
+"/etc/postfix/pop-before-smtp" which creates/updates a file with the same name
+but with ".db" appended (since the default tie function appends a ".db" onto
+the specified name for you). If your config file supersedes the tie function,
+you can choose to append a different suffix or no suffix at all.
 
 =item --logto=FILE
 
@@ -113,10 +120,6 @@ tie/sync/flock subroutines (see the BerkeleyDB example in the config file).
 Also remember that if you're using Postfix, the example main.cf section we
 include below will need you to change the "hash:" prefix to the appropriate
 prefix for your DB type.
-
-The default hash file is named /etc/postfix/pop-before-smtp.db. If you override
-this via the dbfile option, however, you would not include the .db on the end
-since the default tie function adds this for you.
 
 This daemon likes a couple of helpers. Here's a nice init script:
 

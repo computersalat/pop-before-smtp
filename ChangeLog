@@ -1,3 +1,11 @@
+2004-11-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added a Qpopper pattern that works when Qpopper is doing its
+	  own logging (i.e. without syslog).
+	- Added support for an $END_pat that works when $PID_pat,
+	  $IP_pat, and $OK_pat are defined (but is optional).
+
 2004-11-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

@@ -111,14 +111,19 @@ $log_func = \&syslog;
 #$pat = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
 #    'User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$';
 
-# There are many, many different logfile formats emitted by various
-# qpoppers. Here's an attempt to match any of them, but, for all
-# I know, it might also match failed logins or something else.
-#$pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: ' .
-#    '.*\s(\d+\.\d+\.\d+\.\d+)$';
+# A fairly modern Qpopper pattern.
+#$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper[^[]*\[\d+\]: \([^)]*\) ' .
+#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
-# For Cyrus, Kenn Martin <kmartin@infoteam.com>, with tweak
-# from William Yodlowsky for IP addrs that don't resolve:
+# For Qpopper POP/APOP Server (matches in.qpopper, qpopper, and popper).
+#$pat = '^(... .. ..:..:..) \S+ (?:in\.q|q)?popper\[\d+\]: Stats: \S+ ' .
+#    '\d+ \d+ \d+ \d+ (?:\S+ )?(\d+\.\d+\.\d+\.\d+)';
+
+# Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
+#$pat = '^(... ... .. ..:..:.. \d{4}) \[\d+\] ' .
+#    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
+
+# For Cyrus (including a tweak for IP addrs that don't resolve):
 #$pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
 #    'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
@@ -129,23 +134,6 @@ $log_func = \&syslog;
 # For qmail's pop3d:
 #$pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
 #    'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)';
-
-# For Qpopper POP/APOP Server
-#$pat = '^(... .. ..:..:..) \S+ qpopper\[\d+\]: Stats: \S+ ' .
-#    '(?:\d+ ){4}(\d+\.\d+\.\d+\.\d+)';
-
-# Alex Burke's popper install
-#$pat = '^(... .. ..:..:..) \S+ q?popper\[\d+\]: Stats: \S+ ' .
-#    '(?:\d+ ){4}(?:\S+ )?(\d+\.\d+\.\d+\.\d+)';
-
-# Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
-#$pat = '^(\w{3} \w{3} \d\d \d\d:\d\d:\d\d \d{4}) \[\d+\] ' .
-#    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
-
-# Nick Bauer <nickb@inc.net> supplied the basis for this qpopper pattern.
-# Some extra tweaks support more recent variations.
-#$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper\S*\[\d+\]: \([^)]*\) ' .
-#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # For cucipop, matching a sample from Daniel Roesen:
 #$pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
@@ -165,13 +153,13 @@ $log_func = \&syslog;
 #$pat = '^(... .. ..:..:..) \S+ popa3d\[\d+\]: ' .
 #    'Authentication passed for \S+ -- \[(\d+\.\d+\.\d+\.\d+)\]';
 
-# A Perdition pattern supplie by Simon Matthews <simon@paxonet.com>.
+# A Perdition pattern.
 #$pat = '^(... .. ..:..:..) \S+ perdition\[\d+\]: ' .
 #    '(?:Auth:) (\d+\.\d+\.\d+\.\d+)(?:\-\>\d+\.\d+\.\d+\.\d+) ' .
 #    'user=(?:\"\S+\") server=(?:\"\S+\") port=(?:\"\S+\") status=(?:\"ok\")';
 
-# For solidpop3d (known as spop3d) from Adam Bartosik (moldovenu@interia.pl)
-# ** You should compile solidpop3d with --enable-extendlog **
+# For solidpop3d (known as spop3d).  ** You should compile
+# solidpop3d with --enable-extendlog **
 #$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
 

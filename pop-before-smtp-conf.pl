@@ -39,6 +39,7 @@ use vars qw(
 
 # Set the log file we will watch for pop3d/imapd records.
 #$file_tail{'name'} = '/var/log/maillog';
+#$file_tail{'name'} = '/Library/Logs/MailService/AppleMailServer.IMAP.log';
 
 # ... or we'll try to figure it out for you.
 if (!-f $file_tail{'name'}) {

@@ -3,6 +3,7 @@ Name: pop-before-smtp
 Version: 1.30pre1
 Release: 1
 Source: https://sourceforge.net/project/popbsmtp/pop-before-smtp-%{version}.tar.gz
+#Source1: pop-before-smtp-conf.pl
 URL: http://popbsmtp.sourceforge.net/
 License: Freely Redistributable
 Packager: Wayne Davison <wayned@users.sourceforge.net>
@@ -35,6 +36,7 @@ install pop-before-smtp $RPM_BUILD_ROOT/usr/sbin
 pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8 2>/dev/null
 perl -i -e 'undef $/; $_ = <>; s/\n=head1.*\n=cut//s; print' $RPM_BUILD_ROOT/usr/sbin/pop-before-smtp
 install pop-before-smtp-conf.pl $RPM_BUILD_ROOT/etc
+#install %SOURCE1 $RPM_BUILD_ROOT/etc
 install pop-before-smtp.init $RPM_BUILD_ROOT/etc/rc.d/init.d/pop-before-smtp
 
 %clean
@@ -49,7 +51,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 
-%doc README TODO ChangeLog contrib
+%doc README TODO ChangeLog pop-before-smtp-conf.pl contrib
 %doc /usr/man/man8/pop-before-smtp.8*
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
 %attr(0644,root,root) %config(noreplace) /etc/pop-before-smtp-conf.pl

@@ -37,7 +37,7 @@
 +#if !POP_STANDALONE
 +	slen = sizeof(saddr);	
 +	if (getpeername(0, (struct sockaddr *)&saddr, &slen)<0) {
-+		syslog(SYSLOG_PRIORITY, "getpeername(0) failed");
++		syslog(SYSLOG_PRI_ERROR, "getpeername(0) failed");
 +		return 1;
 +	}
 +#endif

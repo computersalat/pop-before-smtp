@@ -1,3 +1,8 @@
+2003-01-02  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added an alternate UW IMAP $pat.
+
 2002-12-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

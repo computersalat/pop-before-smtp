@@ -273,7 +273,7 @@ if ($dump_config) {
 }
 if ($list_ips) {
     $tie_func->();
-    $flock_func->(1);
+    $flock_func->(1) if $flock;
     my @ips = sort keys %db;
     print 'The database holds ', scalar @ips, ' IP';
     if (@ips) {
@@ -282,7 +282,7 @@ if ($list_ips) {
     else {
 	print "s.\n";
     }
-    $flock_func->(0);
+    $flock_func->(0) if $flock;
     exit;
 }
 if (defined $daemon_pidfile) {

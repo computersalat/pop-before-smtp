@@ -11,7 +11,7 @@
 
 	* pop-before-smtp:
 	- Fixed the IP address in the expiration-event log message.
-	- Mentione that we depend on Date::Format now (which is a part of the
+	- Mention that we depend on Date::Format now (which is a part of the
 	  TimeDate module that we already required).
 
 2002-04-15  Wayne Davison  <wayned@users.sourceforge.net>

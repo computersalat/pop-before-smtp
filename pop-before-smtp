@@ -5,7 +5,8 @@ use strict;
 # and the mailing list for discussing this program and asking for help at
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
-# pop-before-smtp 1.29 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.30-pre-1
+# Copyright (c) 1999, 2000, 2001 Bennett Todd.  Freely Redistributable.
 
 =head1 NAME
 
@@ -14,7 +15,8 @@ use strict;
 =head1 SYNOPSIS
 
   nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
-   [--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--grace=SECONDS] &
+      [--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE] \
+      [--grace=SECONDS] &
 
 =head1 DESCRIPTION
 
@@ -159,7 +161,7 @@ $grace = 1800; # 30-minute grace period
 
 # See the pop-before-smtp-conf.pl file for what these values mean.
 %file_tail = (
-    name => '/var/log/maillog', # File to watch for pop3d/imapd records
+    name => '/var/log/maillog',
     maxinterval => 10,
     interval => 5,
     adjustafter => 3,
@@ -192,11 +194,13 @@ GetOptions(
     "debug!" => sub {$debug = 1; $log_func = \&log_to_stdout unless $log_func},
     "flock!" => \$flock,
     "watchlog|logfile=s" => \$file_tail{'name'},
+    'logto=s' => sub { set_output_log($_[1]) },
     "dbfile=s" => \$dbfile,
     "grace=i" => \$grace,
     "reprocess!" => \$reprocess,
 ) or die "Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]\n    " .
-    "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--grace=SECONDS]\n";
+    "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE]\n    " .
+    "[--grace=SECONDS]\n";
 
 $flock = 0 unless $write; # flocking makes no sense if you're not writing
 
@@ -325,9 +329,16 @@ sub cleanup_nets
 sub log_to_stdout
 {
     my $level = shift;
-    my $ts = localtime($now);
-    $ts =~ s/\d\d\d\d$//;
+    my($ts) = localtime($now) =~ /^\w\w\w (.*)\d\d\d\d$/;
     print $ts, @_, "\n";
+}
+
+sub set_output_log
+{
+    my($file) = @_;
+    open(LOG, ">>$file") or die "Unable to append to $file: $!";
+    $log_func = \&log_to_stdout;
+    select(LOG);
 }
 
 sub sig_handler

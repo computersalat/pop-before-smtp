@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-$DIR = '/home/groups/p/po/popbsmtp/htdocs';
-$OUTFILE = "$DIR/ChangeLog.html";
+$OUTFILE = 'ChangeLog.html';
 
 undef $/; # Slurp entire files.
 

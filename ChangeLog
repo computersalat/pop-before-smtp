@@ -1,6 +1,11 @@
 2004-04-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Added a --version option to output the current version.
+
+2004-04-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
 	- Include the config-file path in the output of the
 	  --dump-config option.
 

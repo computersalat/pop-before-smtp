@@ -288,6 +288,12 @@ if ($dump_config) {
     print "watchlog: $file_tail{'name'}\n";
     print "dbfile: $dbfile\n";
     print "logto: $logto\n" if defined $logto;
+    if (defined(&custom_match)) {
+	print "Using custom_match() subroutine for watchlog matching.\n";
+    }
+    else {
+	print "pat: $pat\n";
+    }
     exit;
 }
 if (defined $daemon_pidfile) {

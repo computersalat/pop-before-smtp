@@ -1,7 +1,8 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.23 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.24 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.24 2000-11-01 Sanitize the environment a little harder
 # 1.23 2000-10-30 Fixed GetOptions to match docs and handle --logfile
 # 1.22 2000-10-11 Jeremy Shaffner <jer@jorsm.com> pointed out that
 #                 several of the example $pats didn't have the needed
@@ -220,8 +221,15 @@ my $debug = 0;
 # File to watch for pop3d/imapd records
 my $logfile = '/var/log/maillog';
 
+my $me = getpwuid($<); # real me
+# Build complete sanitary environment
 # If postconf isn't somewhere on this PATH, do fix the PATH so it is
-$ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
+%ENV = (
+	PATH => '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin',
+	HOME => '/tmp',
+	SHELL => '/bin/sh',
+	LOGNAME => $me,
+);
 
 # This regex pull the lines I'm interested in out of $logfile, and yanks out
 # the timestamp and IP address

@@ -1,3 +1,8 @@
+2004-03-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added --list to list the IPs currently in the database.
+
 2004-02-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

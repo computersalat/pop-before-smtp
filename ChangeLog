@@ -1,3 +1,9 @@
+2002-04-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added the --logto=FILE option.
+	- Removed the day-of-the-week from the stdout timestamp.
+
 2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

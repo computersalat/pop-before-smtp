@@ -1,3 +1,8 @@
+2004-02-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Fixed the Dovecot pattern (was matching a hostname of "www").
+
 2004-02-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

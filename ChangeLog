@@ -1,3 +1,71 @@
+2004-08-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Changed the default database name from its old value of
+	  /etc/postfix/pop-before-smtp to /etc/mail/pop-before-smtp
+	  (to make it more generic).
+	- Improved the perldoc manpage.
+
+	* pop-before-smtp-conf.pl:
+	- Made it a little more obvious that the $pat2 value would need
+	  to be created with a "my" (due to the "use strict" setting).
+
+	* contrib/README.QUICKSTART:
+	- Improved the sendmail config details.
+
+	* contrib/popauth.m4:
+	- New file that has M4 macros for sendmail.  This was modified
+	  by Alain Knaff from the official sendmail version to add in
+	  some extra SPF support.
+
+2004-08-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* COPYING:
+	- Updated the copyright years.
+
+	* contrib/init-debian:
+	- Merged in some changes from the official debian package and
+	  made some improvements of my own.
+
+2004-07-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Updated the Dovecot pattern to work with the newer version's
+	  logging style (as well as the old).
+
+	* contrib/README.QUICKSTART:
+	- Improved some of the text in the dependency section.
+
+2004-07-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Log an error using category 'err', not the deprecated 'error'.
+
+2004-04-29  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- The config option for solidpop3d is --enable-logextend, not
+	  --enable-extendlog.
+
+2004-04-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added a multi-line match rule for solidpop3d.
+	- Got rid of some useless parens.
+
+2004-04-23  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/README.QUICKSTART:
+	- Moved the install step higher and a few other misc. changes.
+
+2004-04-21  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/popa3d/popa3d-0.4.patch:
+	- Added a missing diff header.
+
+	* contrib/popa3d/popa3d-0.6.4.patch:
+	- Updated patch from Jan Huelsbergen for 0.6.4 version of popa3d.
+
 2004-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

@@ -64,9 +64,7 @@ dbfile path, feel free to edit that into the file as well.
 
 If you're not using Postfix, you'll hopefully find your SMTP software
 mentioned near the end of the config file.  Comment out the preceding =pod
-line for the section you want to enable.  The instructions in the rest of
-this file assume you're using Postfix, so you'll have to translate the
-Postfix-specific steps into something appropriate for your SMTP software.
+line for the section you want to enable.
 
 3. Test the pop-before-smtp daemon.
 
@@ -94,14 +92,25 @@ Run these commands:
 
 % /etc/rc.d/init.d/pop-before-smtp start
 
-Take a look in /etc/postfix to make sure that there's a file called
-"pop-before-smtp.db" - it should have a fairly recent modification date
-(as it should have just been created).
+Verify that the DB file has been created.  If you're not sure where to
+look, run "pop-before-smtp --info" and look at the "dbfile" value.  The
+actual created filename may have a suffix on it (such as ".db"), so append
+a '*' on the end of the name when you look for it.  Some examples:
 
-6. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
+    ls -l /etc/postfix/pop-before-smtp*
+    ls -l /etc/mail/popauth*
+
+This file should have a fairly recent modification date (as it should have
+just been created).
+
+6. Setup your SMTP software to look for this new DB file.
+
+For Postfix:
+
+Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
 add this somewhere into that line:
 
-check_client_access hash:/etc/postfix/pop-before-smtp
+    check_client_access hash:/etc/postfix/pop-before-smtp
 
 If you don't already have an "smtpd_recipient_restrictions" in your
 main.cf, add this one as it works pretty well:
@@ -110,9 +119,19 @@ smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 	check_client_access hash:/etc/postfix/pop-before-smtp,
 	check_relay_domains
 
-7. Reload Postfix and make sure that it's working by checking your email
-(from a non-local IP, of course!), then checking to see the modification
-date on the file /etc/postfix/pop-before-smtp.db has changed.  If so, you
-can relay to your heart's content.
+For Sendmail:
 
-Let me repeat - this *is* the easy way. ;-)
+Add this line to your sendmail.cf file:
+
+    HACK(`popauth')
+
+For other SMTP software, please let me know what it requires so I can
+include it here.
+
+7. Force your SMTP software to reload the config file.
+
+For postfix, you would type "postfix reload" (as root).
+
+8. Test the setup.  After access your POP mailbox (from a non-local IP, of
+course!) you should find that the modification date on the DB file has been
+updated.  If so, you should be able to relay to your heart's content.

@@ -284,25 +284,11 @@ my $fi = File::Tail->new(
 #                              #
 ################################
 
-sub cleanup_nets {
-    my @r;
-    for (@_) {
-        /^\s*(.*?)\s*$/;
-        $_ = $1;
-        s/\s+/ /g;
-        s/^mynetworks\s*=\s*//;
-        push @r, split /[,\s]+/, $_;
-    }
-    return @r;
-}
 my @mynets = cleanup_nets(`postconf mynetworks`);
-while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
-    for (reverse @tmp) {
-        splice @mynets, $_, 1, cleanup_nets(`cat $mynets[$_]`);
-    }
+
+foreach (@mynets) {
+    Net::Netmask->new($_)->storeNetblock();
 }
-    
-Net::Netmask->new($_)->storeNetblock() for @mynets;
 
 my (%t, @q);
 
@@ -363,4 +349,31 @@ continue {
 	}
 	$last_expire_check = $now;
     }
+}
+
+exit;
+
+
+sub cleanup_nets
+{
+    my @nets;
+    foreach (@_) {
+	($_) = /^\s*(.*?)\s*$/s;
+	s/^mynetworks\s*=\s*//;
+	foreach (split /[,\s]+/) {
+	    if (m#^/#) {
+		undef $/;
+		open(IN, $_) or die "Unable to open $_: $!";
+		$_ = <IN>;
+		close IN;
+		$/ = "\n";
+		s/#.*//mg;
+		push @nets, cleanup_nets($_);
+	    }
+	    else {
+		push @nets, $_;
+	    }
+	}
+    }
+    @nets;
 }

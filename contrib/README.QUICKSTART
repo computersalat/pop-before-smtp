@@ -63,8 +63,8 @@ If you're using Postfix and need to use a custom DB style or a different
 dbfile path, feel free to edit that into the file as well.
 
 If you're not using Postfix, you'll hopefully find your SMTP software
-mentioned near the end of the config file.  Comment out the preceding =pod
-line for the section you want to enable.
+mentioned near the end of the config file.  Comment out the two surrounding
+=cut lines for the section you want to enable.
 
 3. Test the pop-before-smtp daemon.
 

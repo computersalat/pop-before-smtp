@@ -6,8 +6,8 @@ use strict;
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
 # pop-before-smtp 1.30pre2
-# Copyright (C) 1999, 2000, 2001 Bennett Todd, and (C) 2002 Wayne Davison.
-# Freely Redistributable.
+# Copyright (C) 1999, 2000, 2001 Bennett Todd.
+# Also Copyright (C) 2002 Wayne Davison. Freely Redistributable.
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ to go somewhere other than stdout.  Often combined with --reprocess.
 
 =item --[no]flock
 
-Using --noflock will turn off the default file locking used on the DB file.
+Using --noflock will turn off the default file-locking used on the DB file.
 
 =item --reprocess
 
@@ -88,7 +88,7 @@ successfully signs in via POP or IMAP.
 
 =head1 INSTALLATION
 
-This daemon directly requires three modules from CPAN, which are not
+This daemon directly requires four modules from CPAN, which are not
 included in the base Perl release as of this writing, and one of
 those depends on another, so make sure you've downloaded and
 installed suitably recent versions of:
@@ -96,7 +96,7 @@ installed suitably recent versions of:
     File::Tail
     Time::HiRes (required by File::Tail)
     Net::Netmask
-    Date::Parse & Date::Format (from TimeDate)
+    Date::Parse & Date::Format (both in TimeDate)
 
 In addition, it depends on the DB_File module; if you don't have it
 included in your perl build already (presumably because Berkeley DB
@@ -152,7 +152,7 @@ File::Tail was hanging in the middle of reading a 15MB logfile. When
 he removed "tail => -1" from the options (so the tail would start at
 the end of the file, rather than at the beginning) that fixed it.
 
-=head1 DOWNLOAD
+=head1 DOWNLOAD, SUPPORT, etc.
 
 See the website http://popbsmtp.sf.net/ for the latest version.
 See the mailing list (referenced on the website) for support.
@@ -167,16 +167,17 @@ the timestamp of the record there has expired (is > 30 minutes old) it tosses
 it, and if the timestamp in the hash equals the timestamp in the queue, it
 deletes the hash entry and the on-disk db file entry.
 
-pop-before-smtp contains support for protecting writes to the db file by flock.
-As far as I know, the consequences of a collision (corrupt read in an smtpd)
-are relatively mild, and the likelihood of one is remote, but the performance
-impact of the locking seems to be negligible, so it's enabled by default. (To
-disable the flocking, invoke with --noflock.)
+pop-before-smtp protects the writes to the db file by flock.  As far as I
+know, the consequences of a collision (corrupt read in an smtpd) are
+relatively mild, and the likelihood of one is remote, but the performance
+impact of the locking seems to be negligible, so it's enabled by default.
+To disable the flocking, invoke with --noflock or set "$flock = 0" in the
+config file.
 
 =head1 AUTHORS
 
-Pop-before-smtp was created by Bennett Todd, <bet@rahul.net>.
-It is currently being maintained by Wayne Davison <wayned@users.sf.net>.
+Pop-before-smtp was created by Bennett Todd <bet@rahul.net>.  It is
+currently being maintained by Wayne Davison <wayned@users.sourceforge.net>.
 
 =cut
 
@@ -200,7 +201,7 @@ $pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
 $write = 1; # open and change the DB
-$flock = 1; # we do the exclusive file locking when updating
+$flock = 1; # we do the exclusive file-locking when updating
 $debug = 0; # no debug messages
 $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
@@ -242,7 +243,7 @@ elsif (-f $config_file) {
 }
 
 GetOptions(
-    'config=s' => sub {die "--config=$_[1] must be the first option.\n"},
+    'config=s' => sub { die "--config=$_[1] must be the first option.\n" },
     "write!" => \$write,
     "debug!" => sub { $debug = $_[1]; $logto = '-' if $debug },
     "flock!" => \$flock,
@@ -251,9 +252,11 @@ GetOptions(
     "dbfile=s" => \$dbfile,
     'logto=s' => \$logto,
     "grace=i" => \$grace,
-) or die "Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]\n    " .
-    "[--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]\n    " .
-    "[--logto=FILE] [--grace=SECONDS]\n";
+) or die <<EOT;
+Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
+    [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]
+    [--logto=FILE] [--grace=SECONDS]
+EOT
 
 $file_tail{'tail'} = -1 if $reprocess;
 set_output_log($logto) if defined $logto;

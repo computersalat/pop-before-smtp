@@ -1,0 +1,10 @@
+Justin <justin@inwa.com.au> contributed a modified version of the
+pop-before-smtp daemon, an appropriate init script, and a helper
+script to restart Courier's estmp daemon (needed to make it re-read
+the pop-before-smtp.db file). He recompiled Courier to use Berkeley
+DB, rather than modifying the pop-before-smtp script to use gdbm.
+His work is included in this distribution in the courier/
+subdirectory. To make it easier to work out how to apply his edits
+to pop-before-smtp as the main version evolves, I've included a copy
+of the baseline script he worked from as pop-before-smtp.orig in
+that subdirectory.

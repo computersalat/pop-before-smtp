@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# getfromcpan version 1.0
+# Copyright (C) 2000 Alexander Burke <alex@pdqsolutions.com>
+#
+# You may do with this script as you like, as long as you leave the
+# above copyright notice intact. You're welcome to add lines below it
+# to reflect changes you've made to the script.
+#
+# There is no warranty, implied or otherwise, for this software.
+# Although unlikely, it may eat all your files and emit a loud belch.
+# If this, or anything similar, occurs, I cannot and will not be held
+# responsible.
+#
+# Please send changes to Bennett Todd <bet@rahul.net> for inclusion in
+# the next version of pop-before-smtp.
+#
+# This script gets the files required for pop-before-smtp from CPAN and
+# installs them.
+#
+# Certain assumptions are made, namely that you have wget installed and
+# are running on a Red Hat system.
+#
+# Please note that updates to these modules on CPAN will result in
+# version number (and hence filename) changes which will break this
+# script. If wget gives you a 404 error when trying to get one of the
+# files from CPAN, that's probably what's happened.
+#
+#######################################################################
+
+
+# Some quick sanity checks.
+if [ ! -f ./perlmod2rpm ]; then
+     echo "ERROR: perlmod2rpm not found in the current directory!"
+     exit 1
+fi
+if [ ! -f `which wget` ]; then
+     echo "ERROR: wget not found!"
+     exit 1
+fi
+if [ ! -f `which rpm` ]; then
+     echo "ERROR: rpm not found!"
+     exit 1
+fi
+
+# Preinstallation cleanup...
+rm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz File-Tail*.tar.gz
+
+# Let's copy perlmod2rpm to where we'll be using it, and go there.
+cp ./perlmod2rpm /usr/src/redhat/SOURCES
+cd /usr/src/redhat/SOURCES
+
+# Okay, here we go.
+echo
+echo #######################################################################
+echo ### Getting and installing Time-HiRes...                            ###
+echo #######################################################################
+echo
+wget http://www.cpan.org/modules/by-module/Time/Time-HiRes-01.20.tar.gz
+./perlmod2rpm Time-HiRes-01.20.tar.gz
+rpm -ivh ../RPMS/i386/Time-HiRes-01.20-1.i386.rpm
+echo
+echo #######################################################################
+echo ### Getting and installing TimeDate...                              ###
+echo #######################################################################
+echo
+wget http://www.cpan.org/modules/by-module/Time/TimeDate-1.10.tar.gz
+./perlmod2rpm TimeDate-1.10.tar.gz
+rpm -ivh ../RPMS/i386/TimeDate-1.10-1.i386.rpm
+echo
+echo #######################################################################
+echo ### Getting and installing Net-Netmask...                           ###
+echo #######################################################################
+echo
+wget http://www.cpan.org/modules/by-module/Net/Net-Netmask-1.8.tar.gz
+./perlmod2rpm Net-Netmask-1.8.tar.gz
+rpm -ivh ../RPMS/i386/Net-Netmask-1.8-1.i386.rpm
+echo
+echo #######################################################################
+echo ### Getting and installing File-Tail...                             ###
+echo #######################################################################
+echo
+wget http://www.cpan.org/modules/by-module/File/File-Tail-0.95.tar.gz
+./perlmod2rpm File-Tail-0.95.tar.gz
+rpm -ivh ../RPMS/i386/File-Tail-0.95-1.i386.rpm
+
+# Let's clean up.
+rm perlmod2rpm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz \
+    File-Tail*.tar.gz

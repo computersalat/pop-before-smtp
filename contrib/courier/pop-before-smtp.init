@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+case "$1" in
+	start)
+		$0 go &
+
+	;;
+	go)
+		echo "Starting pop-before-smtp daemon."
+		die(){ echo "pop-before-smtp: $*">&2; exit 1; }
+		/usr/bin/pop-before-smtp >/var/log/pop-before-smtp 2>&1 & echo $! >/var/run/pop-before-smtp.pid
+	;;
+	stop)
+		echo "Stopping pop-before-smtp daemon."
+		echo -n "kill " > /etc/init.d/killtemp
+		cat /var/run/pop-before-smtp.pid >> /etc/init.d/killtemp
+		/etc/init.d/killtemp
+	;;
+	restart)
+		$0 stop
+		$0 go &
+	;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,4 @@
+bartek marcinkiewicz <jr@rzeznia.eu.org> contributed this support.
+popa3d-0.4.patch adds the IP address to the log entries, which
+pop-before-smtp requires; then you can choose the (commented-out)
+rexexp $pat for popa3d in pop-before-smtp.

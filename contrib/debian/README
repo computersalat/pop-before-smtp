@@ -1,0 +1,24 @@
+Date: Wed, 8 Nov 2000 02:08:33 +0100 (CET)
+From: Jonas Smedegaard <jonas@jones.dk>
+To: pop-before-smtp@fridge.oven.com
+Subject: Unofficial .deb packages
+Message-ID: <Pine.LNX.4.21.0011080200470.12992-100000@progeny>
+
+Hi!
+
+I don't think I have announced this before on this list: I have made some
+.deb packages for Potato and Woody of this wonderful little daemon.
+
+Add one of the following, depending on your system, to your
+/etc/apt/sources.list file:
+
+deb http://debian.jones.dk/pub/debian/local potato misc
+deb http://debian.jones.dk/pub/debian/local woody misc
+
+Keep up the good work, Todd :-)
+
+Jonas "dr. Jones" Smedegaard
+
+-- 
+* IT-guide dr. Jones * +45 40843136 * dr@jones.dk * http://dr.jones.dk *
+**** _Content_ * _Sensation_ * _Friction_ ** http://www.wetware.dk/ ****

@@ -231,7 +231,7 @@ $flock_func = \&flock_DB;
     PATH => '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin',
     HOME => '/tmp',
     SHELL => '/bin/sh',
-    LOGNAME => getpwuid($<), # real me
+    LOGNAME => scalar getpwuid($<), # real me
 );
 
 my $config_file = '/etc/pop-before-smtp-conf.pl';

@@ -1,3 +1,12 @@
+2002-04-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added a couple comments.
+
+	* pop-before-smtp-conf.pl:
+	- Change some comments to (hopefully) make things easier to wade
+	  through.
+
 2002-04-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
@@ -11,8 +20,8 @@
 
 	* pop-before-smtp:
 	- Fixed the IP address in the expiration-event log message.
-	- Mention that we depend on Date::Format now (which is a part of the
-	  TimeDate module that we already required).
+	- Mentioned that we depend on Date::Format now (which is a part of
+	  the TimeDate module that is already a dependency).
 
 2002-04-15  Wayne Davison  <wayned@users.sourceforge.net>
 

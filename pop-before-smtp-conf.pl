@@ -359,7 +359,7 @@ $sync_func = \&sync_sendmail;
 my $pid_file = '/var/run/sendmail.pid';
 
 open(PID, $pid_file) || die "Unable to open $pid_file: $!";
-my $sendmail_pid = <IN> + 0;
+my $sendmail_pid = <PID> + 0;
 close PID;
 
 sub mynet_sendmail
@@ -388,7 +388,7 @@ sub sync_sendmail
 
     until (kill(1, $sendmail_pid)) {
 	open(PID, $pid_file) || die "Unable to open $pid_file: $!";
-	my $new_pid = <IN> + 0;
+	my $new_pid = <PID> + 0;
 	close PID;
 	if ($new_pid == $sendmail_pid) {
 	    die "Unable to signal sendmail to reread the database.\n";

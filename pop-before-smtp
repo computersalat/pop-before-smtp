@@ -383,6 +383,8 @@ sub cleanup_nets
     @nets;
 }
 
+# --- START --- The default Postfix/DB_File support functions
+
 sub mynet_postfix
 {
     $_ = `postconf mynetworks`;
@@ -414,6 +416,8 @@ sub flock_DB
     flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
 	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
+
+# --- END --- The default Postfix/DB_File support functions
 
 sub log_to_stdout
 {

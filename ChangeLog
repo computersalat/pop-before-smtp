@@ -1,4 +1,4 @@
-2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+2002-04-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
 	- Updated the init-file example in the docs.
@@ -10,7 +10,7 @@
 	- Updated to handle the new config file and improve a few things.
 
 	* contrib/getfromcpan:
-	- Read the "topdir" out of the .rpmmacros file (if it exists).
+	- Read the %_topdir out of the .rpmmacros file (if it exists).
 	- Put all the module versions numbers in variables at the top of the
 	  file and updated them to their most-current values.
 	- Fixed all the echoes with unbalanced double-quotes.
@@ -18,6 +18,10 @@
 	- Fixed the pre-installation cleanup to cleanup the SOURCES dir.
 	- Allow the script to be run as non-root to just build the RPMs (it
 	  skips installing the RPMs, and also does not remove them).
+
+	* contrib/perlmod2rpm:
+	- Updated to look in ~/.rpmmacros for the %_topdir definition and use
+	  that in place of /usr/src/redhat if found.
 
 	* pop-before-smtp.spec:
 	- Added potential support for installing a custom config file.

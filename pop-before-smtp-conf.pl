@@ -150,6 +150,10 @@ $log_func = \&syslog;
 #$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
 
+# Pattern for teapop (http://www.toontown.org/teapop/) by Patrick Prasse.
+#$pat = '^(... .. ..:..:..) \S+ teapop\[\d+\]: ' .
+#    'Successful login for \S+ .+ \[(\d+\.\d+\.\d+\.\d+)\]$';
+
 ############################# END OF PATTERNS ##############################
 
 

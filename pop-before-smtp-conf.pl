@@ -412,7 +412,31 @@ sub flock_sendmail
     flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
 	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
-
 =cut #-------------------------- Sendmail SMTP -------------------------END-
+
+=pod #========================== CDB_File SMTP =======================START=
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll use CDB_File instead od DB_File.
+
+use CDB_File;
+
+$tie_func = \&tie_CDB;
+$sync_func = \&sync_CDB;
+$flock = 0;
+
+# We leave the global %db as an untied hash.
+sub tie_CDB
+{
+}
+
+sub sync_CDB
+{
+    my $cdb = CDB_File->new($dbfile, "$dbfile.tmp") or die;
+    foreach (keys %db) {
+	$cdb->insert($_, $dbvalue);
+    }
+    $cdb->finish;
+}
+=cut #========================== CDB_File SMTP =========================END=
 
 1;

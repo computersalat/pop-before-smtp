@@ -1,7 +1,8 @@
 2005-01-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
-	- Got rid of an extraneous space from the dovecot pattern.
+	- Got rid of an extraneous space from the dovecot pattern
+	  and improved it to accept any IPv6 prefix on the IP.
 
 	* pop-before-smtp:
 	- Optimized the startup log-scan when an $out_pat regex is

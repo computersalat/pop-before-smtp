@@ -96,7 +96,7 @@ installed suitably recent versions of:
     File::Tail
     Time::HiRes (required by File::Tail)
     Net::Netmask
-    Date::Parse (from TimeDate)
+    Date::Parse & Date::Format (from TimeDate)
 
 In addition, it depends on the DB_File module; if you don't have it
 included in your perl build already (presumably because Berkeley DB
@@ -291,8 +291,6 @@ if ($write) {
 my $db_changed = 0;
 my $last_expire_check = 0;
 
-my($timestamp, $ipaddr);
-
 while (1) {
     $_ = $fi->read;
     if ($reprocess) {
@@ -303,6 +301,8 @@ while (1) {
     else {
 	$now = time;
     }
+
+    my($timestamp, $ipaddr);
     if (defined(&custom_match)) {
 	($timestamp, $ipaddr) = &custom_match;
 	next unless defined($ipaddr);
@@ -310,9 +310,11 @@ while (1) {
     else {
 	next unless ($timestamp, $ipaddr) = /$pat/o;
     }
+
     my $ts = str2time($timestamp) or next;
     $ts += $grace;
     next if $ts < $now;
+
     if (findNetblock($ipaddr)) {
 	$log_func->('debug', "ignoring local-net ip=$ipaddr") if $debug;
 	next;
@@ -322,6 +324,7 @@ while (1) {
     my $already_enabled = exists($t{$ipaddr});
     $t{$ipaddr} = $ts;
     next if $already_enabled;
+
     $flock_func->(1);
     $db{$ipaddr} = $dbvalue;
     $log_func->('info', "added $ipaddr to DB");
@@ -331,7 +334,7 @@ continue {
     if ($db_changed || $now > $last_expire_check + $grace) {
 	while (@q && $q[0][1] <= $now) {
 	    my($ipaddr,$ts) = @{shift @q};
-	    $log_func->('debug', "expiration event for ip=$_") if $debug;
+	    $log_func->('debug', "expiration event for ip=$ipaddr") if $debug;
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {
 		    $flock_func->(1);

@@ -5,6 +5,10 @@
 	  all the options do, to order the info a little better, and to not
 	  make it sound like Postfix is the only SMTP software we work with.
 	- Fixed the usage message, and tweaked the Getopt config a bit.
+	- If --reprocess is specified, make sure that we start reading from
+	  the beginning of the log file.
+	- Added back a debug message for every expiration event.
+	- Tweaked flock_DB() a tad.
 
 	* TODO:
 	- Added a new doc-related item.

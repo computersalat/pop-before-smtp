@@ -382,6 +382,9 @@ sub cleanup_nets
 		s/#.*//mg;
 		push @nets, cleanup_nets($_);
 	    }
+	    elsif (m#^hash:#) {
+		# Just ignore hash files for now.
+	    }
 	    else {
 		push @nets, $_;
 	    }

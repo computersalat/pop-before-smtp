@@ -1,7 +1,10 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.21 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.22 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.22 2000-10-11 Jeremy Shaffner <jer@jorsm.com> pointed out that
+#                 several of the example $pats didn't have the needed
+#                 terminal semicolons; fixed that.
 # 1.21 2000-09-20 Olivier Castan <ocastan@cybercable.fr> reported a bug
 #                 in the debugging code, it reported purges it wasn't
 #                 acting on because the grace period hadn't expired
@@ -235,7 +238,7 @@ my $pat2 = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
 # There are many, many different logfile formats emitted by various
 # qpoppers. Here's an attempt to match any of them, but for all
 # I know it might also match failed logins, or something else.
-# my $pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$'
+# my $pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$';
 
 # For Cyrus, Kenn Martin <kmartin@infoteam.com>, with tweak
 # from William Yodlowsky for IP addrs that don't resolve:
@@ -265,7 +268,7 @@ my $pat2 = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
 # Nick Bauer <nickb@inc.net> has something completely different as
 # a qpopper logfile format
 # my $pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) POP login ' .
-#           'by user "[^"]+" at \([^)]+\) (\d+.\d+.\d+.\d+)$'
+#           'by user "[^"]+" at \([^)]+\) (\d+.\d+.\d+.\d+)$';
 
 # For cucipop, matching a sample from Daniel Roesen:
 # my $pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .

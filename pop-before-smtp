@@ -17,7 +17,8 @@ pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
      [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
-     [--logto=FILE] [--grace=SECONDS] [--dumpconfig] [--daemon=PIDFILE]
+     [--logto=FILE] [--grace=SECONDS] [--daemon=PIDFILE] \
+     [--dumpconfig] [--list]
 
 =head1 DESCRIPTION
 
@@ -92,6 +93,11 @@ successfully signs in via POP or IMAP.
 
 Output some config info and exit. This makes it easy to see what things like
 the dbfile, logto, and watchlog values are being set to in the config file.
+
+=item --list
+
+List the current IPs contained in the DB file (if any) and exit.  Can be
+combined with --dumpconfig.
 
 =item --daemon=PIDFILE
 
@@ -230,7 +236,7 @@ $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
-my($daemon_pidfile, $dump_config);
+my($daemon_pidfile, $list_ips, $dump_config);
 
 $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
@@ -280,11 +286,13 @@ GetOptions(
     'dbfile=s' => \$dbfile,
     'logto=s' => \$logto,
     'grace=i' => \$grace,
+    'list' => \$list_ips,
     'dumpconfig' => \$dump_config,
 ) or die <<EOT;
 Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]
-    [--logto=FILE] [--grace=SECONDS] [--dumpconfig] [--daemon=PIDFILE]
+    [--logto=FILE] [--grace=SECONDS] [--daemon=PIDFILE]
+    [--dumpconfig] [--list]
 EOT
 
 if ($dump_config) {
@@ -297,6 +305,20 @@ if ($dump_config) {
     else {
 	print "pat: $pat\n";
     }
+    exit unless $list_ips;
+}
+if ($list_ips) {
+    $tie_func->();
+    $flock_func->(1);
+    my @ips = sort keys %db;
+    print 'The database holds ', scalar @ips, ' IP';
+    if (@ips) {
+	print @ips == 1? '' : 's', ":\n\t", join("\n\t", @ips), "\n";
+    }
+    else {
+	print "s.\n";
+    }
+    $flock_func->(0);
     exit;
 }
 if (defined $daemon_pidfile) {

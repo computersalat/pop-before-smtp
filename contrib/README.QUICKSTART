@@ -1,18 +1,7 @@
-Darron Froese <darron@froese.org> provided this excellent and clear
-tutorial get-started-quick procedure for pop-before-smtp.  Bennett Todd and
-Wayne Davison have made some changes to keep it up-to-date with the newer
-releases.
-
 Please send criticisms and corrections to the popbsmtp mailing list:
 
 <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
-
-Please send thanks and kudos to Darron Froese, whose creative work this
-document is.  (His home page:  http://darron.froese.org/ .)
-
 ------------------------------------------------------------------------------
-
-This *is* the easy way - it actually doesn't get any easier than this.
 
 Do these things:
 
@@ -23,13 +12,14 @@ For a Debian system, you can install the dependencies this way:
 % apt-get update
 % apt-get install libtimedate-perl libnet-netmask-perl libberkeleydb-perl
 
-Debian has the script itself as a package, so just using this:
+Debian has the script itself as a package, but it depends on the postfix
+mail server.  Depending on your setup, you might be able to just do this:
 
 % apt-get install pop-before-smtp
 
-will get you going.  You can then manually update the script to a newer
-version, if you so desire (but be careful to preserve the non-standard
-changes to the script that the Debian package makes).
+You can then manually update the script to a newer version, if you so
+desire (but be careful to preserve the non-standard changes to the script
+that the Debian package makes).
 
 For a Gentoo Linux system, run a command like this as root:
 
@@ -44,7 +34,13 @@ or maybe this:
 
 % urpmi perl-TimeDate perl-Net-Netmask perl-DB_File
 
+There are other software-update packages that your system might use, such
+as "up2date".  Use the one that is appropriate for your system.
+
 You can also search for the packages on an RPM site like rpmfind.net.
+
+If the hints above didn't work for you or you just want to install things
+without using packages, read on (otherwise skip to step 2).
 
 If you want to create your own perl-module RPMs, take a look at the script
 in contrib named getfromcpan.  It fetches the perl modules, turns them into

@@ -96,7 +96,7 @@ This daemon likes a couple of helpers. Here's a nice init script:
     pid=/var/run/$progname.pid
     die(){ echo "$progname: $*">&2; exit 1; }
     case "$1" in
-    start) $pgm --debug >$log 2>&1 & echo $! >$pid;;
+    start) $pgm --logto=$log >/dev/null 2>&1 & echo $! >$pid;;
     stop) p=`cat $pid`; test -n "$p" || exit 0
         kill $p || exit 0; sleep 1
         kill -9 $p 2>/dev/null || exit 0; sleep 1

@@ -69,9 +69,9 @@ if (!-f $file_tail{'name'}) {
 
 =pod #============================= syslog ===========================START=
 # If you want to output a log file of what pop-before-smtp is doing, you have
-# a few choices: either set $logto above, comment-out the =pod line above to
-# use this syslog section, or put a reference to your own custom logging
-# function into $log_func.
+# a few choices: either set $logto above, comment-out both the =pod line above
+# and the =cut line below to use this syslog section, or put a reference to
+# your own custom logging function into $log_func.
 
 use Sys::Syslog;
 openlog('pop-before-smtp', 'pid', 'mail');
@@ -149,7 +149,8 @@ $log_func = \&syslog;
 
 
 =pod #===================== Match Multiple Patterns ==================START=
-# Comment-out the above =pod line to use this function.
+# Comment-out (or remove) both the preceding =pod line and the following
+# =cut line to use this function.
 
 # Add as many patterns to the @match array as you like:
 my @match = ( $pat, $pat2 );
@@ -168,7 +169,8 @@ sub custom_match
 =cut #===================== Match Multiple Patterns ====================END=
 
 =pod #---------------------- vm-pop3d Match Support ------------------START-
-# Comment-out the above =pod line to use this function.
+# Comment-out (or remove) both the preceding =pod line and the following
+# =cut line to use this function.
 
 # vm-pop3d support by <andy@kahncentral.net>.  Tweaked by Wayne Davison.
 
@@ -205,8 +207,8 @@ sub custom_match
 ########################## Alternate DB/SMTP support #######################
 
 =pod #------------------------ Postfix NDBM_File ---------------------START-
-# If you comment-out the preceding =pod line, we'll use NDBM_File instead
-# of DB_File.
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll use NDBM_File instead of DB_File.
 
 use NDBM_File;
 
@@ -224,8 +226,8 @@ sub tie_NDBM
 =cut #------------------------ Postfix NDBM_File -----------------------END-
 
 =pod #======================== Postfix BerkeleyDB ====================START=
-# If you comment-out the preceding =pod line, we'll use BerkeleyDB instead
-# of DB_File.
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll use BerkeleyDB instead of DB_File.
 
 use BerkeleyDB;
 
@@ -251,8 +253,9 @@ sub sync_BerkeleyDB
 =cut #======================== Postfix BerkeleyDB ======================END=
 
 =pod #-------------------------- qmail tcprules ----------------------START-
-# If you comment-out the preceding =pod line, we'll use the tcprules program
-# instead of maintaining a DB_File hash.
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll use the tcprules program instead of
+# maintaining a DB_File hash.
 
 my $TCPRULES = '/usr/local/bin/tcprules';
 
@@ -301,8 +304,8 @@ sub sync_tcprules
 =cut #-------------------------- qmail tcprules ------------------------END-
 
 =pod #=========================== Courier SMTP =======================START=
-# If you comment-out the preceding =pod line, we'll interface with Courier
-# SMTP using DB_File.
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll interface with Courier SMTP using DB_File.
 
 my $ESMTPD = '/usr/lib/courier/sbin/esmtpd';
 
@@ -343,8 +346,8 @@ sub sync_courier
 =cut #=========================== Courier SMTP =========================END=
 
 =pod #-------------------------- Sendmail SMTP -----------------------START-
-# If you comment-out the preceding =pod line, we'll interface with Sendmail
-# SMTP using DB_File.
+# If you comment-out (or remove) both the preceding =pod line and the
+# following =cut line, we'll interface with Sendmail SMTP using DB_File.
 
 use DB_File;
 

@@ -317,13 +317,19 @@ flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
 
 $| = 1 if $debug;
 
+my($now, $db_changed);
+my $last_expire_check = 0;
+
 while (1) {
     $_ = $fi->read;
+    $now = time;
+    # Uncomment this next line for testing (to reprocess the logfile).
+    #/^(... .. ..:..:..)/ and $now = str2time($1);
     m/$pat/o or m/$pat2/o or next;
     my ($timestamp, $ipaddr) = ($1, $2);
     my $ts = str2time($timestamp) or next;
     $ts += $grace;
-    next if $ts < time;
+    next if $ts < $now;
     print "read ts=$timestamp ip=$ipaddr\n" if $debug;
     next if findNetblock($ipaddr);
     print "\taccepted --- not in mynetworks\n" if $debug;
@@ -334,14 +340,27 @@ while (1) {
     flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
     $db{$ipaddr} = "ok" if $write;
     print "\twritten ok\n" if $write and $debug;
-    while ($q[0][1] < time) {
-        if ($q[0][1] == $t{$q[0][0]}) {
-            print "purging ts=".localtime($q[0][1])." ip=$q[0][0]\n" if $debug;
-            delete $t{$q[0][0]};
-            delete $db{$q[0][0]} if $write;
-        }
-        shift @q;
+    $db_changed = 1;
+}
+continue {
+    if ($db_changed || $now > $last_expire_check + $grace/2) {
+	while (@q && $q[0][1] <= $now) { 
+	    my($ipaddr,$ts) = @{shift @q};
+	    if ($ts == $t{$ipaddr}) {
+		if (!$db_changed) {
+		    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
+		    $db_changed = 1;
+		}
+		print "purging ts=".localtime($ts)." ip=$ipaddr\n" if $debug;
+		delete $t{$ipaddr};
+		delete $db{$ipaddr} if $write;
+	    }
+	}
+	if ($db_changed) {
+	    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+	    flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
+	    $db_changed = 0;
+	}
+	$last_expire_check = $now;
     }
-    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
-    flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
 }

@@ -1,3 +1,16 @@
+2002-05-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added "=over 4" and "=back" to the pod docs (around the options
+	  list).
+	- If we've been configured to not re-read the maillog file, we set
+	  any existing IPs in the DB to expire in $grace seconds.
+	- Improved the slow-system expire check so that the last person
+	  doesn't consistently get 2*$grace seconds of authorization.
+
+	* TODO:
+	- Removed another completed todo-item.
+
 2002-04-27  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

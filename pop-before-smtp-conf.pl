@@ -115,7 +115,8 @@ sub getline_FileTail
 # To enable an entry, just delete the "#" at the start of all the lines
 # *after* the initial comment line(s).  If the entry of your choice also
 # provides $out_pat, you should uncomment that variable as well, which
-# allows us to keep track of users who are still connected to the server.
+# allows us to keep track of users who are still connected to the server
+# (e.g. Thunderbird caches open IMAP connections).
 #
 # Note also that the servers that require multiple log lines be read to
 # get all the needed info have a setup with 3 *_pat variables instead of
@@ -537,14 +538,19 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 # continue trying to match the $OK_pat value on matching PID lines until we
 # either match the $FAIL_pat (in which case the IP is ignored) or the $OK_pat
 # (in which case the IP is accepted).  Thus, $FAIL_pat can be either a
-# failure log line or a "this PID is finished" log line common to both
-# success and failure.  These patterns are only applied to lines that match
-# the $PID_pat regex.
+# failure log line or a this-PID-is-finished log line common to both success
+# and failure.  Finally, an optional $OUT_pat may be defined if you want to
+# track active connections -- when defined, any PID that matches the $OK_pat
+# will be considered connected until we find a match for $OUT_pat.  It is
+# fine if lines that match $OUT_pat would also match $FAIL_pat (such as a
+# disconnect message) -- this won't confuse the code.
+#
+# Keep in mind that $IP_pat, $OK_pat, $OUT_pat, and $FAIL_pat will only be
+# applied to lines that match the $PID_pat regex.
 
-    my %popIPs;
+    my(%popIPs, %popConnected);
 
     $FAIL_pat = '.' if !defined $FAIL_pat;
-    # TODO: add support for optional $OUT_pat variable.
 
     # The mail-log line to match is in $_.
     sub custom_match
@@ -555,17 +561,26 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 		$popIPs{$pid} = $3;
 	    }
 	    else {
-		foreach my $key (keys %popIPs) {
-		    if ($pid == $key) {
-			my $ip = $popIPs{$pid};
+		my $ip = $popIPs{$pid};
+		if (defined $ip) {
+		    if ($popConnected{$pid}) {
+			if (/$OUT_pat/o) {
+			    delete $popConnected{$pid};
+			    delete $popIPs{$pid};
+			    return ($ts, $ip, -1);
+			}
+		    } else {
 			if (/$OK_pat/o) {
+			    if (defined $OUT_pat) {
+				$popConnected{$pid} = 1;
+				return ($ts, $ip, 1);
+			    }
 			    delete $popIPs{$pid};
 			    return ($ts, $ip, 0);
 			}
 			if (/$FAIL_pat/o) {
 			    delete $popIPs{$pid};
 			}
-			last;
 		    }
 		}
 	    }

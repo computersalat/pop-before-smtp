@@ -1,3 +1,8 @@
+2002-05-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/README.QUICKSTART:
+	- Correct the sendmail instructions for adding the popauth hack.
+
 2002-05-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

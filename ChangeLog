@@ -2,7 +2,8 @@
 
 	* pop-before-smtp:
 	- Updated the init-file example in the docs.
-	- Changed to --debug option to always set the $log_func.
+	- Changed to --debug option to always set the $log_func and to
+	  select(STDOUT).
 
 	* pop-before-smtp-conf.pl:
 	- Added an introductory comment.

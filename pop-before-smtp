@@ -456,9 +456,16 @@ sub cleanup_nets
 
 sub mynet_postfix
 {
-    $_ = `postconf mynetworks`;
-    s/^mynetworks\s*=\s*//;
-    $_;
+    my $mynet = '$mynetworks';
+    while ($mynet =~ /\$([^\/\s]+)/) {
+	my $var = $1;
+	$_ = `postconf $var`;
+	s/^\Q$var\E\s*=\s*//
+	    or die "postconf was unable to determine the value of: $var\n";
+	s/\s+$//;
+	$mynet =~ s/\$\Q$var\E/$_/g;
+    }
+    $mynet;
 }
 
 my $dbh;

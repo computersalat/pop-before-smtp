@@ -1,3 +1,18 @@
+2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Removed the dashes from the current (pre-release) version number.
+
+	* pop-before-smtp.spec:
+	- Updated the Version/Source/Packager/URL.
+	- Since we're installing the docs as a separate man page, strip the
+	  pod doc out of the installed script.
+	- Install the config file in /etc.
+	- Added %clean.
+	- Fixed the man-page reference in the %files section to work even if
+	  the file gets compressed.
+	- Put the ChangeLog in the doc dir.
+
 2002-04-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

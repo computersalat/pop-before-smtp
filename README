@@ -62,44 +62,15 @@ Everything is in the script and its config file, including the
 documentation, the text of the init script, and the Postfix/sendmail
 config recommendations.
 
-Here's some more details on what this script requires and how to setup
-your system.  For step-by-step installation instructions, see the file
-README.QUICKSTART in the contrib dir.
+For details on how to setup your system and to configure and install
+pop-before-smtp, see the README.QUICKSTART file in the contrib dir.
+Or, for the most up-to-date version, visit it on the web:
 
-The prerequisites for this script are:
+    http://popbsmtp.sourceforge.net/quickstart.shtml
 
-    Net::Netmask
-    Date::Parse & Date::Format (from the TimeDate tarball on CPAN)
+There is also a good debug resource there as well:
 
-A script to do all the fetching and create RPMs for the perl modules
-is named contrib/getfromcpan, contributed by Alexander J. Burke
-<alex@pdqsolutions.com>.  If you need to install pop-before-smtp on
-multiple machines, running getfromcpan will build a set of RPMs that you
-can install onto as many machines as you need (I particularly recommend
-running it as a normal user, as long as you have your rpm-build area set
-up for that -- see the ~/.rpmmacros file if you don't).
-
-OR you can just download 'em:
-
-    % perl -MCPAN -e 'install Date::Parse'
-    % perl -MCPAN -e 'install Net::Netmask'
-
-Then unpack them, and for each one (remembering to do Time-HiRes
-before File-Tail, since it depends on it), cd into its directory and
-type:
-
-	perl ./Makefile.PL && sudo make install
-
-Once those are installed you should be able to run pop-before-smtp.
-But you want it run at boot time, in the background, with the pid
-logged so it can be killed and restarted easily, so in that case you
-would start it and stop it with
-
-    /etc/rc.d/init.d/pop-before-smtp start
-    /etc/rc.d/init.d/pop-before-smtp stop
-
-You should run "chkconfig pop-before-smtp on" to create all the
-run-level symlinks that ensure the script starts up on reboot.
+    http://popbsmtp.sourceforge.net/debug.shtml
 
 ----- Note on the pop-before-smtp file-locking code -----
 

@@ -8,8 +8,8 @@
 	- Use time2str() for our stdout-log timestamp.
 
 	* pop-before-smtp-conf.pl:
-	- Added a sample BerkeleyDB setup (commented out).
-	- Added a commented-out setup for qmail tcprules and Courier SMTP.
+	- Added a commented-out sample setup for postfix BerkeleyDB, qmail
+	  tcprules, and Courier SMTP.
 	- Added $dbvalue section.
 	- Added /var/log/mail.log to the list of known watch-log values.
 
@@ -44,7 +44,7 @@
 	  differences.
 
 	* contrib/README.QUICKSTART:
-	- Tell people to sent fixes to the mailing list.
+	- Tell people to send fixes to the mailing list.
 	- Fixed the line-wrapping glitches.
 
 2002-04-12  Wayne Davison  <wayned@users.sourceforge.net>

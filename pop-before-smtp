@@ -386,8 +386,8 @@ while (1) {
 	next;
     }
     $log_func->('debug', "found ip=$ipaddr") if $debug;
-    push @q, [$ipaddr, $ts];
     my $already_enabled = exists($t{$ipaddr});
+    push @q, [$ipaddr, $ts] if !$already_enabled || $ts > $t{$ipaddr};
     $t{$ipaddr} = $ts;
     next if $already_enabled;
 

@@ -354,7 +354,6 @@ sub sync_courier
 use DB_File;
 
 $dbfile = '/etc/mail/popauth'; # DB hash to write
-#$dbvalue = 'POP:1'; # ???
 
 $mynet_func = \&mynet_sendmail;
 $tie_func = \&tie_sendmail;

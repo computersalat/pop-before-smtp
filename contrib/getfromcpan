@@ -31,13 +31,12 @@
 # v1.0  12-Nov-2000  Initial release
 # v1.1  19-Nov-2000  Addition of more sanity checks; small tweaks
 # v1.2  24-Apr-2002  Allow non-root run, don't delete RPMs, updated CPAN vers
+# v1.3   5-Mar-2004  Removed no-longer-needed modules, updated CPAN vers
 #
 ############################################################################
 
-HIRES_VER=01.20 	# Time/Time-HiRes
-TIMEDATE_VER=1.11	# Time/TimeDate
-NETMASK_VER=1.9002	# Net/Net-Netmask
-FILETAIL_VER=0.98	# File/File-Tail
+TIMEDATE_VER=1.16	# Time/TimeDate
+NETMASK_VER=1.9007	# Net/Net-Netmask
 
 if [ -f $HOME/.rpmmacros ]; then
     TOPDIR=`sed -ne 's/%_topdir[ 	]*//p' <$HOME/.rpmmacros`
@@ -78,34 +77,9 @@ cp ./perlmod2rpm $TOPDIR/SOURCES
 cd $TOPDIR/SOURCES
 
 # Preinstallation cleanup.
-rm -f Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz File-Tail*.tar.gz
+rm -f TimeDate*.tar.gz Net-Netmask*.tar.gz
 
 # Okay, here we go.
-echo
-echo =======================================================================
-echo === Getting and building Time-HiRes...                              ===
-echo =======================================================================
-echo
-wget http://www.cpan.org/modules/by-module/Time/Time-HiRes-$HIRES_VER.tar.gz
-RESULT=$?
-if [ "$RESULT" != "0" ]; then
-      echo "ERROR: Something went wrong! Aborting."
-      exit 1
-fi
-./perlmod2rpm Time-HiRes-$HIRES_VER.tar.gz
-RESULT=$?
-if [ "$RESULT" != "0" ]; then
-      echo "ERROR: Something went wrong! Aborting."
-      exit 1
-fi
-if [ "$UID" == "0" ]; then
-    rpm -ivh ../RPMS/i?86/Time-HiRes-$HIRES_VER-1.i?86.rpm
-    RESULT=$?
-    if [ "$RESULT" != "0" ]; then
-	  echo "ERROR: Something went wrong! Aborting."
-	  exit 1
-    fi
-fi
 echo
 echo =======================================================================
 echo === Getting and building TimeDate...                                ===
@@ -156,39 +130,12 @@ if [ "$UID" == "0" ]; then
 	  exit 1
     fi
 fi
-echo
-echo =======================================================================
-echo === Getting and building File-Tail...                               ===
-echo =======================================================================
-echo
-wget http://www.cpan.org/modules/by-module/File/File-Tail-$FILETAIL_VER.tar.gz
-RESULT=$?
-if [ "$RESULT" != "0" ]; then
-      echo "ERROR: Something went wrong! Aborting."
-      exit 1
-fi
-./perlmod2rpm File-Tail-$FILETAIL_VER.tar.gz
-RESULT=$?
-if [ "$RESULT" != "0" ]; then
-      echo "ERROR: Something went wrong! Aborting."
-      exit 1
-fi
-if [ "$UID" == "0" ]; then
-    rpm -ivh ../RPMS/i?86/File-Tail-$FILETAIL_VER-1.i?86.rpm
-    RESULT=$?
-    if [ "$RESULT" != "0" ]; then
-	  echo "ERROR: Something went wrong! Aborting."
-	  exit 1
-    fi
-fi
 
 # Let's clean up.
-rm -f perlmod2rpm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz \
-      File-Tail*.tar.gz
+rm -f perlmod2rpm TimeDate*.tar.gz Net-Netmask*.tar.gz
 
 #if [ "$UID" == "0" ]; then
-    #rm -f ../RPMS/i?86/Time-HiRes*.rpm ../RPMS/i?86/TimeDate*.rpm \
-	  #../RPMS/i?86/Net-Netmask*.rpm ../RPMS/i?86/File-Tail*.rpm
+    #rm -f ../RPMS/i?86/TimeDate*.rpm ../RPMS/i?86/Net-Netmask*.rpm
 #fi
 
 echo

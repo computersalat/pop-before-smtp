@@ -1,3 +1,10 @@
+2003-11-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, contrib/README.QUICKSTART,
+	contrib/README.rootless-install:
+	- Changed (deprecated) check_relay_domains to
+	  reject_unauth_destination.
+
 2003-09-21  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

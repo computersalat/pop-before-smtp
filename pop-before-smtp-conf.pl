@@ -167,12 +167,12 @@ sub getline_FileTail
 #    'User .+ logged in from (\d+\.\d+\.\d+\.\d+)';
 
 # Older vm-pop3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
-#my $PID_pat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: ';
+#my $PID_pat = '^(... .. ..:..:..) \S+ vm-pop3d\[(\d+)\]: ';
 #my $IP_pat = $PID_pat . 'Connect from (\d+\.\d+\.\d+\.\d+)$';
 #my $OK_pat = $PID_pat . 'User .+ logged in';
 
 # For popa3d -- needs to match 2 log entries (uncomment all 3 "my" lines).
-#my $PID_pat = '^(... .. ..:..:..) \S+ (?:popa3d)\[(\d+)\]: ';
+#my $PID_pat = '^(... .. ..:..:..) \S+ popa3d\[(\d+)\]: ';
 #my $IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)$';
 #my $OK_pat = $PID_pat . 'Authentication passed for ';
 
@@ -182,13 +182,18 @@ sub getline_FileTail
 
 # A Perdition pattern.
 #$pat = '^(... .. ..:..:..) \S+ perdition\[\d+\]: ' .
-#    '(?:Auth:) (\d+\.\d+\.\d+\.\d+)(?:\-\>\d+\.\d+\.\d+\.\d+) ' .
-#    'user=(?:\"\S+\") server=(?:\"\S+\") port=(?:\"\S+\") status=(?:\"ok\")';
+#    'Auth: (\d+\.\d+\.\d+\.\d+)\-\>\d+\.\d+\.\d+\.\d+ ' .
+#    'user=\"\S+\" server=\"\S+\" port=\"\S+\" status=\"ok\"';
 
-# For solidpop3d (known as spop3d).  ** You should compile
-# solidpop3d with --enable-extendlog **
+# For solidpop3d (known as spop3d).  ** If you compiled
+# solidpop3d with --enable-extendlog and enabled that option! **
 #$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
+
+# For spop3d w/o --enabled-extendlog (uncomment all 3 "my" lines).
+#my $PID_pat = '^(... .. ..:..:..) \S+ spop3d\[(\d+)\]: ';
+#my $IP_pat = $PID_pat . 'connect from (\d+\.\d+\.\d+\.\d+)';
+#my $OK_pat = $PID_pat . 'user \S+ authenticated';
 
 # Pattern for teapop (http://www.toontown.org/teapop/) by Patrick Prasse.
 #$pat = '^(... .. ..:..:..) \S+ teapop\[\d+\]: ' .

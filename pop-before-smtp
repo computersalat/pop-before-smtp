@@ -1,7 +1,8 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.22 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.23 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.23 2000-10-30 Fixed GetOptions to match docs and handle --logfile
 # 1.22 2000-10-11 Jeremy Shaffner <jer@jorsm.com> pointed out that
 #                 several of the example $pats didn't have the needed
 #                 terminal semicolons; fixed that.
@@ -89,9 +90,7 @@ use strict;
 =head1 SYNOPSIS
 
   nohup pop-before-smtp [--[no]write] [--[no]debug] [--[no]flock] \
-	[--logfile=filename] \
-	[--dbfile=filename] \
-	[--grace=seconds] &
+	[--logfile=filename] [--dbfile=filename] [--grace=seconds] &
 
 =head1 DESCRIPTION
 
@@ -279,12 +278,13 @@ my $grace = 1800; # 30 minutes --- grace period
 
 GetOptions(
 	"write!" => \$write,
-	"flock!" => \$flock,
 	"debug!" => \$debug,
+	"flock!" => \$flock,
+	"logfile=s" => \$logfile,
 	"dbfile=s" => \$dbfile,
 	"grace=i" => \$grace,
-) or die "syntax: $0 [--[no]write] [--[no]debug] [--logfile=filename] " .
-	"[--dbfile=filename] [--grace=seconds]\n";
+) or die "syntax: $0 [--[no]write] [--[no]debug] [--[no]flock] " .
+	"[--logfile=filename] [--dbfile=filename] [--grace=seconds]\n";
 
 $flock = 0 unless $write; # flocking makes no sense if you're not writing
 

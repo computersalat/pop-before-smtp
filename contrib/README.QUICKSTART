@@ -93,9 +93,9 @@ Run these commands:
 % /etc/rc.d/init.d/pop-before-smtp start
 
 Verify that the DB file has been created.  If you're not sure where to
-look, run "pop-before-smtp --info" and look at the "dbfile" value.  The
-actual created filename may have a suffix on it (such as ".db"), so append
-a '*' on the end of the name when you look for it.  Some examples:
+look, run "pop-before-smtp --dumpconfig" and look at the "dbfile" value.
+The actual created filename may have a suffix on it (such as ".db"), so
+append a '*' on the end of the name when you look for it.  Some examples:
 
     ls -l /etc/postfix/pop-before-smtp*
     ls -l /etc/mail/popauth*

@@ -17,7 +17,7 @@ pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
      [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
-     [--logto=FILE] [--grace=SECONDS] [--info] &
+     [--logto=FILE] [--grace=SECONDS] [--dumpconfig] &
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ Turns on logging to the specified file (use "-" for stdout).
 Set the number of seconds that an IP address is authorized after it
 successfully signs in via POP or IMAP.
 
-=item --info
+=item --dumpconfig
 
 Output some config info and exit. This makes it easy to see what things like
 the dbfile, logto, and watchlog values are being set to in the config file.
@@ -269,7 +269,7 @@ GetOptions(
     'dbfile=s' => \$dbfile,
     'logto=s' => \$logto,
     'grace=i' => \$grace,
-    'info' => \$dump_config,
+    'dumpconfig' => \$dump_config,
 ) or die <<EOT;
 Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]

@@ -1,7 +1,7 @@
 2002-05-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
-	- Added the --info option to show some basic config information.
+	- Added the --dumpconfig option to show some basic config information.
 	- Mention a sendmail.cf setup, and be less Postfix-centric.
 
 	* pop-before-smtp-conf.pl:

@@ -1,5 +1,10 @@
 2004-03-04  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.35.
+
+2004-03-04  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* pop-before-smtp:
 	- Added --list to list the IPs currently in the database.
 
@@ -23,9 +28,10 @@
 
 	* pop-before-smtp:
 	- We now let the user configure how logfile-reading should be
-	  done. The config file can now set $tail_init_func and
-	  $tail_getline_func to override the default, which has changed
-	  to be some custom logfile- reading functions instead of
+	  done, with the new default being to use some simpler logfile-
+	  reading functions that we provide. The user can override this
+	  by setting $tail_init_func and $tail_getline_func.  This fixes
+	  some out-of-control CPU use that some users experience using
 	  File::Tail.
 
 	* pop-before-smtp-conf.pl:

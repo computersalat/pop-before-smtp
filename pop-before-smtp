@@ -9,12 +9,12 @@ use strict;
 
 =head1 NAME
 
-  pop-before-smtp --- watch log for POP/IMAP auth, update map allowing SMTP
+  pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
 
 =head1 SYNOPSIS
 
-  nohup pop-before-smtp [--[no]write] [--[no]debug] [--[no]flock] \
-       [--logfile=filename] [--dbfile=filename] [--grace=seconds] &
+  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
+   [--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--grace=SECONDS] &
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,8 @@ write the db hash file; if your maillog is world-readable this might
 allow you to try it out (with --debug) running as a non-privileged
 user.
 
-Edit the source to change the wired-in logfile format, tail parameters, etc.
+Edit the supplied pop-before-smtp-conf.pl file to change the wired-in logfile
+format, tail parameters, etc.
 
 When starting up, it builds an internal table of all netblocks natively
 permitted by Postfix (it looks at the output of "postconf mynetworks"); before
@@ -92,8 +93,8 @@ This daemon likes a couple of helpers. Here's a nice init script:
     pid=/var/run/$progname.pid
     die(){ echo "$progname: $*">&2; exit 1; }
     case "$1" in
-     start) $pgm >$log 2>&1 & echo $! >$pid;;
-      stop) p=`cat $pid`; test -n "$p" || exit 0
+    start) $pgm --debug >$log 2>&1 & echo $! >$pid;;
+    stop) p=`cat $pid`; test -n "$p" || exit 0
         kill $p || exit 0; sleep 1
         kill -9 $p 2>/dev/null || exit 0; sleep 1
         kill -0 $p && die "$pid won't die"
@@ -118,9 +119,10 @@ the end of the file, rather than at the beginning) that fixed it.
 See the website http://popbsmtp.sf.net/ for the latest version, and
 the mailing list for support.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Bennett Todd, <bet@rahul.net>
+Pop-before-smtp was created by Bennett Todd, <bet@rahul.net>.
+It is currently being maintained by Wayne Davison <wayned@users.sf.net>.
 
 =cut
 
@@ -131,189 +133,154 @@ use Date::Parse;
 use Getopt::Long;
 use Fcntl ':flock';
 
-##################################
-#                                #
-# Tuneable parameters start here #
-#                                #
-##################################
-
-# Flags
-my $write = 1;
-my $flock = 1;
-my $debug = 0;
-
-# File to watch for pop3d/imapd records
-my $logfile = '/var/log/maillog';
-
-my $me = getpwuid($<); # real me
-# Build complete sanitary environment
-# If postconf isn't somewhere on this PATH, do fix the PATH so it is
-%ENV = (
-    PATH => '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin',
-    HOME => '/tmp',
-    SHELL => '/bin/sh',
-    LOGNAME => $me,
+use vars qw(
+    $pat
+    $write
+    $flock
+    $debug
+    $reprocess
+    $dbfile
+    $grace
+    %file_tail
+    $log_func
 );
 
-# This regex pull the lines I'm interested in out of $logfile, and yanks out
-# the timestamp and IP address
+# Default values, possibly overridden in the config file.
 
-# For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
-my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
-          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
+$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+    '(?:Login|Authenticated|Auth) user=\S+ ' .
+    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
+$write = 1; # open and change the DB
+$flock = 1; # we do the exclusive file locking when updating
+$debug = 0; # no debug messages
+$reprocess = 0; # no debug reprocessing of watchlog
+$dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
+$grace = 1800; # 30-minute grace period
 
-# Bennett Todd to add support for GNU pop3d
-my $pat2 = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .
-      'User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$';
-
-# There are many, many different logfile formats emitted by various
-# qpoppers. Here's an attempt to match any of them, but for all
-# I know it might also match failed logins, or something else.
-# my $pat = '^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$';
-
-# For Cyrus, Kenn Martin <kmartin@infoteam.com>, with tweak
-# from William Yodlowsky for IP addrs that don't resolve:
-# my $pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .
-#           'login: \S*\[(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
-
-# For Courier-IMAP:
-#my $pat = '^(... .. ..:..:..) \S+ imaplogin: ' .
-#          'LOGIN, user=\S+, ip=\[(\d+\.\d+\.\d+\.\d+)\]$';
-
-# For qmail's pop3d:
-#my $pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
-#          'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)$';
-
-# For Qpopper POP/APOP Server
-# my $pat = '^(... .. ..:..:..) \S+ (?:qpopper)\[\d+\]: Stats: \S+ ' .
-#           '(?:\d+ ){4}(\d+.\d+.\d+.\d+)';
-
-# Alex Burke's popper install
-# my $pat = '^(... .. ..:..:..) \S+ popper\[\d+\]: Stats: \S+ ' .
-#           '(?:\d+ ){4}(?:\S+ )?(\d+.\d+.\d+.\d+)$';
-
-# Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
-# my $pat = '^(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) \[\d+\] ' .
-#           ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
-
-# Nick Bauer <nickb@inc.net> has something completely different as
-# a qpopper logfile format
-# my $pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) POP login ' .
-#           'by user "[^"]+" at \([^)]+\) (\d+.\d+.\d+.\d+)$';
-
-# For cucipop, matching a sample from Daniel Roesen:
-# my $pat = '^(... .. ..:..:..) \S+ cucipop\[\d+\]: \S+ ' .
-#           '(\d+\.\d+\.\d+\.\d+) \d+, \d+ \(\d+\), \d+ \(\d+\)';
-
-# For popa3d with the patch from bartek marcinkiewicz <jr@rzeznia.eu.org>
-# (available in contrib/popa3d/):
-# my $pat = '^(... .. ..:..:..) \S+ popa3d\[\d+\]: Authentication passed for \S+ -- \[(\d+.\d+.\d+.\d+)\]$';
-
-my $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
-my $grace = 1800; # 30 minutes --- grace period
-
-GetOptions(
-    "write!" => \$write,
-    "debug!" => \$debug,
-    "flock!" => \$flock,
-    "logfile=s" => \$logfile,
-    "dbfile=s" => \$dbfile,
-    "grace=i" => \$grace,
-) or die "syntax: $0 [--[no]write] [--[no]debug] [--[no]flock] " .
-    "[--logfile=filename] [--dbfile=filename] [--grace=seconds]\n";
-
-$flock = 0 unless $write; # flocking makes no sense if you're not writing
-
-# These parameters control how closely the watcher tries to follow the
-# logfile, which affects how much resources it consumes, and how quickly
-# people can smtp after they have popped.
-# They are documented in the File::Tail pod; run "perldoc File::Tail" to
-# find out details. I guessed at these to try and get this daemon to follow
-# the logfile pretty closely (to avoid users having to wait too long
-# after a pop before they can relay) without wasting too much CPU
-# needlessly.
-my $fi = File::Tail->new(
-    name => $logfile,
+# See the pop-before-smtp-conf.pl file for what these values mean.
+%file_tail = (
+    name => '/var/log/maillog', # File to watch for pop3d/imapd records
     maxinterval => 10,
     interval => 5,
     adjustafter => 3,
     tail => -1,
 );
 
-# Daniel Roesen prefers this one; he feels that it does a better job
-# of being suitably prompt about noticing new logins, and that the
-# tuning that I chose is too likely to cause users to fail to be
-# able to send email.
-#
-# my $fi = File::Tail->new(
-#         name => $logfile,
-#         maxinterval => 2,
-#         interval => 1,
-#         adjustafter => 3,
-#         resetafter => 30,
-#         tail => -1,
-# );
+# Build complete sanitary environment.
+%ENV = (
+    PATH => '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin',
+    HOME => '/tmp',
+    SHELL => '/bin/sh',
+    LOGNAME => getpwuid($<), # real me
+);
 
-################################
-#                              #
-# Tuneable parameters end here #
-#                              #
-################################
+my $config_file = '/etc/pop-before-smtp-conf.pl';
+
+# Kludge the parsing of the --config=FILE option so we can parse the
+# rest of our options after reading the config file.
+if (@ARGV && $ARGV[0] =~ /^--config=(.*)/) {
+    require $1;
+    shift;
+}
+elsif (-f $config_file) {
+    require $config_file;
+}
+
+GetOptions(
+    'config=s' => sub {die "--config=$_[1] must be the first option.\n"},
+    "write!" => \$write,
+    "debug!" => sub {$debug = 1; $log_func = \&log_to_stdout unless $log_func},
+    "flock!" => \$flock,
+    "watchlog|logfile=s" => \$file_tail{'name'},
+    "dbfile=s" => \$dbfile,
+    "grace=i" => \$grace,
+    "reprocess!" => \$reprocess,
+) or die "Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]\n    " .
+    "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--grace=SECONDS]\n";
+
+$flock = 0 unless $write; # flocking makes no sense if you're not writing
+
+$log_func = sub { } unless $log_func;
+
+my $fi = File::Tail->new(%file_tail);
+
+$SIG{'INT'} = \&sig_handler;
+$SIG{'TERM'} = \&sig_handler;
+$SIG{__DIE__} = \&mydie;
+
+$| = 1;
+
+my $now = time;
+$log_func->('info', 'starting up');
 
 foreach (cleanup_nets(`postconf mynetworks`)) {
     Net::Netmask->new($_)->storeNetblock();
 }
 
 my (%t, @q);
+my (%db, $dbh);
 
-use vars qw(%db);
-my $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH or
-    die "$0: cannot dbopen $dbfile: $!\n" if $write;
-my $fd = $dbh->fd;
-open(DB_FH, "+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n" if $write;
-flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
-delete $db{$_} for keys %db;
-flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
+if ($write) {
+    $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH
+	or die "$0: cannot dbopen $dbfile: $!\n";
+    my $fd = $dbh->fd;
+    open(DB_FH, "+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n";
+    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
+    delete $db{$_} for keys %db;
+    flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
+}
 
-$| = 1 if $debug;
-
-my($now, $db_changed);
+my $db_changed = 0;
 my $last_expire_check = 0;
+
+my($timestamp, $ipaddr);
 
 while (1) {
     $_ = $fi->read;
-    $now = time;
-    # Uncomment this next line for testing (to reprocess the logfile).
-    #/^(... .. ..:..:..)/ and $now = str2time($1);
-    m/$pat/o or m/$pat2/o or next;
-    my ($timestamp, $ipaddr) = ($1, $2);
+    if ($reprocess) {
+	# To assist with debugging, pretend the current time is when this
+	# line's event happened.
+	/^(... .. ..:..:..)/ and $now = str2time($1);
+    }
+    else {
+	$now = time;
+    }
+    if (defined(&custom_match)) {
+	($timestamp, $ipaddr) = &custom_match;
+	next unless defined($ipaddr);
+    }
+    else {
+	next unless ($timestamp, $ipaddr) = /$pat/o;
+    }
     my $ts = str2time($timestamp) or next;
     $ts += $grace;
     next if $ts < $now;
-    print "read ts=$timestamp ip=$ipaddr\n" if $debug;
-    next if findNetblock($ipaddr);
-    print "\taccepted --- not in mynetworks\n" if $debug;
+    if (findNetblock($ipaddr)) {
+	$log_func->('debug', "ignoring local-net ip=$ipaddr") if $debug;
+	next;
+    }
+    $log_func->('debug', "found ip=$ipaddr") if $debug;
     push @q, [$ipaddr, $ts];
     my $already_enabled = exists($t{$ipaddr});
     $t{$ipaddr} = $ts;
     next if $already_enabled;
     flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
     $db{$ipaddr} = "ok" if $write;
-    print "\twritten ok\n" if $write and $debug;
+    $log_func->('info', "added $ipaddr to DB");
     $db_changed = 1;
 }
 continue {
     if ($db_changed || $now > $last_expire_check + $grace/2) {
-	while (@q && $q[0][1] <= $now) { 
+	while (@q && $q[0][1] <= $now) {
 	    my($ipaddr,$ts) = @{shift @q};
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {
 		    flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
 		    $db_changed = 1;
 		}
-		print "purging ts=".localtime($ts)." ip=$ipaddr\n" if $debug;
 		delete $t{$ipaddr};
 		delete $db{$ipaddr} if $write;
+		$log_func->('info', "removed $ipaddr from DB");
 	    }
 	}
 	if ($db_changed) {
@@ -353,4 +320,25 @@ sub cleanup_nets
 	}
     }
     @nets;
+}
+
+sub log_to_stdout
+{
+    my $level = shift;
+    my $ts = localtime($now);
+    $ts =~ s/\d\d\d\d$//;
+    print $ts, @_, "\n";
+}
+
+sub sig_handler
+{
+    my($sig) = @_;
+    $log_func->('crit', "caught SIG$sig -- exiting");
+    exit 1;
+}
+
+sub mydie
+{ 
+    my($msg) = @_;
+    $log_func->('crit', "fatal error: $msg") if defined $log_func;
 }

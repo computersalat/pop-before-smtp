@@ -4,10 +4,11 @@ use strict;
 # Check the website <URL:http://popbsmtp.sf.net/> for the latest version,
 # and the mailing list for discussing this program and asking for help at
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
-
-# pop-before-smtp 1.35
+#
 # Copyright (C) 1999, 2000, 2001 Bennett Todd.
 # Also Copyright (C) 2002, 2003, 2004 Wayne Davison. Freely Redistributable.
+
+my $VERSION = '1.35';
 
 =head1 NAME
 
@@ -18,7 +19,7 @@ pop-before-smtp - watch log for POP/IMAP auth, update map allowing SMTP
  nohup pop-before-smtp [--config=FILE] [--[no]write] [--[no]debug] \
      [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE] \
      [--logto=FILE] [--grace=SECONDS] [--daemon=PIDFILE] \
-     [--dumpconfig] [--list]
+     [--version] [--dumpconfig] [--list]
 
 =head1 DESCRIPTION
 
@@ -89,15 +90,21 @@ Turns on logging to the specified file (use "-" for stdout).
 Set the number of seconds that an IP address is authorized after it
 successfully signs in via POP or IMAP.
 
+=item --version
+
+Output the current version of the script and exit.  May be combined with
+--dumpconfig and --list in the same run.
+
 =item --dumpconfig
 
 Output some config info and exit. This makes it easy to see what things like
 the dbfile, logto, and watchlog values are being set to in the config file.
+May be combined with --version and --list in the same run.
 
 =item --list
 
-List the current IPs contained in the DB file (if any) and exit.  Can be
-combined with --dumpconfig.
+List the current IPs contained in the DB file (if any) and exit.  May be
+combined with --version and --dumpconfig in the same run.
 
 =item --daemon=PIDFILE
 
@@ -227,7 +234,7 @@ $reprocess = 0; # no debug reprocessing of watchlog
 $dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
-my($daemon_pidfile, $list_ips, $dump_config);
+my($daemon_pidfile, $dump_version, $dump_config, $list_ips);
 
 $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
@@ -278,15 +285,20 @@ GetOptions(
     'dbfile=s' => \$dbfile,
     'logto=s' => \$logto,
     'grace=i' => \$grace,
-    'list' => \$list_ips,
+    'version' => \$dump_version,
     'dumpconfig' => \$dump_config,
+    'list' => \$list_ips,
 ) or die <<EOT;
 Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]
     [--logto=FILE] [--grace=SECONDS] [--daemon=PIDFILE]
-    [--dumpconfig] [--list]
+    [--version] [--dumpconfig] [--list]
 EOT
 
+if ($dump_version) {
+    print "version: $VERSION\n";
+    exit unless $dump_config || $list_ips;
+}
 if ($dump_config) {
     print "config file: $config_file\n";
     print "watchlog: $file_tail{'name'}\n";

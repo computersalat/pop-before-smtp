@@ -39,6 +39,12 @@ For the non-RPM way, run these commands as root:
 That will install the necessary Perl modules from CPAN automatically -- as
 long as you have Internet connectivity and a Perl that knows about CPAN.
 
+For a Gentoo Linux system, run a command like this as root:
+
+# emerge dev-perl/{Time-HiRes,File-Tail,TimeDate,Net-Netmask}
+
+That will install all the necessary perl modules that pop-before-smtp needs.
+
 2. Edit the pop-before-smtp-conf.pl file to customize it for your system.
 
 Look for this:

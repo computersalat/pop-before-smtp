@@ -25,8 +25,8 @@ spec file.
 
 =head1 PATHS
 
-You _must_ place the tarballs, if any, in /usr/src/redhat/SOURCES/. The spec
-files will be written in /usr/src/redhat/SPECS/.
+You _must_ place the tarballs, if any, in %_topdir/SOURCES/. The spec
+files will be written in %_topdir/SPECS/.
 
 =cut
 
@@ -46,7 +46,16 @@ $opt_n = $opt_d = 0;
 die "syntax: $0 [-n] [-d] filename [...]\n" unless getopts('nd') and @ARGV;
 
 my $oldcwd = cwd;
-chdir '/usr/src/redhat/SOURCES/' or die;
+my $topdir = '/usr/src/redhat';
+if (open(IN, "$ENV{HOME}/.rpmmacros")) {
+    while (<IN>) {
+	if (/\%_topdir\s+(\S+)/) {
+	    $topdir = $1;
+	    last;
+	}
+    }
+}
+chdir "$topdir/SOURCES" or die;
 
 my ($mday,$mon,$year,$wday) = (localtime(time))[3..6];
 my @M = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
@@ -89,7 +98,7 @@ for (@ARGV) {
 			$d{$_} = $th->readline("$_: ");
 		}
 	}
-	IO::File->new(">/usr/src/redhat/SPECS/$d{name}.spec")->print(<<Eof);
+	IO::File->new(">$topdir/SPECS/$d{name}.spec")->print(<<Eof);
 Summary: $d{summ}
 Name: $d{name}
 Version: $d{vers}
@@ -131,5 +140,5 @@ find \$RPM_BUILD_ROOT -name perllocal.pod | perl -lne unlink
 * $wday $mon $mday $year <bet\@mordor.net>
   - Initial Wrap
 Eof
-	system "rpm -ba /usr/src/redhat/SPECS/$d{name}.spec" and die unless $opt_n;
+	system "rpm -ba $topdir/SPECS/$d{name}.spec" and die unless $opt_n;
 }

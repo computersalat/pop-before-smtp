@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# getfromcpan version 1.1
+# getfromcpan version 1.2
 # Copyright (C) 2000 Alexander Burke <alex@pdqsolutions.com>
 #
 # You may do with this script as you like, as long as you leave the
@@ -18,8 +18,9 @@
 # pop-before-smtp.
 #
 # This script gets the files required for pop-before-smtp from CPAN and
-# installs them. Certain assumptions are made, namely that you have wget
-# installed and are running on a Red Hat system.
+# (if you're root) installs them. Certain assumptions are made, namely that
+# you have wget installed and, if you don't have an .rpmmacros file,
+# that you're running on a Red Hat system.
 #
 # Please note that updates to these modules on CPAN will result in
 # version number (and hence filename) changes which will break this
@@ -27,15 +28,16 @@
 # files from CPAN, that's probably what's happened.
 #
 # REVISION HISTORY:
-# v1.0  12-Nov-2000     Initial release
-# v1.1  19-Nov-2000     Addition of more sanity checks; small tweaks
+# v1.0  12-Nov-2000  Initial release
+# v1.1  19-Nov-2000  Addition of more sanity checks; small tweaks
+# v1.2  24-Apr-2002  Allow non-root run, don't delete RPMs, updated CPAN vers
 #
 ############################################################################
 
-HIRES_VER=01.20 	# Time::Time-HiRes
-TIMEDATE_VER=1.11	# Time::TimeDate
-NETMASK_VER=1.9002	# Net::Netmask
-FILETAIL_VER=0.98	# File::File-Tail
+HIRES_VER=01.20 	# Time/Time-HiRes
+TIMEDATE_VER=1.11	# Time/TimeDate
+NETMASK_VER=1.9002	# Net/Net-Netmask
+FILETAIL_VER=0.98	# File/File-Tail
 
 if [ -f $HOME/.rpmmacros ]; then
     TOPDIR=`sed -ne 's/%_topdir[ 	]*//p' <$HOME/.rpmmacros`
@@ -184,10 +186,10 @@ fi
 rm -f perlmod2rpm Time-HiRes*.tar.gz TimeDate*.tar.gz Net-Netmask*.tar.gz \
       File-Tail*.tar.gz
 
-if [ "$UID" == "0" ]; then
-    rm -f ../RPMS/i?86/Time-HiRes*.rpm ../RPMS/i?86/TimeDate*.rpm \
-	  ../RPMS/i?86/Net-Netmask*.rpm ../RPMS/i?86/File-Tail*.rpm
-fi
+#if [ "$UID" == "0" ]; then
+    #rm -f ../RPMS/i?86/Time-HiRes*.rpm ../RPMS/i?86/TimeDate*.rpm \
+	  #../RPMS/i?86/Net-Netmask*.rpm ../RPMS/i?86/File-Tail*.rpm
+#fi
 
 echo
 echo =======================================================================

@@ -1,3 +1,8 @@
+2003-07-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added a pattern for Dovecot POP3/IMAP (from Brian Stanback).
+
 2003-05-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp-conf.pl:

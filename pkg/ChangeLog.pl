@@ -15,7 +15,7 @@ print OUT <<EOT;
 SRC="http://sourceforge.net/sflogo.php?group_id=5017" width="88" height="31"
 border="0" alt="SourceForge Logo" align=right></A>
 
-<H2>ChangeLog for "popbsmtp"</H2>
+<H2>ChangeLog for "popbsmtp" (pop-before-smtp)</H2>
 
 EOT
 

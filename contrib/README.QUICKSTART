@@ -204,6 +204,32 @@ macro files, but I don't know how to tell sendmail to reload its config
 (please let me know so I can update this).
 
 
-8. Test the setup.  After access your POP mailbox (from a non-local IP, of
-course!) you should find that the modification date on the DB file has been
-updated.  If so, you should be able to relay to your heart's content.
+8. Test the setup.
+
+After you access your POP mailbox (from a non-local IP, of course!) you
+should find that the modification date on the DB file has been updated.
+You can see the current contents of the database by running this:
+
+    pop-before-smtp --list
+
+If the IP is not there, see the debugging info on this page:
+
+    http://popbsmtp.sourceforge.net/debug.shtml
+
+The next thing to test is to try to send a relayed email (one that is not
+addressed to the SMTP host's domain) to make sure that your SMTP software
+has opened up relaying for your IP.
+
+Finally, you should test that something hasn't gone wrong with your setup
+to make it an open relay.  The easiest way is to use the tests provided by
+mail-abuse.org.  From a shell on your SMTP system, run this command:
+
+    telnet relay-test.mail-abuse.org
+
+This will take a few seconds to sort itself out then the test will begin
+back to the same IP that you connected from (there is no prompting).
+You'll see the test output scroll by, and at the end you should see a
+summary of "System appeared to reject relay attempts" if everything is OK.
+
+These tests do NOT blacklist you if you are "open", so no worries about
+being RBL'ed if it is found that you are running as an open-relay.

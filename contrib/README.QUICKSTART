@@ -5,6 +5,7 @@ Please send criticisms and corrections to the popbsmtp mailing list:
 
 Do these things:
 
+
 1. Install the necessary perl modules that pop-before-smtp requires.
 
 For a Debian system, you can install the dependencies this way:
@@ -63,6 +64,7 @@ run this command:
 
 % perl -MCPAN -e 'install DB_File'
 
+
 2. Install the script and its support files.
 
 Run these commands (if using the default install locations):
@@ -70,6 +72,7 @@ Run these commands (if using the default install locations):
 % cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
 % cp pop-before-smtp /usr/sbin/
 % cp pop-before-smtp-conf.pl /etc
+
 
 3. Edit the pop-before-smtp-conf.pl file to customize it for your system.
 
@@ -99,6 +102,7 @@ mentioned near the end of the config file.  Comment out the two surrounding
 =cut lines for the section you want to enable.  For instance, sendmail
 users would enable the "Sendmail SMTP" section.
 
+
 4. Test the pop-before-smtp daemon.
 
 If you choose to test before installing, put this option first in the
@@ -122,6 +126,7 @@ have any POP/IMAP connections in the file, or you don't have the right $pat
 variable uncommented.  Check the maillog file manually to see what's up and
 then retest until things look good.
 
+
 5. Start the pop-before-smtp daemon:
 
 % /etc/rc.d/init.d/pop-before-smtp start
@@ -138,9 +143,11 @@ append a '*' on the end of the name when you look for it.  Some examples:
 This file should have a fairly recent modification date (as it should have
 just been created).
 
+
 6. Setup your SMTP software to look for this new DB file.
 
 For Postfix:
+============
 
 Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
 add this somewhere into that line:
@@ -155,29 +162,47 @@ smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 	reject_unauth_destination
 
 For Sendmail:
+=============
 
-You need to tweak your setup (often your sendmail.cf file) to include a
-couple new items.  Remember that sendmail is very particular about tabs,
-so grab the info from this file:
+You need to tweak your config to use the IPs contained in the database.
+Remember that sendmail is very particular about tabs, so be careful in
+what you type when updating the config files.
 
-    http://popbsmtp.sourceforge.net/sendmail.txt
+One of the easiest ways to set things up for a modern sendmail is to put an
+M4 macro file in the "hack" dir on your system, which is typically here:
 
-and copy the lines you need verbatim (don't use the clipboard).
+    /usr/share/sendmail-cf/hack
 
-If you're generating your sendmail.cf file from macros, Toby Wahlers
-recommends this approach:
+The one that the sendmail folks themselves suggest using is found here:
 
- - Make a backup of cf/m4/proto.m4, e.g. proto.m4.orig
- - Update proto.m4 with the required sendmail.cf changes, in the correct
-   locations.
- - Generate your new sendmail.cf file.
+    http://www.sendmail.org/~ca/email/rules/popauth.m4
 
-For other SMTP software, please let me know what it requires so I can
-include it here.
+A modified version of this file that Alain Knaff tweaked to add some SPF
+compatibility is found in the contrib dir of the source.  (See its comments
+for its added POP_B4_SMTP_ISAUTH option.)
+
+To use either of these macro files, put a copy in the hack dir on your
+system and then add this line to your sendmail.mc file:
+
+    HACK(`popauth')dnl
+
+Note that these rules expect the database to be /etc/mail/popauth, so be
+sure to set that as the dbfile in your pop-before-smtp-conf.pl file.
+
+For other SMTP software:
+========================
+
+Please let me know what it requires so I can include it here.
+
 
 7. Force your SMTP software to reload the config file.
 
 For postfix, you would type "postfix reload" (as root).
+
+For sendmail I think you need generate a new sendmail.cf file from your
+macro files, but I don't know how to tell sendmail to reload its config
+(please let me know so I can update this).
+
 
 8. Test the setup.  After access your POP mailbox (from a non-local IP, of
 course!) you should find that the modification date on the DB file has been

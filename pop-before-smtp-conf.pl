@@ -342,4 +342,23 @@ sub sync_courier
 }
 =cut #=========================== Courier SMTP =========================END=
 
+=pod #-------------------------- Sendmail SMTP -----------------------START-
+# If you comment-out the preceding =pod line, we'll interface with Sendmail
+# SMTP using DB_File.
+
+use DB_File;
+
+$dbfile = '/etc/mail/popauth'; # DB hash to write
+#$dbvalue = 'POP:1'; # ???
+
+$mynet_func = \&mynet_sendmail;
+
+sub mynet_sendmail
+{
+    # You'll want to edit this value.
+    '127.0.0.0/8 192.168.1.1/24';
+}
+
+=cut #-------------------------- Sendmail SMTP -------------------------END-
+
 1;

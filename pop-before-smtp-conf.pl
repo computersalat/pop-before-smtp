@@ -185,12 +185,12 @@ sub getline_FileTail
 #    'Auth: (\d+\.\d+\.\d+\.\d+)\-\>\d+\.\d+\.\d+\.\d+ ' .
 #    'user=\"\S+\" server=\"\S+\" port=\"\S+\" status=\"ok\"';
 
-# For solidpop3d (known as spop3d).  ** If you compiled
-# solidpop3d with --enable-extendlog and enabled that option! **
+# For solidpop3d (known as spop3d).  ** If you configured
+# solidpop3d with --enable-logextend! **
 #$pat = '^(... .. ..:..:..) \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
 
-# For spop3d w/o --enabled-extendlog (uncomment all 3 "my" lines).
+# For spop3d w/o --enabled-logextend (uncomment all 3 "my" lines).
 #my $PID_pat = '^(... .. ..:..:..) \S+ spop3d\[(\d+)\]: ';
 #my $IP_pat = $PID_pat . 'connect from (\d+\.\d+\.\d+\.\d+)';
 #my $OK_pat = $PID_pat . 'user \S+ authenticated';

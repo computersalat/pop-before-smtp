@@ -7,6 +7,9 @@
 	* pop-before-smtp-conf.pl:
 	- Added a sample BerkeleyDB setup (commented out).
 
+	* TODO:
+	- Removed something done, added something new.
+
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

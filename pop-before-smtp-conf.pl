@@ -67,11 +67,11 @@ if (!-f $file_tail{'name'}) {
 #$file_tail{'resetafter'} = 30;
 #$file_tail{'tail'} = -1;
 
-=pod #============================= syslog ===========================START=
+=cut #============================= syslog ===========================START=
 # If you want to output a log file of what pop-before-smtp is doing, you have
-# a few choices: either set $logto above, comment-out both the =pod line above
-# and the =cut line below to use this syslog section, or put a reference to
-# your own custom logging function into $log_func.
+# a few choices: either set $logto above, comment-out the two surrounding
+# =cut lines to use this syslog section, or put a reference to your own
+# custom logging function into $log_func.
 
 use Sys::Syslog;
 openlog('pop-before-smtp', 'pid', 'mail');
@@ -179,9 +179,8 @@ $log_func = \&syslog;
 ############################# END OF PATTERNS ##############################
 
 
-=pod #======================= Match Many Patterns ====================START=
-# Comment-out (or remove) both the preceding =pod line and the following
-# =cut line to use this function.
+=cut #======================= Match Many Patterns ====================START=
+# Comment-out (or remove) the two surrounding =cut lines to use this function.
 
 # This is an example of using the custom_match() function to match
 # several patterns (allowing you to match multiple pop/imap servers
@@ -210,9 +209,9 @@ sub custom_match
 #
 ########################## Alternate DB/SMTP support #######################
 
-=pod #------------------------ Postfix NDBM_File ---------------------START-
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll use NDBM_File instead of DB_File.
+=cut #------------------------ Postfix NDBM_File ---------------------START-
+# If you comment-out (or remove) the two surrounding =cut lines, we'll use
+# NDBM_File instead of DB_File.
 
 use NDBM_File;
 
@@ -229,9 +228,9 @@ sub tie_NDBM
 }
 =cut #------------------------ Postfix NDBM_File -----------------------END-
 
-=pod #======================== Postfix BerkeleyDB ====================START=
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll use BerkeleyDB instead of DB_File.
+=cut #======================== Postfix BerkeleyDB ====================START=
+# If you comment-out (or remove) the two surrounding =cut lines, we'll use
+# BerkeleyDB instead of DB_File.
 
 use BerkeleyDB;
 
@@ -256,10 +255,9 @@ sub sync_BerkeleyDB
 }
 =cut #======================== Postfix BerkeleyDB ======================END=
 
-=pod #-------------------------- qmail tcprules ----------------------START-
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll use the tcprules program instead of
-# maintaining a DB_File hash.
+=cut #-------------------------- qmail tcprules ----------------------START-
+# If you comment-out (or remove) the two surrounding =cut lines, we'll use
+# the tcprules program instead of maintaining a DB_File hash.
 
 my $TCPRULES = '/usr/local/bin/tcprules';
 
@@ -307,9 +305,9 @@ sub sync_tcprules
 }
 =cut #-------------------------- qmail tcprules ------------------------END-
 
-=pod #=========================== Courier SMTP =======================START=
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll interface with Courier SMTP using DB_File.
+=cut #=========================== Courier SMTP =======================START=
+# If you comment-out (or remove) the two surrounding =cut lines, we'll
+# interface with Courier SMTP using DB_File.
 
 my $ESMTPD = '/usr/lib/courier/sbin/esmtpd';
 
@@ -349,12 +347,11 @@ sub sync_courier
 }
 =cut #=========================== Courier SMTP =========================END=
 
-=pod #-------------------------- Sendmail SMTP -----------------------START-
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll interface with Sendmail SMTP using DB_File.
-# See the quickstart guide for the sendmail.cf changes you'll need to make.
-# If you find that Sendmail isn't recognizing the changes to the DB file,
-# set $signal_sendmail to 1.
+=cut #-------------------------- Sendmail SMTP -----------------------START-
+# If you comment-out (or remove) the two surrounding =cut lines, we'll
+# interface with Sendmail SMTP using DB_File.  See the quickstart guide for
+# the sendmail.cf changes you'll need to make.  If you find that Sendmail
+# isn't recognizing the changes to the DB file, set $signal_sendmail to 1.
 
 use DB_File;
 
@@ -419,9 +416,9 @@ sub flock_sendmail
 }
 =cut #-------------------------- Sendmail SMTP -------------------------END-
 
-=pod #========================== CDB_File SMTP =======================START=
-# If you comment-out (or remove) both the preceding =pod line and the
-# following =cut line, we'll use CDB_File instead od DB_File.
+=cut #========================== CDB_File SMTP =======================START=
+# If you comment-out (or remove) the two surrounding =cut lines, we'll use
+# CDB_File instead od DB_File.
 
 use CDB_File;
 

@@ -1,6 +1,6 @@
 Summary: Watch log for POP/IMAP auth, notify Postfix to allow relay
 Name: pop-before-smtp
-Version: 1.31
+Version: 1.32
 Release: 1
 Source: https://sourceforge.net/project/popbsmtp/pop-before-smtp-%{version}.tar.gz
 #Source1: pop-before-smtp-conf.pl
@@ -63,5 +63,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) /etc/rc.d/init.d/pop-before-smtp
 
 %changelog
+* Sun Dec 15 2002 Wayne Davison <wayned@users.sourceforge.net>
+- Modified for 1.32
+
+* Sat Aug 31 2002 Wayne Davison <wayned@users.sourceforge.net>
+- Modified for 1.31
+
 * Fri Apr 12 2002 Wayne Davison <wayned@users.sourceforge.net>
 - Modified for 1.30

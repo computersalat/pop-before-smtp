@@ -248,7 +248,7 @@ sub tie_BerkeleyDB
 
 sub sync_BerkeleyDB
 {
-    $dbh->sync and die "$0: sync $dbfile: $!\n";
+    $dbh->db_sync and die "$0: sync $dbfile: $!\n";
 }
 =cut #======================== Postfix BerkeleyDB ======================END=
 

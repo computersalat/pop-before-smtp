@@ -336,7 +336,21 @@ my $now = time;
 $log_func->('info', 'starting up');
 
 @mynets = cleanup_nets($mynet_func->());
-Net::Netmask->new($_)->storeNetblock() for @mynets;
+if ($debug) {
+    my $cnt = @mynets;
+    my $s = $cnt == 1? '' : 's';
+    $log_func->('debug', "Using $cnt value$s for pre-authorized networks: `"
+			. join("', `", @mynets) . "'");
+}
+for (@mynets) {
+    my $netblock = Net::Netmask->new2($_);
+    if ($netblock) {
+	$netblock->storeNetblock();
+    }
+    else {
+	$log_func->('error', "Net::Netmask error parsing `$_': " . Net::Netmask::errstr);
+    }
+}
 
 my (%t, @q);
 
@@ -437,17 +451,15 @@ sub cleanup_nets
 	($_) = /^\s*(.*?)\s*$/s;
 	foreach (split /[,\s]+/) {
 	    if (m#^/#) {
-		# Slurp the whole file into $_.
-		undef $/;
 		open(IN, $_) or die "Unable to open $_: $!";
-		$_ = <IN>;
+		# Slurp the whole file into $_.
+		undef $/; $_ = <IN>; $/ = "\n";
 		close IN;
-		$/ = "\n";
 		# Remove any comments from the file's data.
 		s/#.*//mg;
 		push @nets, cleanup_nets($_);
 	    }
-	    elsif (m#^hash:#) {
+	    elsif (m#^[a-z]+:#) {
 		# Just ignore hash files for now.
 	    }
 	    else {

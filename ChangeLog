@@ -1,3 +1,20 @@
+2002-05-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added the --info option to show some basic config information.
+	- Mention a sendmail.cf setup, and be less Postfix-centric.
+
+	* pop-before-smtp-conf.pl:
+	- Added a sendmail SMTP section.
+
+	* README:
+	- Mention that we work with other SMTP software besides Postfix.
+	- Point people at the README.QUICKSTART file.
+	- Improved/simplified/re-ordered some of the install info.
+
+	* contrib/README.QUICKSTART:
+	- Updated to include sendmail info and to be less Postfix-centric.
+
 2002-05-21  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
@@ -286,7 +303,7 @@
 	- Mention a couple items that I'd like to do.
 	- Got rid of the separate-config discussion (which is now done).
 
-	* pop-before-smtp-config.pl:
+	* pop-before-smtp-conf.pl:
 	- Moved the various user-selectable $pat values here.
 	- Added pattern for Perdition.
 	- Include the various overridable parameters that a user might want to

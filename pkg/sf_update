@@ -1,0 +1,3 @@
+#!/bin/sh
+./ChangeLog.pl
+rsync -av ChangeLog.shtml pop-before-smtp-*.tar.gz popbsmtp.sf.net:/home/groups/p/po/popbsmtp/htdocs

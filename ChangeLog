@@ -1,3 +1,8 @@
+2002-12-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	Added pattern for teapop from Patrick Prasse <patrick.prasse@gmx.net>.
+
 2002-11-20  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

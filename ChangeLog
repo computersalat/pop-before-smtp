@@ -1,3 +1,9 @@
+2003-04-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Output the state of the watchlog matching when --dumpconfig is
+	  specified.
+
 2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

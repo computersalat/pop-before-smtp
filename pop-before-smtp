@@ -378,7 +378,7 @@ for (@mynets) {
 	$netblock->storeNetblock();
     }
     else {
-	$log_func->('error', "Net::Netmask error parsing `$_': " . &Net::Netmask::errstr);
+	$log_func->('err', "Net::Netmask error parsing `$_': " . &Net::Netmask::errstr);
     }
 }
 

@@ -115,20 +115,20 @@ $log_func = \&syslog;
 #    'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)$';
 
 # For Qpopper POP/APOP Server
-#$pat = '^(... .. ..:..:..) \S+ (?:qpopper)\[\d+\]: Stats: \S+ ' .
+#$pat = '^(... .. ..:..:..) \S+ qpopper\[\d+\]: Stats: \S+ ' .
 #    '(?:\d+ ){4}(\d+\.\d+\.\d+\.\d+)';
 
 # Alex Burke's popper install
-#$pat = '^(... .. ..:..:..) \S+ popper\[\d+\]: Stats: \S+ ' .
+#$pat = '^(... .. ..:..:..) \S+ q?popper\[\d+\]: Stats: \S+ ' .
 #    '(?:\d+ ){4}(?:\S+ )?(\d+\.\d+\.\d+\.\d+)$';
 
 # Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
-#$pat = '^(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4}) \[\d+\] ' .
+#$pat = '^(\w{3} \w{3} \d\d \d\d:\d\d:\d\d \d{4}) \[\d+\] ' .
 #    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
 
 # Nick Bauer <nickb@inc.net> has something completely different as
 # a qpopper logfile format
-#$pat = '^(... .. ..:..:..) \S+ qpopper\S+\[\d+\]: \([^)]*\) ' .
+#$pat = '^(... .. ..:..:..) \S+ qpopper\S*\[\d+\]: \([^)]*\) ' .
 #    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)$';
 
 # For cucipop, matching a sample from Daniel Roesen:

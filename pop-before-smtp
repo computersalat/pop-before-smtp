@@ -243,14 +243,14 @@ GetOptions(
     "write!" => \$write,
     "debug!" => sub { $debug = $_[1]; $logto = '-' if $debug },
     "flock!" => \$flock,
+    'reprocess!' => \$reprocess,
     "watchlog|logfile=s" => \$file_tail{'name'},
-    'logto=s' => sub { $logto = $_[1] },
     "dbfile=s" => \$dbfile,
+    'logto=s' => \$logto,
     "grace=i" => \$grace,
-    "reprocess!" => \$reprocess,
 ) or die "Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]\n    " .
-    "[--[no]flock] [--watchlog=FILE] [--dbfile=FILE] [--logto=FILE]\n    " .
-    "[--grace=SECONDS]\n";
+    "[--[no]flock] [--reprocess] [--watchlog=FILE] [--dbfile=FILE]\n    " .
+    "[--logto=FILE] [--grace=SECONDS]\n";
 
 set_output_log($logto) if defined $logto;
 

@@ -1,3 +1,8 @@
+2004-01-06  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.34.
+
 2003-11-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, contrib/README.QUICKSTART,

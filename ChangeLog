@@ -7,6 +7,7 @@
 	* contrib/README.QUICKSTART:
 	- Changed the reference to =pod/=cut lines into one about the two =cut
 	  lines.
+	- Some more sendmail info.
 
 2003-01-02  Wayne Davison  <wayned@users.sourceforge.net>
 

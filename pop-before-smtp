@@ -77,10 +77,9 @@ to see the actual value for your system.
 
 =item --dbfile=FILE
 
-You can specify what DB file to update. The default value in the script is
-"/etc/mail/pop-before-smtp", but you should run "pop-before-smtp --dumpconfig"
-to see the actual value for your system.  Typically, the filename that is
-created/updated is this name with a ".db" suffix added (because the default
+You can specify what DB file to update.  To see what the default value is for
+your system, run "pop-before-smtp --dumpconfig".  Typically, the filename that
+is created/updated is this name with a ".db" suffix added (because the default
 tie function appends the ".db" onto the specified db name -- if you supply a
 custom tie function, it is free to choose to do something else).
 
@@ -194,7 +193,7 @@ $write = 1; # open and change the DB
 $flock = 1; # we do the exclusive file-locking when updating
 $debug = 0; # no debug messages
 $reprocess = 0; # no debug reprocessing of watchlog
-$dbfile = '/etc/mail/pop-before-smtp'; # DB hash to write
+$dbfile = '/etc/postfix/pop-before-smtp'; # DB hash to write
 $dbvalue = 'ok';
 $grace = 30*60; # 30-minute grace period
 my($daemon_pidfile, $dump_version, $dump_config, $list_ips);

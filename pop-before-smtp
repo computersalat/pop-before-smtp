@@ -274,7 +274,7 @@ while (1) {
     $db_changed = 1;
 }
 continue {
-    if ($db_changed || $now > $last_expire_check + $grace/2) {
+    if ($db_changed || $now > $last_expire_check + $grace) {
 	while (@q && $q[0][1] <= $now) {
 	    my($ipaddr,$ts) = @{shift @q};
 	    if ($ts == $t{$ipaddr}) {

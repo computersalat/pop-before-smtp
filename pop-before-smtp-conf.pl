@@ -352,11 +352,49 @@ $dbfile = '/etc/mail/popauth'; # DB hash to write
 #$dbvalue = 'POP:1'; # ???
 
 $mynet_func = \&mynet_sendmail;
+$tie_func = \&tie_sendmail;
+$sync_func = \&sync_sendmail;
+#$flock_func = \&flock_DB; # Use the default
+
+my $pid_file = '/var/run/sendmail.pid';
+
+open(PID, $pid_file) || die "Unable to open $pid_file: $!";
+my $sendmail_pid = <IN> + 0;
+close PID;
 
 sub mynet_sendmail
 {
     # You'll want to edit this value.
     '127.0.0.0/8 192.168.1.1/24';
+}
+
+my $dbh;
+
+# We set the global %db to the opened database hash.  We also set $dbh for
+# our sync function, and DB_FH for our flock_DB function.
+sub tie_sendmail
+{
+    $dbh = tie %db, 'DB_File', "$dbfile.db", O_CREAT|O_RDWR, 0666, $DB_HASH
+	or die "$0: cannot dbopen $dbfile: $!\n";
+    if ($flock) {
+	my $fd = $dbh->fd;
+	open(DB_FH,"+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n";
+    }
+}
+
+sub sync_sendmail
+{
+    $dbh->sync and die "$0: sync $dbfile: $!\n";
+
+    until (kill(1, $sendmail_pid)) {
+	open(PID, $pid_file) || die "Unable to open $pid_file: $!";
+	my $new_pid = <IN> + 0;
+	close PID;
+	if ($new_pid == $sendmail_pid) {
+	    die "Unable to signal sendmail to reread the database.\n";
+	}
+	$sendmail_pid = $new_pid;
+    }
 }
 
 =cut #-------------------------- Sendmail SMTP -------------------------END-

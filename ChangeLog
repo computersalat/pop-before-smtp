@@ -1,3 +1,9 @@
+2004-11-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- If $flock is not set, make sure that the --list option
+	  doesn't try to flock the database.
+
 2004-10-03  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

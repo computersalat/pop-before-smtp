@@ -5,18 +5,18 @@
 # need to read through all of this.  If you're using Postfix and UW POP/IMAP,
 # you can likely just use the default setup without any changes.  The most
 # common changes needed are to pick the right $pat variable for your POP/IMAP
-# software, ensure that the maillog name is right, and perhaps uncomment a
+# software, ensure that the mail-log name is right, and perhaps uncomment a
 # section with the support for a different SMTP (other than Postfix).  See the
 # contrib/README.QUICKSTART file for step-by-step instructions on how to
 # install and test your setup.
 
 use strict;
 use vars qw(
-    $pat $write $flock $debug $reprocess $grace $logto %file_tail
+    $pat $out_pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
     $tail_init_func $tail_getline_func
-    $PID_pat $IP_pat $OK_pat $FAIL_pat
+    $PID_pat $IP_pat $OK_pat $FAIL_pat $OUT_pat
 );
 
 #
@@ -113,7 +113,9 @@ sub getline_FileTail
 # an example below).  Feel free to delete all the stuff you don't need.
 #
 # To enable an entry, just delete the "#" at the start of all the lines
-# *after* the initial comment line(s).
+# *after* the initial comment line(s).  If the entry of your choice also
+# provides $out_pat, you should uncomment that variable as well, which
+# allows us to keep track of users who are still connected to the server.
 #
 # Note also that the servers that require multiple log lines be read to
 # get all the needed info have a setup with 3 *_pat variables instead of
@@ -157,8 +159,10 @@ sub getline_FileTail
 #    'login: [^[\s]*\s*\[[:f]*(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
-#$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:login|d|d-ssl): ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:d|d-ssl): ' .
 #    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#$out_pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:d|d-ssl): ' .
+#    '(?:LOGOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For qmail's pop3d:
 #$pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
@@ -221,21 +225,40 @@ sub getline_FileTail
 
 # This is an example of using the custom_match() function to match
 # several patterns (allowing you to match multiple pop/imap servers
-# at the same time).
+# at the same time).  Note that you can define logout patterns for
+# some, all, or none of the login patterns, as needed.
 
-my $pat2 = '... define an extra pattern here ...';
+my(@login, @logout);
 
-# Add as many patterns to the @match array as you like:
-my @match = ( $pat, $pat2 );
+$login[0] = $pat;
+#$logout[0] = $out_pat;
 
-$_ = qr/$_/ foreach @match; # Pre-compile the regular expressions.
+$login[1] = '... define an extra login pattern here ...';
+#$logout[1] = '... define an extra logout pattern, if needed ...';
 
-# The maillog line to match is in $_.
+# ... plus any other patterns you want to define ...
+
+foreach (@login, @logout) {
+    next unless defined $_;
+    $_ = qr/$_/;	# Pre-compile the regular expressions.
+}
+
+# The mail-log line to match is in $_.
 sub custom_match
 {
-    foreach my $regex (@match) {
-	# Return timestamp and IP for any (pre-compiled) pattern that matches.
-	return ($1, $2) if /$regex/;
+    my($timestamp, $ipaddr);
+    foreach my $regex (@logout) {
+	if (defined($regex) && (($timestamp, $ipaddr) = /$regex/)) {
+	    return ($timestamp, $ipaddr, -1);
+	}
+    }
+    my $j = 0;
+    foreach my $regex (@login) {
+	if (($timestamp, $ipaddr) = /$regex/) {
+	    my $increment = defined($logout[$j]) ? 1 : 0;
+	    return ($timestamp, $ipaddr, $increment);
+	}
+	$j++;
     }
     ( );
 }
@@ -521,8 +544,9 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
     my %popIPs;
 
     $FAIL_pat = '.' if !defined $FAIL_pat;
+    # TODO: add support for optional $OUT_pat variable.
 
-    # The maillog line to match is in $_.
+    # The mail-log line to match is in $_.
     sub custom_match
     {
 	if (/$PID_pat/o) {
@@ -536,7 +560,7 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 			my $ip = $popIPs{$pid};
 			if (/$OK_pat/o) {
 			    delete $popIPs{$pid};
-			    return ($ts, $ip);
+			    return ($ts, $ip, 0);
 			}
 			if (/$FAIL_pat/o) {
 			    delete $popIPs{$pid};

@@ -195,7 +195,7 @@ sub getline_FileTail
 #    'Successful login for \S+ .+ \[(\d+\.\d+\.\d+\.\d+)\]$';
 
 # For Dovecot POP3/IMAP
-#$pat = '^(... .. ..:..:..) www (?:imap|pop3)-login: ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:imap|pop3)-login: ' .
 #    'Login: \S+ \[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server

@@ -105,15 +105,15 @@ users would enable the "Sendmail SMTP" section.
 
 4. Test the pop-before-smtp daemon.
 
-If you choose to test before installing, put this option first in the
-following commands:
+If you choose to skip the install step above and do some testing first,
+put this option first in the following commands:
 
     --config=./pop-before-smtp-conf.pl 
 
 This command will dump the value of the main options so that you can verify
 that you've got your configuration right:
 
-% pop-before-smtp --dumpconfig
+% ./pop-before-smtp --dumpconfig
 
 This command will test that your $pat choice is right:
 

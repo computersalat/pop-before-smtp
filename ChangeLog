@@ -1,3 +1,8 @@
+2002-05-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Evaluate getpwuid() in a scalar context.
+
 2002-05-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

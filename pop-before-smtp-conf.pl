@@ -503,10 +503,13 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 # continue trying to match the $OK_pat value on matching PID lines until we
 # either match the $END_pat (in which case the IP is ignored) or the $OK_pat
 # (in which case the IP is accepted).  Thus, $END_pat can be either a
-# failure log line or a "this PID is finished" log line common to both success
-# and failure.
+# failure log line or a "this PID is finished" log line common to both
+# success and failure.  These patterns are only applied to lines that match
+# the $PID_pat regex.
 
     my %popIPs;
+
+    $END_pat = '.' if !defined $END_pat;
 
     # The maillog line to match is in $_.
     sub custom_match
@@ -524,7 +527,7 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 			    delete $popIPs{$pid};
 			    return ($ts, $ip);
 			}
-			if (!defined($END_pat) || /$END_pat/o) {
+			if (/$END_pat/o) {
 			    delete $popIPs{$pid};
 			}
 			last;

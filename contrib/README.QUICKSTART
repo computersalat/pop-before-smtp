@@ -18,16 +18,40 @@ Do these things:
 
 1. Install the necessary perl modules that pop-before-smtp requires.
 
-If you want to install the perl modules as RPMs, take a look at the script
+For a Debian system, you can install the dependencies this way:
+
+% apt-get update
+% apt-get install libtimedate-perl libnet-netmask-perl libberkeleydb-perl
+
+Debian has the script itself as a package, so just using this:
+
+% apt-get install pop-before-smtp
+
+will get you going.  You can then manually update the script to a newer
+version, if you so desire (but be careful to preserve the non-standard
+changes to the script that the Debian package makes).
+
+For a Gentoo Linux system, run a command like this as root:
+
+% emerge dev-perl/{TimeDate,Net-Netmask,DB_File}
+
+For an RPM-based system, you can often get packages via yum or urpmi.
+Try a command like this:
+
+% yum install perl-TimeDate perl-Net-Netmask perl-DB_File
+
+or maybe this:
+
+% urpmi perl-TimeDate perl-Net-Netmask perl-DB_File
+
+You can also search for the packages on an RPM site like rpmfind.net.
+
+If you want to create your own perl-module RPMs, take a look at the script
 in contrib named getfromcpan.  It fetches the perl modules, turns them into
-RPMs, and then (if you run it as root) installs them.  I prefer to build
+RPMs, and then (if you ran it as root) installs them.  I prefer to build
 the RPMs as a non-root user and then install the RPMs manually as root.
 The script works either way because it looks for your ~/.rpmmacros file to
 determine what "topdir" to use.
-
-Note that some systems already have pre-built packages for some or all of
-these RPMs already available, so you might want to check your distribution
-CDs or your favorite RPM/Apt site.
 
 For the non-RPM way, run these commands as root:
 
@@ -37,11 +61,11 @@ For the non-RPM way, run these commands as root:
 That will install the necessary Perl modules from CPAN automatically -- as
 long as you have Internet connectivity and a Perl that knows about CPAN.
 
-For a Gentoo Linux system, run a command like this as root:
+If your system does not yet have the DB_File perl module, you may need to
+first install the BerkeleyDB library (perhaps from its C source), and then
+run this command:
 
-# emerge dev-perl/{TimeDate,Net-Netmask}
-
-That will install all the necessary perl modules that pop-before-smtp needs.
+% perl -MCPAN -e 'install DB_File'
 
 2. Edit the pop-before-smtp-conf.pl file to customize it for your system.
 
@@ -71,27 +95,36 @@ mentioned near the end of the config file.  Comment out the two surrounding
 =cut lines for the section you want to enable.  For instance, sendmail
 users would enable the "Sendmail SMTP" section.
 
-3. Test the pop-before-smtp daemon.
+3. Install the script and its support files.
 
-Run this to ensure that your $pat choice is right:
-
-% ./pop-before-smtp --config=./pop-before-smtp-conf.pl --debug --nowrite
- --reprocess
-
-(That should be all one line.) You should see messages about what IPs the
-script finds and which ones it considers local and non-local.  (Press
-Ctrl-C to abort the script when you've seen enough.)  If you didn't see any
-IP mentions, either you don't have any POP/IMAP connections in the file, or
-you don't have the right $pat variable uncommented.  Check the maillog file
-manually to see what's up and then retest until things look good.
-
-4. Install the script and its support files.
-
-Run these commands:
+Run these commands (if using the default install locations):
 
 % cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
 % cp pop-before-smtp /usr/sbin/
 % cp pop-before-smtp-conf.pl /etc
+
+4. Test the pop-before-smtp daemon.
+
+If you choose to test before installing, put this option first in the
+following commands:
+
+    --config=./pop-before-smtp-conf.pl 
+
+This command will dump the value of the main options so that you can verify
+that you've got your configuration right:
+
+% pop-before-smtp --dumpconfig
+
+This command will test that your $pat choice is right:
+
+% ./pop-before-smtp --debug --nowrite --reprocess
+
+You should see messages about what IPs the script finds and which ones it
+considers local and non-local.  (Press Ctrl-C to abort the script when
+you've seen enough.)  If you didn't see any IP mentions, either you don't
+have any POP/IMAP connections in the file, or you don't have the right $pat
+variable uncommented.  Check the maillog file manually to see what's up and
+then retest until things look good.
 
 5. Start the pop-before-smtp daemon:
 
@@ -103,6 +136,7 @@ The actual created filename may have a suffix on it (such as ".db"), so
 append a '*' on the end of the name when you look for it.  Some examples:
 
     ls -l /etc/postfix/pop-before-smtp*
+    ls -l /var/lib/pop-before-smtp/hosts*
     ls -l /etc/mail/popauth*
 
 This file should have a fairly recent modification date (as it should have

@@ -1,3 +1,8 @@
+2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.33.
+
 2003-02-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
@@ -249,7 +254,7 @@
 	- Output the usage message using <<EOT.
 
 	* pop-before-smtp-conf.pl:
-	A few more comment tweaks.
+	- A few more comment tweaks.
 
 	* README:
 	- Added a note about our file-locking code.

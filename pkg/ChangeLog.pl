@@ -1,21 +1,19 @@
 #!/usr/bin/perl
 
-$OUTFILE = 'ChangeLog.html';
+$OUTFILE = 'ChangeLog.shtml';
 
 undef $/; # Slurp entire files.
 
 open(OUT, ">$OUTFILE.new") or die $!;
 
 print OUT <<EOT;
-<HTML><HEAD>
-<TITLE>POPbSMTP ChangeLog</TITLE>
-</HEAD><BODY BGCOLOR=white TEXT=black LINK=blue VLINK=purple>
+<html><head>
+<title>Pop-before-smtp Changelog</title>
+</head><body bgcolor=white text=black link=blue vlink=purple>
 
-<A HREF="http://sourceforge.net/"><IMG
-SRC="http://sourceforge.net/sflogo.php?group_id=5017" width="88" height="31"
-border="0" alt="SourceForge Logo" align=right></A>
+<!--#include virtual="/top.html" -->
 
-<H2>ChangeLog for "popbsmtp" (pop-before-smtp)</H2>
+<h2>ChangeLog for "popbsmtp" (pop-before-smtp)</h2>
 
 EOT
 
@@ -39,7 +37,8 @@ s%((?:Released version|Upped the version (?:number )?to) \S+)%<FONT COLOR=red>$1
 
 print OUT $_, <<EOT;
 </UL></UL>
-</BODY></HTML>
+
+<p> Return to the <a href="/">home page</a>.
 EOT
 
 close(OUT);

@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.7 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.8 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.8 2000-03-21 tweaked UW regexp based on further feedback from Andy Dills
 # 1.7 2000-03-20 added regexp for courier-imap
 # 1.6 2000-03-13 added installation notes on prerequisites to the readme
 # 1.5 2000-02-21 added comment pointing to File::Tail for description of
@@ -126,7 +127,7 @@ my $logfile = '/var/log/maillog';
 
 # For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
 my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
-          '(?:Login|Authenticated) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Cyrus, Kenn Martin <kmartin@infoteam.com> used:
 # my $pat = '^(... .. ..:..:..) \S+ (?:pop3d|imapd)\[\d+\]: ' .

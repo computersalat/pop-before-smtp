@@ -1,3 +1,11 @@
+2002-11-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/README.QUICKSTART:
+	- Updated the sendmail install info.
+
+	* pop-before-smtp-conf.pl:
+	- Tweaked a sendmail comment.
+
 2002-11-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

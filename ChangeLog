@@ -6,6 +6,9 @@
 	- Added an example custom_match() subroutine that efficiently matches
 	  multiple regular expressions.
 
+	* README, contrib/README.QUICKSTART:
+	- A few more improvments for the new version.
+
 2002-04-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

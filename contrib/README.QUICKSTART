@@ -54,7 +54,7 @@ find your logfile automatically -- it searches for several other values).
 Take a look at the $pat definitions in the pop-before-smtp-conf.pl file
 and uncomment the one for the mail server that you're running - if you're
 running Linux it's probably going to be the $pat denoted by: "# For UW
-ipop3d/imapd" (this is also the defaut if no $pat is umcommented in the
+ipop3d/imapd" (this is also the default if no $pat is uncommented in the
 config file).  Make sure you uncomment all the lines from the "$pat = "
 start down to the nearest ';' for your pattern of choice (this is usually
 2-3 lines).
@@ -82,7 +82,7 @@ IP mentions, either you don't have any POP/IMAP connections in the file, or
 you don't have the right $pat variable uncommented.  Check the maillog file
 manually to see what's up and then retest until things look good.
 
-5. Install the script and its support files.
+4. Install the script and its support files.
 
 Run these commands:
 
@@ -90,7 +90,7 @@ Run these commands:
 % cp pop-before-smtp /usr/sbin/
 % cp pop-before-smtp-config.pl /etc
 
-6. Start the pop-before-smtp daemon:
+5. Start the pop-before-smtp daemon:
 
 % /etc/rc.d/init.d/pop-before-smtp start
 
@@ -98,7 +98,7 @@ Take a look in /etc/postfix to make sure that there's a file called
 "pop-before-smtp.db" - it should have a fairly recent modification date
 (as it should have just been created).
 
-7. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
+6. Look in your /etc/postfix/main.cf for "smtpd_recipient_restrictions" --
 add this somewhere into that line:
 
 check_client_access hash:/etc/postfix/pop-before-smtp
@@ -110,7 +110,7 @@ smtpd_recipient_restrictions = permit_mynetworks,reject_non_fqdn_recipient,
 	check_client_access hash:/etc/postfix/pop-before-smtp,
 	check_relay_domains
 
-8. Reload Postfix and make sure that it's working by checking your email
+7. Reload Postfix and make sure that it's working by checking your email
 (from a non-local IP, of course!), then checking to see the modification
 date on the file /etc/postfix/pop-before-smtp.db has changed.  If so, you
 can relay to your heart's content.

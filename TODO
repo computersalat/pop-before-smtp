@@ -15,10 +15,3 @@ Add automatic configure-n-install tool.
 Document DB lib version issue, diagnosis, fixes.
 
 Make postconf mynetworks default to 127.0.0.0/8 if postconf doesn't.
-
-Add cmdline option for dbfile extention (default ".db").
-
-Add cmdline option for the dbfile value (default "ok").
-
-Add cmdline option to goose the smtp daemon to make it reread the db file
-(default nothing).

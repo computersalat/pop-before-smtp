@@ -1,15 +1,16 @@
-Summary: watch log for pop/imap auth, notify Postfix to allow relay
+Summary: Watch log for POP/IMAP auth, notify Postfix to allow relay
 Name: pop-before-smtp
-Version: 1.24
+Version: 1.30pre1
 Release: 1
-Source: https://fridge.oven.com/~bet/src/pop-before-smtp-%{PACKAGE_VERSION}.tar.gz
+Source: https://sourceforge.net/project/popbsmtp/pop-before-smtp-%{version}.tar.gz
+URL: http://popbsmtp.sourceforge.net/
 License: Freely Redistributable
-Packager: Bennett Todd <bet@rahul.net>
+Packager: Wayne Davison <wayned@users.sourceforge.net>
 Group: Networking/Daemons
-BuildArchitectures: noarch
-BuildRoot: /var/tmp/pop-before-smtp-rpmroot
-%description
+BuildArch: noarch
+BuildRoot: /var/tmp/%{name}-buildroot
 
+%description
 Spam prevention requires preventing open relaying through email
 servers. However, legit users want to be able to relay. If legit
 users always stayed in one spot, they'd be easy to describe to the
@@ -25,13 +26,19 @@ people who have recently downloaded their email.
 %setup
 
 %build
-echo I see nothing to build here to build
+echo Nothing to build...
 
 %install
+rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/{etc/rc.d/init.d,usr/{sbin,man/man8}}
+install pop-before-smtp $RPM_BUILD_ROOT/usr/sbin
+pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8 2>/dev/null
+perl -i -e 'undef $/; $_ = <>; s/\n=head1.*\n=cut//s; print' $RPM_BUILD_ROOT/usr/sbin/pop-before-smtp
+install pop-before-smtp-conf.pl $RPM_BUILD_ROOT/etc
 install pop-before-smtp.init $RPM_BUILD_ROOT/etc/rc.d/init.d/pop-before-smtp
-install pop-before-smtp $RPM_BUILD_ROOT/usr/sbin/
-pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add pop-before-smtp
@@ -41,7 +48,13 @@ pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8
 
 %files
 %defattr(-,root,root)
-%doc README perlmod2rpm
-%doc /usr/man/man8/pop-before-smtp.8
+
+%doc README TODO ChangeLog contrib
+%doc /usr/man/man8/pop-before-smtp.8*
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
+%attr(0644,root,root) %config(noreplace) /etc/pop-before-smtp-conf.pl
 %attr(0755,root,root) /etc/rc.d/init.d/pop-before-smtp
+
+%changelog
+* Fri Apr 12 2002 Wayne Davison <wayned@users.sourceforge.net>
+- Modified for 1.30pre1

@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Usage: ./maketar [-rTAG]
+
+cvs co -P $* popbsmtp
+
+cd popbsmtp
+
+# Support making the tar file with a temporary patch.
+if test -f patch ; then
+    patch -p0 <../patch
+fi
+
+ver=`sed -ne 's/^# pop-before-smtp \([^ ]*\).*/\1/p' pop-before-smtp`
+rm -rf CVS */CVS */*/CVS .cvsignore */.cvsignore */*/.cvsignore pkg
+
+cd ..
+
+mv popbsmtp pop-before-smtp-$ver
+if test -f pop-before-smtp-$ver.tar.gz; then
+    tar cvfz pop-before-smtp-cvs.tar.gz pop-before-smtp-$ver
+else
+    tar cvfz pop-before-smtp-$ver.tar.gz pop-before-smtp-$ver
+fi
+rm -rf pop-before-smtp-$ver

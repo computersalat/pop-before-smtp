@@ -6,3 +6,56 @@ still allow legit users to relay through it even if they roam.
 
 Everything is in the script, including the documentation and the
 text of the init script and Postfix config recommendation.
+
+(The below text is copied from an email I sent someone, explaining
+how to get this working. The perlmod2rpm script referenced is
+included in this tarball).
+
+The prerequisites for this script are
+
+	File::Tail
+	Time::HiRes (needed by File::Tail)
+	Net::Netmask
+	Date::Parse (from the TimeDate tarball on CPAN)
+
+Once those are installed you should be able to run pop-before-smtp.
+But you want it run at boot time, in the background, with the pid
+logged so it can be killed and restarted easily, so in that case you
+would start it and stop it with
+
+	/etc/rc.d/init.d/pop-before-smtp start
+	/etc/rc.d/init.d/pop-before-smtp stop
+
+I believe when you installed the rpm it also ran "chkconfig
+pop-before-smtp reset" in the postinstall script, so the links for
+the various run-levels should all be in place to ensure that it
+automatically starts on reboot.
+
+So just install the prerequisite perl modules. I attach a script I
+use for creating rpms from modules I download from CPAN, it may be
+helpful. Perhaps, after you put this script somewhere, you can do
+something like
+
+	cd /usr/src/redhat/SOURCES
+	wget http://www.cpan.org/modules/by-module/Time/Time-HiRes-01.20.tar.gz
+	perlmod2rpm Time-HiRes-01.20.tar.gz
+	sudo rpm -i /usr/src/redhat/RPMS/i386/Time-HiRes-01.20-1.i386.rpm
+	wget http://www.cpan.org/modules/by-module/Time/TimeDate-1.08.tar.gz
+	perlmod2rpm TimeDate-1.08.tar.gz
+	sudo rpm -i /usr/src/redhat/RPMS/i386/TimeDate-1.08-1.i386.rpm
+	wget http://www.cpan.org/modules/by-module/Net/Net-Netmask-1.8.tar.gz
+	perlmod2rpm Net-Netmask-1.8.tar.gz
+	sudo rpm -i /usr/src/redhat/RPMS/i386/Net-Netmask-1.8-1.i386.rpm
+	wget http://www.cpan.org/modules/by-module/File/File-Tail-0.95.tar.gz
+	perlmod2rpm File-Tail-0.95.tar.gz
+	sudo rpm -i /usr/src/redhat/RPMS/i386/File-Tail-0.95-1.i386.rpm
+
+(untested).
+
+Or you can just download 'em, unpack each (remembering to do
+Time-HiRes before File-Tail, since it depends on it), and for each
+one, cd into its unpack directory and go
+
+	perl ./Makefile.PL && sudo make install
+
+-Bennett

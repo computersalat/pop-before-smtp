@@ -1,6 +1,6 @@
 Summary: watch log for pop/imap auth, notify Postfix to allow relay
 Name: pop-before-smtp
-Version: 1.5
+Version: 1.6
 Release: 1
 Source: https://fridge.oven.com/~bet/src/pop-before-smtp-%{PACKAGE_VERSION}.tar.gz
 License: Freely Redistributable
@@ -43,7 +43,7 @@ pod2man pop-before-smtp >$RPM_BUILD_ROOT/usr/man/man8/pop-before-smtp.8
 
 %files
 %defattr(-,root,root)
-%doc README
+%doc README perlmod2rpm
 %doc /usr/man/man8/pop-before-smtp.8
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
 %attr(0755,root,root) /etc/rc.d/init.d/popbsmtp

@@ -1,12 +1,14 @@
 # This config file is a perl library that can override various aspects of the
 # pop-before-smtp script's setup.  Install it as /etc/pop-before-smtp-conf.pl
 
-# There's a lot of stuff in here, so don't get overwhelmed.  Most people can
-# use the default setup (if you're using Postfix and UW pop/imap).  Other folks
-# just need to choose the right $pat variable and perhaps uncomment a section
-# (near the end of the file) with the support for your particular SMTP program
-# (if you're not using Postfix).  See the contrib/README.QUICKSTART file for
-# how to install and test your setup.
+# There's quite a bit of sample stuff after the options, so you probably don't
+# need to read through all of this.  If you're using Postfix and UW POP/IMAP,
+# you can likely just use the default setup without any changes.  The most
+# common changes needed are to pick the right $pat variable for your POP/IMAP
+# software, ensure that the maillog name is right, and perhaps uncomment a
+# section with the support for a different SMTP (other than Postfix).  See the
+# contrib/README.QUICKSTART file for step-by-step instructions on how to
+# install and test your setup.
 
 use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
@@ -49,7 +51,8 @@ if (!-f $file_tail{'name'}) {
     }
 }
 
-# If postconf isn't somewhere on this PATH, uncomment and customize.
+# If you need to define a custom PATH (for instance, if you're using Postfix
+# and postconf is someplace wierd), uncomment and customize this.
 #$ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
 
 # These parameters control how closely the watcher tries to follow the
@@ -64,16 +67,15 @@ if (!-f $file_tail{'name'}) {
 #$file_tail{'resetafter'} = 30;
 #$file_tail{'tail'} = -1;
 
-#===========================================================================
+#============================== syslog ===============================START=
 # If you want to output a log file of what pop-before-smtp is doing, you have
-# a few choices: either set $logto above, uncomment the syslog lines below,
+# a few choices: either set $logto above, uncomment the 3 syslog lines below,
 # or put a reference to your own custom logging function in $log_func.
 
-# Uncomment these 3 lines to cause log messages to use syslog().
 #use Sys::Syslog;
 #openlog('pop-before-smtp', 'pid', 'mail');
 #$log_func = \&syslog;
-#===========================================================================
+#============================== syslog =================================END=
 
 ############################ START OF PATTERNS #############################
 #
@@ -145,9 +147,8 @@ if (!-f $file_tail{'name'}) {
 ############################# END OF PATTERNS ##############################
 
 
-=pod #===================== Match Multiple Patterns ========================
-
-# Add as many patterns as you like.
+=pod #===================== Match Multiple Patterns ==================START=
+# Add as many patterns as you like:
 my @match = ( $pat, $pat2 );
 
 $_ = qr/$_/ foreach @match; # Pre-compile the regular expressions.
@@ -160,10 +161,9 @@ sub custom_match
     }
     ( );
 }
+=cut #===================== Match Multiple Patterns ====================END=
 
-=cut #===================== Match Multiple Patterns ========================
-
-=pod #---------------------- vm-pop3d Match Support ------------------------
+=pod #---------------------- vm-pop3d Match Support ------------------START-
 # vm-pop3d support by <andy@kahncentral.net>.
 #
 # Comment-out the above =pod line to use this function.
@@ -190,16 +190,16 @@ sub custom_match
     }
     ( );
 }
-=cut #---------------------- vm-pop3d Match Support ------------------------
+=cut #---------------------- vm-pop3d Match Support --------------------END-
 
-############################# Alternate DB support #########################
+########################## Alternate DB/SMTP support #######################
 #
 # If you need to use something other than DB_File, define your own tie,
 # sync, and (optionally) flock functions.
 #
-############################# Alternate DB support #########################
+########################## Alternate DB/SMTP support #######################
 
-=pod #======================== Postfix BerkeleyDB ==========================
+=pod #======================== Postfix BerkeleyDB ====================START=
 # If you comment-out the preceding =pod line, we'll use BerkeleyDB instead
 # of DB_File.
 
@@ -224,10 +224,9 @@ sub sync_BerkeleyDB
 {
     $dbh->sync and die "$0: sync $dbfile: $!\n";
 }
+=cut #======================== Postfix BerkeleyDB ======================END=
 
-=cut #======================================================================
-
-=cut #-------------------------- qmail tcprules ----------------------------
+=pod #-------------------------- qmail tcprules ----------------------START-
 # If you comment-out the preceding =pod line, we'll use the tcprules program
 # instead of maintaining a DB_File hash.
 
@@ -275,9 +274,9 @@ sub sync_tcprules
     close RULES or die "closing tcprules pipe: $!";
     $log_func->('debug', "wrote tcp rules to $dbfile") if $debug;
 }
-=cut #----------------------------------------------------------------------
+=cut #-------------------------- qmail tcprules ------------------------END-
 
-=pod #=========================== Courier SMTP =============================
+=pod #=========================== Courier SMTP =======================START=
 # If you comment-out the preceding =pod line, we'll interface with Courier
 # SMTP using DB_File.
 
@@ -317,7 +316,6 @@ sub sync_courier
     # Reload SMTP Daemon (isn't there a better way to do this?)
     system "$ESMTPD stop; $ESMTPD start";
 }
-
-=cut #======================================================================
+=cut #=========================== Courier SMTP =========================END=
 
 1;

@@ -1,6 +1,31 @@
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Updated the init-file example in the docs.
+
+	* pop-before-smtp-conf.pl:
+	- Added an introductory comment.
+
+	* contrib/README.QUICKSTART:
+	- Updated to handle the new config file and improve a few things.
+
+	* contrib/getfromcpan:
+	- Read the "topdir" out of the .rpmmacros file (if it exists).
+	- Put all the module versions numbers in variables at the top of the
+	  file and updated them to their most-current values.
+	- Fixed all the echoes with unbalanced double-quotes.
+	- Fixed a couple of the sanity checks.
+	- Fixed the pre-installation cleanup to cleanup the SOURCES dir.
+	- Allow the script to be run as non-root to just build the RPMs (it
+	  skips installing the RPMs, and also does not remove them).
+
+	* pop-before-smtp.spec:
+	- Added potential support for installing a custom config file.
+	- Put the unchanged config file into the doc dir.
+
+2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
 	- Added the ability to override our tie, sync, and flock functions
 	  from the config file.
 	- Allow the value we put into the DB to be configured.

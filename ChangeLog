@@ -4,7 +4,7 @@
 	- Moved the config items into a config file and added the
 	  --config=FILE option to override its default location.
 	- Enabled only one $pat variable by default (UW).
-	- Added the ability to use a custom_match() funciton to enable more
+	- Added the ability to use a custom_match() function to enable more
 	  complex watch-log matching.
 	- Changed the name of the --logfile option to --watchlog (though we
 	  still accept --logfile for backward compatibility).
@@ -16,7 +16,7 @@
 	- Write the "die" message to the output log (if logging).
 
 	* TODO:
-	- Mention a few items that I'd like to do.
+	- Mention a couple items that I'd like to do.
 	- Got rid of the separate-config discussion (which is now done).
 
 	* pop-before-smtp-config.pl:

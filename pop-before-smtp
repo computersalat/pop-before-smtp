@@ -5,7 +5,7 @@ use strict;
 # and the mailing list for discussing this program and asking for help at
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
-# pop-before-smtp 1.30-pre-1
+# pop-before-smtp 1.30pre1
 # Copyright (c) 1999, 2000, 2001 Bennett Todd.  Freely Redistributable.
 
 =head1 NAME
@@ -303,7 +303,7 @@ sub cleanup_nets
 {
     my @nets;
     foreach (@_) {
-	# Detaint and remove leading/trailing spaces.
+	# Detaint.  Also remove leading/trailing spaces.
 	($_) = /^\s*(.*?)\s*$/s;
 	s/^mynetworks\s*=\s*//;
 	foreach (split /[,\s]+/) {

@@ -1,3 +1,8 @@
+2004-01-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Updated the pattern support for vm-pop3d.
+
 2004-01-22  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

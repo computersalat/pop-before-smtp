@@ -16,37 +16,43 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+progname=pop-before-smtp
+pgm=/usr/sbin/$progname
+pid=/var/run/$progname.pid
+
+die(){ echo "$progname: $*">&2; exit 1; }
+
 # Make absolutely sure we don't dump core anywhere.
 # Alright, so I'm paranoid, okay? ;)
 ulimit -S -c 0 >/dev/null 2>&1
 
 # See how we were called.
 case "$1" in
-   start)
-	echo -n "Starting pop-before-smtp: "
-	/usr/sbin/pop-before-smtp & echo $! >/var/run/pop-before-smtp.pid
+start)
+	echo -n "Starting $progname:"
+	$pgm >/dev/null 2>&1 & echo $! >$pid
 	if test $? -eq 0; then
 		echo_success
 	else
 		echo_failure
 	fi
 	echo
-	touch /var/lock/subsys/pop-before-smtp
+	touch /var/lock/subsys/$progname
 	;;
-   stop)
-	echo -n "Shutting down pop-before-smtp: "
-	killproc pop-before-smtp
-	rm -f /var/lock/subsys/pop-before-smtp
-	echo ""
+stop)
+	echo -n "Shutting down $progname:"
+	killproc $progname
+	rm -f /var/lock/subsys/$progname
+	echo
 	;;
-   restart)
+restart)
 	$0 stop
 	$0 start
 	;;
-   status)
-	status /usr/sbin/pop-before-smtp
+status)
+	status /usr/sbin/$progname
 	;;
-   *)
-	echo "Usage: pop-before-smtp {start|stop|restart|status}"
-	exit 1
+*)
+	die "Usage: `basename $0` {start|stop|restart|status}"
+	;;
 esac

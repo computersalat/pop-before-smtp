@@ -4,18 +4,34 @@
 
 progname=pop-before-smtp
 pgm=/usr/sbin/$progname
-log=/var/log/$progname
 pid=/var/run/$progname.pid
+
+if test -f /etc/$progname-conf.pl; then
+	# If there is a config file, let it do its job.
+	logto=
+else
+	# Without a config file, try to intuit the proper options.
+	log=/var/log/$progname
+	logto=--logto=$log
+fi
+
 die(){ echo "$progname: $*">&2; exit 1; }
 
 . /etc/rc.d/init.d/functions
 
 case "$1" in
- start) echo -n Starting pop-before-smtp
-	$pgm --debug >$log 2>&1 & echo $! >$pid
-	echo_success; echo ''
+start)
+	echo -n "Starting $progname:"
+	$pgm $logto >/dev/null 2>&1 & echo $! >$pid
+	if test $? -eq 0; then
+		echo_success
+	else
+		echo_failure
+	fi
+	echo
 	;;
-  stop) echo -n Stopping pop-before-smtp
+stop)
+	echo -n "Shutting down $progname:"
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -27,14 +43,19 @@ case "$1" in
 	else
 		echo_failure
 	fi
-	echo ''
+	echo
 	;;
-
-status)	p=`cat $pid 2>/dev/null`
+restart)
+	$0 stop
+	$0 start
+	;;
+status)
+	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
 	kill -0 $p || die "$pgm[$p] is no longer running"
-	ps -up $p
+	ps -fp $p
 	;;
-restart) $0 stop; $0 start;;
-      *) die "syntax: `basename $0` start|stop|restart|status";;
+*)
+	die "Usage: `basename $0` {start|stop|restart|status}"
+	;;
 esac

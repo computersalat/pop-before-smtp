@@ -7,7 +7,7 @@ pgm=/usr/sbin/$progname
 pid=/var/adm/$progname.pid
 test -d /var/run && pid=/var/run/$progname.pid
 
-if test -f /etc/pop-before-smtp-conf.pl; then
+if test -f /etc/$progname-conf.pl; then
 	# If there is a config file, let it do its job.
 	watchlog=
 	logto=
@@ -26,11 +26,17 @@ fi
 die(){ echo "$progname: $*">&2; exit 1; }
 
 case "$1" in
-start)	echo -n Starting pop-before-smtp...
+start)
+	echo -n "Starting $progname..."
 	$pgm $watchlog $logto >/dev/null 2>&1 & echo $! >$pid
-	echo done
+	if test $? -eq 0; then
+		echo done
+	else
+		echo failed
+	fi
 	;;
-stop)	echo -n Stopping pop-before-smtp...
+stop)
+	echo -n "Stopping $progname..."
 	p=`cat $pid 2>/dev/null`; test -n "$p" && (
 		kill $p || exit 0; sleep 1
 		kill -9 $p 2>/dev/null || exit 0; sleep 1
@@ -43,12 +49,17 @@ stop)	echo -n Stopping pop-before-smtp...
 		echo failed
 	fi
 	;;
-status)	p=`cat $pid 2>/dev/null`
+restart)
+	$0 stop
+	$0 start
+	;;
+status)
+	p=`cat $pid 2>/dev/null`
 	test -n "$p" || die "no pidfile for $pgm"
 	kill -0 $p || die "$pgm[$p] is no longer running"
 	ps -fp $p
 	;;
-restart) $0 stop; $0 start;;
-      *) die "syntax: `basename $0` start|stop|restart|status";;
+*)
+	die "Usage: `basename $0` {start|stop|restart|status}"
+	;;
 esac
-

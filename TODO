@@ -1,74 +1,22 @@
-Factor out the $pats as much as possible, and structure the remaining ones as a separate config file (see appended mail [1])
+Document somewhere how the current flock setup is adequate for our needs
+since we're the only one writing the file (and it does properly protect
+a reader from getting corrupted data if the reader process is locking
+the file before it reads its first buffer-full of data, as I believe is
+the case with postfix).
 
-make postconf mynetworks default to 127.0.0.0/8 if postconf doesn't
+Make the tie function overridable from the config file?
 
-Add cmdline option for dbfile extention (default ".db")
+Factor out the $pats as much as possible.
 
-Add cmdline option  for the dbfile value (default "ok")
+Add automatic configure-n-install tool.
 
-Add cmdline option to goose the smtp daemon to make it reread the db file (default nothing)
+Document DB lib version issue, diagnosis, fixes.
 
-appended mail [1]:
-2000-11-08-04:51:33 Jonas Smedegaard:
-> Feel free to advertise. And no, there's no need for anything special on
-> your part.
+Make postconf mynetworks default to 127.0.0.0/8 if postconf doesn't.
 
-Thanks! Will do!
+Add cmdline option for dbfile extention (default ".db").
 
-> What would be nice, though, was a runtime option to choose which
-> RE's to use, as Debian policies don't allow for editable scripts
-> in /usr/sbin.
+Add cmdline option for the dbfile value (default "ok").
 
-I sure have to grant the wisdom of this point; that's the one real
-maintenance blech on the whole thing. Unfortunately, I've not been
-able to come up with a unified regexp that matches successful logins
-for all daemons _and_ doesn't match unsuccessful logins of any sort.
-That last is the tricky bit, for successful logins only, you could
-just use
-
-	'^(... .. ..:..:..) \S+ \S+:.*\D(\d+\.\d+\.\d+\.\d+)'
-
-Problem is, if I went with that, and more than a few people were
-using this daemon, spammers would quickly spead the word to try a
-random pop/imap at a mail server to see if it opens the door even
-without knowing a valid login.
-
-> I imagine naming each RE and replace "m/$pat/o or m/$pat2/o or
-> next;" with a loop through selected ones - with fallback to the
-> current imapd and pop3d.
-
-I don't have the conviction that a nearly all users can just pick
-one of the existing $pats, I'm pretty sure many folks have to edit
-them to make their install work.
-
-At the expense of multiplying this thing's complexity by adding yet
-another file, hmm, ok, how about, the above generic regexp is
-hard-coded into the script, and is used if the file
-/etc/pop-before-smtp.patterns (overridable via cmdline arg) is not
-found. If however that file is found, it's then read as a fragment
-of perl, and is expected to define an array of precompiled regexp
-patterns. So I'll code the config file use as
-
-	my @pats = -f $patfile ? do $patfile : $defaultpat;
-
-Then code the shipped defaultpat file as
-
-	( # Uncomment as many of these as you want to, for performance
-	  # reasons try and confine yourself to ones that are likely
-	  # to actually be found in your 
-	# For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
-	#qr{^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: (?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$},
-
-	# Bennett Todd to add support for GNU pop3d
-	#qr{^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: User .* logged in with mailbox .* from (\d+\.\d+\.\d+\.\d+)$},
-
-	# There are many, many different logfile formats emitted by various
-	# qpoppers. Here's an attempt to match any of them, but for all
-	# I know it might also match failed logins, or something else.
-	# qr{^(... .. ..:..:..) \S+ q?popper\S+\[\d+\]: .*\s(\d+.\d+.\d+.\d+)$},
-
-	...
-
-	) # And that's all the patterns we've had contributed so far
-
--Bennett
+Add cmdline option to goose the smtp daemon to make it reread the db file
+(default nothing).

@@ -47,7 +47,7 @@ reading the config file.
 
 Specify --nowrite if you don't want the DB file to be even opened, let alone
 updated. Useful for trying out pattern-matching rules, especially when used
-with --debug and --reprocess.  (If your maillog is world-readable, you can
+with --debug and --reprocess.  (If your mail-log is world-readable, you can
 even run the test as a non-privileged user.)
 
 =item --[no]debug
@@ -63,17 +63,14 @@ Using --noflock will turn off the default file-locking used on the DB file.
 
 =item --reprocess
 
-Parse the whole maillog file, pretending that each line is happening again.
+Parse the whole mail-log file, pretending that each line is happening again.
 Useful for testing, especially when combined with --debug and possibly
 --nowrite.
 
 =item --watchlog=FILE
 
-You can specify what maillog to watch for POP/IMAP events. The default in the
-script is /var/log/maillog, but the provided config file searches for an
-existing log file, also checking for /var/log/mail/info, /var/log/mail.log,
-/var/log/messages, or /var/adm/messages.  Run "pop-before-smtp --dumpconfig"
-to see the actual value for your system.
+You can specify what mail-log to watch for POP/IMAP events.  To see what the
+default value is for your system, run "pop-before-smtp --dumpconfig".
 
 =item --dbfile=FILE
 

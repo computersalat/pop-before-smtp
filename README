@@ -5,12 +5,12 @@ PLATFORM-SPECIFIC NOTES (up front so you can comfortably ignore the
 stuff if it doesn't apply to you:-)
 
 Courier users (folks running this with the Courier SMTP daemon)
-  will want to read contrib/courier/README and work with the
-  files in the contrib/courier/ subdirectory.
+  will want to enable the section of the pop-before-smtp-conf.pl file
+  that handles the Courier SMTP setup.
 
-Qmail users might want to look in the contrib/qmail dir, for a
-  patched version of pop-before-smtp that manipulates qmail's
-  tcpserver tcprules file
+Qmail users might want to look in the pop-before-smtp-conf.pl file
+  for a section that causes pop-before-smtp to manipulate qmail's
+  tcpserver tcprules file.
 
 Debian users should look at contrib/debian/README
 
@@ -42,7 +42,7 @@ People more interested in getting it running as fast as possible
   onto a Red Hat Linux system.
 
 If you prefer pop-before-smtp to log via syslog, there's a commented-
- out setup for it in the pop-before-smtp-config.pl file.
+  out setup for it in the pop-before-smtp-config.pl file.
 
 Users of Microsoft Outlook Express 5.5 (and perhaps others as well),
   do not use Tools->Options->Send->"Send messages immediately", as

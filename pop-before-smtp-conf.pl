@@ -3,7 +3,8 @@
 
 use vars qw(
     $pat $write $flock $debug $reprocess $grace %file_tail
-    %db $dbfile $tie_func $sync_func $flock_func $log_func
+    @mynets %db $dbfile $dbvalue
+    $mynet_func $tie_func $sync_func $flock_func $log_func
 );
 
 #
@@ -20,6 +21,9 @@ use vars qw(
 # Override the DB hash file we will create/update (".db" gets appended).
 #$dbfile = '/etc/postfix/pop-before-smtp';
 
+# Override the value that gets put into the DB hash.
+#$dbvalue = 'ok';
+
 # A 30-minute grace period before the IP address is expired.
 #$grace = 30*60;
 
@@ -28,7 +32,8 @@ use vars qw(
 
 # ... or we'll try to figure it out for you.
 if (!-f $file_tail{'name'}) {
-    foreach (qw( /var/log/mail/info /var/log/messages /var/adm/messages )) {
+    foreach (qw( /var/log/mail/info /var/log/mail.log
+		 /var/log/messages /var/adm/messages )) {
 	if (-f $_) {
 	    $file_tail{'name'} = $_;
 	    last;
@@ -64,13 +69,13 @@ if (!-f $file_tail{'name'}) {
 #$log_func = \&syslog;
 #===========================================================================
 
-#############################START OF PATTERNS##############################
+############################ START OF PATTERNS #############################
 #
 # Pick one of these values for the $pat variable OR define a subroutine
 # named "custom_match" to handle a more complex match scenario (there's
 # and example below).  Feel free to delete all the stuff you don't need.
 #
-#############################START OF PATTERNS##############################
+############################ START OF PATTERNS #############################
 
 # For UW ipop3d/imapd and their secure versions. This is the DEFAULT.
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
@@ -130,7 +135,7 @@ if (!-f $file_tail{'name'}) {
 #    '(?:Auth:) (\d+.\d+.\d+.\d+)(?:\-\>\d+.\d+.\d+.\d+) ' .
 #    'user=(?:\"\S+\") server=(?:\"\S+\") port=(?:\"\S+\") status=(?:\"ok\")';
 
-##############################END OF PATTERNS###############################
+############################# END OF PATTERNS ##############################
 
 
 =pod #----------------------------------------------------------------------
@@ -162,13 +167,20 @@ sub custom_match
 }
 =cut #----------------------------------------------------------------------
 
-=pod ######################## Alternate DB support #########################
+############################# Alternate DB support #########################
+#
 # If you need to use something other than DB_File, define your own tie,
-# sync, and (optionally) flock functions.  If you comment-out the preceding
-# =pod line, we'll use BerkeleyDB instead of DB_File.
+# sync, and (optionally) flock functions.
+#
+############################# Alternate DB support #########################
+
+=pod #======================== Postfix BerkeleyDB ==========================
+# If you comment-out the preceding =pod line, we'll use BerkeleyDB instead
+# of DB_File.
 
 use BerkeleyDB;
 
+#$mynet_func = \&mynet_postfix;
 $tie_func = \&tie_BerkeleyDB;
 $sync_func = \&sync_BerkeleyDB;
 $flock = 0;
@@ -188,6 +200,99 @@ sub sync_BerkeleyDB
     $dbh->sync and die "$0: sync $dbfile: $!\n";
 }
 
-=cut ########################################################################
+=cut #======================================================================
+
+=cut #-------------------------- qmail tcprules ----------------------------
+# If you comment-out the preceding =pod line, we'll use the tcprules program
+# instead of maintaining a DB_File hash.
+
+my $TCPRULES = '/usr/local/bin/tcprules';
+
+$mynet_func = \&mynet_tcprules;
+$tie_func = \&tie_tcprules;
+$sync_func = \&sync_tcprules;
+$flock = 0;
+
+sub mynet_tcprules
+{
+    # You'll want to edit this value.
+    '127.0.0.0/8 192.168.1.1/24';
+}
+
+my @qnets;
+
+# We leave the global %db as an untied hash and setup a @qnets array.
+sub tie_tcprules
+{
+    # convert 10.1.3.0/28 to 10.1.3.0-15 
+    #     and 10.1.0.0/16 to 10.1.
+    # because tcprules doesn't understand nnn.nnn.nnn.nnn/bb netmask formats
+    foreach (@mynets) {
+	if (m#(.*)/(\d+)#) { 
+	    $_ = $1; 
+	    my $netbits = (32 - $2);
+	    while (int($netbits / 8)) { # for every 8 bits, chop a quad
+		s/\.[^.]*$//; 
+		$netbits -= 8; 
+	    }
+	    s/(\d+)$/$1.sprintf("-%d",$1 + (2**$netbits) - 1)/e if $netbits > 0;
+	    /(\..*){3}/ or s/$/./;
+	} 
+	push @qnets, $_;
+    }
+}
+
+sub sync_tcprules
+{
+    open(RULES, "|$TCPRULES $dbfile $dbfile.tmp") or die "forking tcprules: $!";
+    map { print RULES "$_:allow,RELAYCLIENT=''\n" } @qnets, keys %db;
+    print RULES ":allow\n";
+    close RULES or die "closing tcprules pipe: $!";
+    $log_func->('debug', "wrote tcp rules to $dbfile") if $debug;
+}
+=cut #----------------------------------------------------------------------
+
+=pod #=========================== Courier SMTP =============================
+# If you comment-out the preceding =pod line, we'll interface with Courier
+# SMTP using DB_File.
+
+my $ESMTPD = '/usr/lib/courier/sbin/esmtpd';
+
+use DB_File;
+
+$dbfile = '/etc/courier/smtpaccess'; # DB hash to write
+$dbvalue = 'allow,RELAYCLIENT';
+
+$mynet_func = \&mynet_courier;
+$tie_func = \&tie_courier;
+$sync_func = \&sync_courier;
+#$flock_func = \&flock_courier; # Same as flock_DB()
+
+sub mynet_courier
+{
+    '';
+}
+
+my $dbh;
+
+sub tie_courier
+{
+    $dbh = tie %db, 'DB_File', "$dbfile.dat", O_CREAT|O_RDWR, 0666, $DB_HASH
+	or die "$0: cannot dbopen $dbfile: $!\n";
+    if ($flock) {
+	my $fd = $dbh->fd;
+	open(DB_FH,"+<&=$fd") or die "$0: cannot open $dbfile filehandle: $!\n";
+    }
+}
+
+sub sync_courier
+{
+    $dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
+
+    # Reload SMTP Daemon (isn't there a better way to do this?)
+    system "$ESMTPD stop; $ESMTPD start";
+}
+
+=cut #======================================================================
 
 1;

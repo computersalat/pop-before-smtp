@@ -29,10 +29,10 @@ use vars qw(
 # A 30-minute grace period before the IP is expired.
 #$grace = 1800;
 
-# Set the log file to watch for pop3d/imapd records.
+# Set the log file we will watch for pop3d/imapd records.
 #$file_tail{'name'} = '/var/log/maillog';
 
-# Or we'll try to figure it out for you.
+# ... or we'll try to figure it out for you.
 if (!-f $file_tail{'name'}) {
     foreach (qw( /var/log/mail/info /var/log/messages /var/adm/messages )) {
 	if (-f $_) {
@@ -41,6 +41,9 @@ if (!-f $file_tail{'name'}) {
 	}
     }
 }
+
+# If postconf isn't somewhere on this PATH, uncomment and customize.
+#$ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
 
 # These parameters control how closely the watcher tries to follow the
 # logfile, which affects how much resources it consumes, and how quickly
@@ -66,14 +69,6 @@ if (!-f $file_tail{'name'}) {
 #openlog('pop-before-smtp', 'pid', 'mail');
 #$log_func = \&syslog;
 #===========================================================================
-
-# This logging function lets you see what pop-before-smtp is doing.  The
-# default is no logging.  We provide &log_to_stdout, and a syslog() setup
-# down near the end of this file.
-#$log_func = \&log_to_stdout;
-
-# If postconf isn't somewhere on this PATH, uncomment and customize.
-#$ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
 
 #############################START OF PATTERNS##############################
 #

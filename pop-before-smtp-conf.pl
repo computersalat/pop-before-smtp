@@ -2,15 +2,8 @@
 # pop-before-smtp script's setup.  Install it as /etc/pop-before-smtp-conf.pl
 
 use vars qw(
-    $pat
-    $write
-    $flock
-    $debug
-    $reprocess
-    $dbfile
-    $grace
-    %file_tail
-    $log_func
+    $pat $write $flock $debug $reprocess $grace %file_tail
+    %db $dbfile $tie_func $sync_func $flock_func $log_func
 );
 
 #
@@ -20,14 +13,15 @@ use vars qw(
 # Clear to avoid our exclusive file locking when updating the DB.
 #$flock = 0;
 
-# Set to output some extra log messages.
+# Set $debug to output some extra log messages (if logging is enabled).
 #$debug = 1;
+#$log_func = \&log_to_stdout;
 
 # Override the DB hash file we will create/update (".db" gets appended).
 #$dbfile = '/etc/postfix/pop-before-smtp';
 
-# A 30-minute grace period before the IP is expired.
-#$grace = 1800;
+# A 30-minute grace period before the IP address is expired.
+#$grace = 30*60;
 
 # Set the log file we will watch for pop3d/imapd records.
 #$file_tail{'name'} = '/var/log/maillog';
@@ -142,7 +136,7 @@ if (!-f $file_tail{'name'}) {
 =pod #----------------------------------------------------------------------
 # vm-pop3d support by <andy@kahncentral.net>.
 #
-# Comment-out the =pod and =cut lines to use this function.
+# Comment-out the above =pod line to use this function.
 
 my $vmIpPat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: '.
        'Connect from (\d+\.\d+\.\d+\.\d+)$';
@@ -167,5 +161,33 @@ sub custom_match
     ( );
 }
 =cut #----------------------------------------------------------------------
+
+=pod ######################## Alternate DB support #########################
+# If you need to use something other than DB_File, define your own tie,
+# sync, and (optionally) flock functions.  If you comment-out the preceding
+# =pod line, we'll use BerkeleyDB instead of DB_File.
+
+use BerkeleyDB;
+
+$tie_func = \&tie_BerkeleyDB;
+$sync_func = \&sync_BerkeleyDB;
+$flock = 0;
+
+my $dbh;
+
+# We must tie the global %db using the global $dbfile.  Also sets $dbh for
+# our sync function.
+sub tie_BerkeleyDB
+{
+    $dbh = tie %db,'BerkeleyDB::Hash', -Filename=>"$dbfile.db" -Flags=>DB_CREATE
+	or die "$0: cannot dbopen $dbfile: $!\n";
+}
+
+sub sync_BerkeleyDB
+{
+    $dbh->sync and die "$0: sync $dbfile: $!\n";
+}
+
+=cut ########################################################################
 
 1;

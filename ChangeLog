@@ -1,3 +1,16 @@
+2002-04-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Improved cleanup_nets() to weed-out comments from included files,
+	De-taint the mynetworks include-file data, and to make the code a
+	little simpler.
+
+	* Make sure that we expire those whose access has lapsed in a
+	timely manner.
+
+	* Updated the URL to the mailing list and the project's home page.
+
+	* Moved the change-log data into this ChangeLog file.
+
 2001-01-19  Bennett Todd  <bet@rahul.net>
 
 	* Released version 1.29.

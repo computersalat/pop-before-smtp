@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.4 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.5 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.5 2000-02-21 added comment pointing to File::Tail for description of
+#                the options with which I'm initializing it
 # 1.4 2000-02-21 added comment describing pattern for Cyrus logfile entries,
 #                from Kenn Martin <kmartin@infoteam.com>.
 # 1.3 2000-02-07 fixed log-watching pattern to correctly recognize imap 
@@ -142,6 +144,11 @@ GetOptions(
 # These parameters control how closely the watcher tries to follow the
 # logfile, which affects how much resources it consumes, and how quickly
 # people can smtp after they have popped.
+# They are documented in the File::Tail pod; run "perldoc File::Tail" to
+# find out details. I guessed at these to try and get this daemon to follow
+# the logfile pretty closely (to avoid users having to wait too long
+# after a pop before they can relay) without wasting too much CPU
+# needlessly.
 my $fi = File::Tail->new(
 	name => $logfile,
 	maxinterval => 10,

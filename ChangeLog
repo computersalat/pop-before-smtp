@@ -1,7 +1,8 @@
 2003-04-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:
-	- Added pattern for Apple IMAP MAIL Server.
+	- Added a pattern for the Apple IMAP MAIL Server and a (commented-
+	  out) value for where the watchlog file exists.
 
 2003-04-28  Wayne Davison  <wayned@users.sourceforge.net>
 

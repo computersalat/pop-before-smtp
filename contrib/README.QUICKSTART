@@ -67,7 +67,15 @@ run this command:
 
 % perl -MCPAN -e 'install DB_File'
 
-2. Edit the pop-before-smtp-conf.pl file to customize it for your system.
+2. Install the script and its support files.
+
+Run these commands (if using the default install locations):
+
+% cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
+% cp pop-before-smtp /usr/sbin/
+% cp pop-before-smtp-conf.pl /etc
+
+3. Edit the pop-before-smtp-conf.pl file to customize it for your system.
 
 Look for this:
 
@@ -94,14 +102,6 @@ If you're not using Postfix, you'll hopefully find your SMTP software
 mentioned near the end of the config file.  Comment out the two surrounding
 =cut lines for the section you want to enable.  For instance, sendmail
 users would enable the "Sendmail SMTP" section.
-
-3. Install the script and its support files.
-
-Run these commands (if using the default install locations):
-
-% cp pop-before-smtp.init /etc/rc.d/init.d/pop-before-smtp
-% cp pop-before-smtp /usr/sbin/
-% cp pop-before-smtp-conf.pl /etc
 
 4. Test the pop-before-smtp daemon.
 

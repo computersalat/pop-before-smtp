@@ -85,10 +85,10 @@ Turns on logging to the specified file (use "-" for stdout).
 
 =item --grace=SECONDS
 
-=back
-
 Set the number of seconds that an IP address is authorized after it
 successfully signs in via POP or IMAP.
+
+=back
 
 =head1 INSTALLATION
 

@@ -284,9 +284,7 @@ my $fi = File::Tail->new(
 #                              #
 ################################
 
-my @mynets = cleanup_nets(`postconf mynetworks`);
-
-foreach (@mynets) {
+foreach (cleanup_nets(`postconf mynetworks`)) {
     Net::Netmask->new($_)->storeNetblock();
 }
 
@@ -358,15 +356,18 @@ sub cleanup_nets
 {
     my @nets;
     foreach (@_) {
+	# Detaint and remove leading/trailing spaces.
 	($_) = /^\s*(.*?)\s*$/s;
 	s/^mynetworks\s*=\s*//;
 	foreach (split /[,\s]+/) {
 	    if (m#^/#) {
+		# Slurp the whole file into $_.
 		undef $/;
 		open(IN, $_) or die "Unable to open $_: $!";
 		$_ = <IN>;
 		close IN;
 		$/ = "\n";
+		# Remove any comments from the file's data.
 		s/#.*//mg;
 		push @nets, cleanup_nets($_);
 	    }

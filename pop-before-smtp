@@ -1,7 +1,12 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.16 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.17 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.17 2000-09-17 Brian Duggan <bduggan@oven.com> and Jeff Moore <jbm@oven.com>
+#                 worked out a fix for the sometimes-present nmsgs= at the end
+#                 of the UW daemons' log entries.
+#                 Kevin Lynn <klynn@santacruz.org> suggested I include
+#                 instructions for running as a non-root user.
 # 1.16 2000-08-10 William Yodlowsky <wyodlows@nj.devry.edu> provided the
 #                 beautifully trivial patch for Taint support
 #                 Darron Froese provided README.QUICKSTART.
@@ -199,7 +204,7 @@ $ENV{'PATH'} = '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin';
 # For UW ipop3d/imapd, pattern tweaked by Stig Hackvan <stig@hackvan.com>
 #Aug 10 19:21:18 fridge gnu-pop3d[21974]: User 'shirwah' logged in with mailbox 'shirwah' from 208.178.52.178
 my $pat = '^(... .. ..:..:..) \S+ (?:ipop3d|imapd)\[\d+\]: ' .
-          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]$';
+          '(?:Login|Authenticated|Auth) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\](?: nmsgs=\d+/\d+)?$';
 
 # Bennett Todd to add support for GNU pop3d
 my $pat2 = '^(... .. ..:..:..) \S+ gnu-pop3d\[\d+\]: ' .

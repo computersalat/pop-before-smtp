@@ -1,6 +1,6 @@
 Summary: watch log for pop/imap auth, notify Postfix to allow relay
 Name: pop-before-smtp
-Version: 1.16
+Version: 1.17
 Release: 1
 Source: https://fridge.oven.com/~bet/src/pop-before-smtp-%{PACKAGE_VERSION}.tar.gz
 License: Freely Redistributable

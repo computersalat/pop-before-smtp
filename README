@@ -1,3 +1,56 @@
+NB for support, subscribe to the mailing list at
+<URL:https://lists.oven.com/mailman/listinfo/pop-before-smtp>
+
+PLATFORM-SPECIFIC NOTES (up front so you can comfortably ignore the
+stuff if it doesn't apply to you:-)
+
+Courier users (folks running this with the Courier SMTP daemon)
+  will want to read contrib/courier/README and work with the
+  files in the contrib/courier/ subdirectory.
+
+Qmail users might want to look in the contrib/qmail dir, for a
+  patched version of pop-before-smtp that manipulates qmail's
+  tcpserver tcprules file
+
+Debian users should look at contrib/debian/README
+
+Red Hat users who really miss the spiffo highlighted OK at
+  startup/shutdown should check out either of the alternate init
+  scripts, available in contrib/init-redhat-alex and
+  init-redhat-bet. Alex's version tries to use the Red Hat init
+  script functions as much as possible, in an effort to be just like
+  the other Red Hat init scripts. Bennett's just makes the minimum
+  use of them to get the highlighted display, while using the same
+  basic logic as the generic init script that has become the
+  package default.
+
+popa3d users can find a patch that adds the IP addr to the log
+  records in contrib/popa3d/, and a corresponding $pat commented out
+  in pop-before-smtp.
+
+Folks interested in running pop-before-smtp as a non-root user
+  should check out contrib/README.rootless-install
+
+People more interested in getting it running as fast as possible
+  without doing an RPM install, who have some environmental
+  prereqs properly in place --- working perl install with working
+  CPAN module, System V init scripts, daemon installing in
+  /usr/sbin/; should check out contrib/README.QUICKSTART. Also,
+  the contrib/getfromcpan script contributed by Alexander Burke
+  <alex@pdqsolutions.com> should make it enormously quicker and
+  easier to package and install all the prerequisite Perl modules
+  onto a Red Hat Linux system.
+
+If you prefer pop-before-smtp to log via syslog, check out the patch
+  in contrib/syslog.
+
+Users of Microsoft Outlook Express 5.5 (and perhaps others as well),
+  do not use Tools->Options->Send->"Send messages immediately", as
+  it prevents Outlook Express from doing a POP or IMAP mailbox
+  download before sending messages, and so will get relay denied.
+
+END OF PLATFORM-SPECIFIC NOTES
+
 This is a simple program for watching /var/log/maillog, looking for
 successful logins via POP or IMAP, and maintaining a database that
 Postfix can use to decide to let users who've recently logged in
@@ -9,7 +62,7 @@ text of the init script and Postfix config recommendation.
 
 (The below text is copied from an email I sent someone, explaining
 how to get this working. The perlmod2rpm script referenced is
-included in this tarball).
+included in this tarball, in the subdirectory contrib).
 
 The prerequisites for this script are
 
@@ -50,7 +103,8 @@ something like
 	perlmod2rpm File-Tail-0.95.tar.gz
 	sudo rpm -i /usr/src/redhat/RPMS/i386/File-Tail-0.95-1.i386.rpm
 
-(untested).
+(untested). A script to do this is contrib/getfromcpan, contributed
+by Alexander J. Burke <alex@pdqsolutions.com>.
 
 Or you can just download 'em, unpack each (remembering to do
 Time-HiRes before File-Tail, since it depends on it), and for each

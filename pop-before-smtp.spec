@@ -24,7 +24,7 @@ database which can be checked by Postfix, to allow relaying for
 people who have recently downloaded their email.
 
 %prep
-%setup
+%setup -q
 
 %build
 echo Nothing to build...
@@ -55,7 +55,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 
-%doc README TODO ChangeLog pop-before-smtp-conf.pl contrib
+%doc README TODO ChangeLog pop-before-smtp-conf.pl
+%doc contrib/README* contrib/getfromcpan contrib/perlmod2rpm
 %doc /usr/man/man8/pop-before-smtp.8*
 %attr(0755,root,root) /usr/sbin/pop-before-smtp
 %attr(0644,root,root) %config(noreplace) /etc/pop-before-smtp-conf.pl
@@ -63,4 +64,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Fri Apr 12 2002 Wayne Davison <wayned@users.sourceforge.net>
-- Modified for 1.30pre1
+- Modified for 1.30

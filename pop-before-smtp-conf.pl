@@ -121,7 +121,7 @@ $log_func = \&syslog;
 
 # For Courier-POP3 and Courier-IMAP:
 #$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:login|d|d-ssl): ' .
-#    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]$';
+#    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For qmail's pop3d:
 #$pat = '^(... .. ..:..:..) \S+ vpopmail\[\d+\]: ' .
@@ -480,4 +480,4 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 EOT
 }
 
-1;
+1; ## THIS LINE MUST REMAIN LAST IN THE FILE! ##

@@ -5,7 +5,7 @@ use strict;
 # and the mailing list for discussing this program and asking for help at
 # <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 
-# pop-before-smtp 1.33
+# pop-before-smtp 1.34
 # Copyright (C) 1999, 2000, 2001 Bennett Todd.
 # Also Copyright (C) 2002 Wayne Davison. Freely Redistributable.
 

@@ -67,15 +67,16 @@ if (!-f $file_tail{'name'}) {
 #$file_tail{'resetafter'} = 30;
 #$file_tail{'tail'} = -1;
 
-#============================== syslog ===============================START=
+=pod #============================= syslog ===========================START=
 # If you want to output a log file of what pop-before-smtp is doing, you have
-# a few choices: either set $logto above, uncomment the 3 syslog lines below,
-# or put a reference to your own custom logging function in $log_func.
+# a few choices: either set $logto above, comment-out the =pod line above to
+# use this syslog section, or put a reference to your own custom logging
+# function into $log_func.
 
-#use Sys::Syslog;
-#openlog('pop-before-smtp', 'pid', 'mail');
-#$log_func = \&syslog;
-#============================== syslog =================================END=
+use Sys::Syslog;
+openlog('pop-before-smtp', 'pid', 'mail');
+$log_func = \&syslog;
+=cut #============================= syslog =============================END=
 
 ############################ START OF PATTERNS #############################
 #
@@ -148,11 +149,14 @@ if (!-f $file_tail{'name'}) {
 
 
 =pod #===================== Match Multiple Patterns ==================START=
-# Add as many patterns as you like:
+# Comment-out the above =pod line to use this function.
+
+# Add as many patterns to the @match array as you like:
 my @match = ( $pat, $pat2 );
 
 $_ = qr/$_/ foreach @match; # Pre-compile the regular expressions.
 
+# The maillog line to match is in $_.
 sub custom_match
 {
     foreach my $regex (@match) {
@@ -164,17 +168,17 @@ sub custom_match
 =cut #===================== Match Multiple Patterns ====================END=
 
 =pod #---------------------- vm-pop3d Match Support ------------------START-
-# vm-pop3d support by <andy@kahncentral.net>.
-#
 # Comment-out the above =pod line to use this function.
 
-my $vmIpPat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: '.
-       'Connect from (\d+\.\d+\.\d+\.\d+)$';
-my $vmUserPat = '\S+ (?:vm-pop3d)\[(\d+)\]: User (\S|\s)+ logged in$';
+# vm-pop3d support by <andy@kahncentral.net>.  Tweaked by Wayne Davison.
 
 # vm-pop3d requires 2 logfile lines to be checked before the user is verified.
 # The first line contains the IP and the second lets us know if the user
 # successfully logged in or not.
+
+my $vmIpPat = '^(... .. ..:..:..) \S+ (?:vm-pop3d)\[(\d+)\]: '.
+       'Connect from (\d+\.\d+\.\d+\.\d+)$';
+my $vmUserPat = '\S+ (?:vm-pop3d)\[(\d+)\]: User (\S|\s)+ logged in$';
 
 my($vmTime, $vmPid, $vmIp);
 
@@ -191,6 +195,7 @@ sub custom_match
     ( );
 }
 =cut #---------------------- vm-pop3d Match Support --------------------END-
+
 
 ########################## Alternate DB/SMTP support #######################
 #

@@ -1,5 +1,12 @@
 2002-04-19  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp:
+	- A few more minor doc/comment changes.
+	- Output the usage message using <<EOT.
+
+	* pop-before-smtp-conf.pl:
+	A few more comment tweaks.
+
 	* README:
 	- Added a note about our file-locking code.
 

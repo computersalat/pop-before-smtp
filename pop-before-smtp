@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
 
-# pop-before-smtp 1.9a Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.9b Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.9b 2000-03-23 HUP handler no longer tries to do anything more than set a
+#                 flag
 # 1.9a 2000-03-21 test version with support for reloading mynetworks on HUP
 # 1.9 2000-03-21 added support for files in mynetworks, tested by Andy Dills
 # 1.8 2000-03-21 tweaked UW regexp based on further feedback from Andy Dills
@@ -186,7 +188,7 @@ sub cleanup_nets {
 
 my $nets;
 
-$SIG{HUP} = sub {
+sub nets_reloader {
 	$nets = {};
 	my @mynets = cleanup_nets(`postconf mynetworks`);
 	while (my @tmp = grep { $mynets[$_] =~ m#^/# } 0..$#mynets) {
@@ -196,7 +198,11 @@ $SIG{HUP} = sub {
 	}
 	Net::Netmask->new($_)->storeNetblock($nets) for @mynets;
 }
-&{$SIG{HUP}};
+
+nets_reloader;
+
+my $hupped = 0;
+$SIG{HUP} = sub { $hupped++ };
 
 my (%t, @q);
 
@@ -208,6 +214,10 @@ delete $db{$_} for keys %db;
 $| = 1 if $debug;
 
 while (1) {
+	if ($hupped) {
+		nets_reloader;
+		$hupped = 0;
+	}
 	$_ = $fi->read;
 	my ($timestamp, $ipaddr) = m/$pat/o or next;
 	my $ts = str2time($timestamp) or next;

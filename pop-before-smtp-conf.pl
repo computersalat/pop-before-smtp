@@ -348,6 +348,7 @@ sub sync_courier
 =pod #-------------------------- Sendmail SMTP -----------------------START-
 # If you comment-out (or remove) both the preceding =pod line and the
 # following =cut line, we'll interface with Sendmail SMTP using DB_File.
+# See the quickstart guide for the sendmail.cf changes you'll need to make.
 # If you find that Sendmail isn't recognizing the changes to the DB file,
 # set $signal_sendmail to 1.
 

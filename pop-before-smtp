@@ -361,6 +361,7 @@ if ($write) {
 
 my $db_changed = 0;
 my $expire_check_time = 0;
+my $starting_up = $file_tail{'tail'} < 0 && !$reprocess;
 
 while (1) {
     $_ = $tail_getline_func->();
@@ -370,6 +371,19 @@ while (1) {
 	/^(... .. ..:..:..)/ and $now = str2time($1);
     } else {
 	$now = time;
+	if ($starting_up && /^(... .. ..:..:..)/) {
+	    if (str2time($1) + $grace >= $now) {
+		$log_func->('debug', "startup log-scan complete") if $debug;
+		$starting_up = 0;
+		$flock_func->(1);
+		foreach my $ip (keys %t) {
+		    $log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
+		    $db{$ip} = $dbvalue;
+		    $log_func->('info', "added $ip to DB");
+		    $db_changed = 1;
+		}
+	    }
+	}
     }
 
     my($timestamp, $ipaddr, $increment);
@@ -388,23 +402,28 @@ while (1) {
 
     my $ts = str2time($timestamp) or next;
     $ts += $grace;
-    next if $ts < $now && !defined $out_pat;
+    next if $starting_up && !defined $out_pat;
 
     if (findNetblock($ipaddr)) {
-	$log_func->('debug', "ignoring local-net ip=$ipaddr") if $debug;
+	$log_func->('debug', "ignoring local-net ip=$ipaddr") if $debug && !$starting_up;
 	next;
     }
-    $log_func->('debug', "found ip=$ipaddr ($increment)") if $debug;
+    $log_func->('debug', "found ip=$ipaddr ($increment)") if $debug && !$starting_up;
     my $already_enabled = exists($t{$ipaddr});
     my $cnt = $already_enabled ? -$t{$ipaddr} : 0;
     $cnt = 0 if $cnt < 0;
     $cnt += $increment;
     if ($cnt <= 0) {
+	if ($starting_up) {
+	    delete $t{$ipaddr} if $already_enabled;
+	    next;
+	}
 	push @q, [$ipaddr, $ts] if !$already_enabled || $ts > $t{$ipaddr};
 	$t{$ipaddr} = $ts;
 	$log_func->('debug', "setting expiration time for ip=$ipaddr to $ts") if $debug;
     } else {
 	$t{$ipaddr} = -$cnt;
+	next if $starting_up;
 	$log_func->('debug', "connection count for ip=$ipaddr is now $cnt") if $debug;
     }
     next if $already_enabled;

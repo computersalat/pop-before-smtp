@@ -9,7 +9,7 @@
 # how to install and test your setup.
 
 use vars qw(
-    $pat $write $flock $debug $reprocess $grace %file_tail
+    $pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
 );
@@ -23,7 +23,8 @@ use vars qw(
 
 # Set $debug to output some extra log messages (if logging is enabled).
 #$debug = 1;
-#$log_func = \&log_to_stdout;
+#$logto = '-'; # Log to stdout.
+#$logto = '/var/log/pop-before-smtp';
 
 # Override the DB hash file we will create/update (".db" gets appended).
 #$dbfile = '/etc/postfix/pop-before-smtp';
@@ -64,11 +65,9 @@ if (!-f $file_tail{'name'}) {
 #$file_tail{'tail'} = -1;
 
 #===========================================================================
-# If you want to output a log file of what pop-before-smtp is doing, you have a
-# few choices: either call set_output_log('FILE'), uncomment the syslog lines
-# below, or put a reference to your own custom logging function in $log_func.
-
-#set_output_log('/var/log/pop-before-smtp');
+# If you want to output a log file of what pop-before-smtp is doing, you have
+# a few choices: either set $logto above, uncomment the syslog lines below,
+# or put a reference to your own custom logging function in $log_func.
 
 # Uncomment these 3 lines to cause log messages to use syslog().
 #use Sys::Syslog;

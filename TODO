@@ -1,10 +1,12 @@
+If the $fail_tail{'tail'} option is not -1 (meaning we don't reread the log
+file), perhaps we should leave the current IPs in the DB file on startup, and
+set them to expire after $grace elapses (timed from db mtime).
+
 Document somewhere how the current flock setup is adequate for our needs
 since we're the only one writing the file (and it does properly protect
 a reader from getting corrupted data if the reader process is locking
 the file before it reads its first buffer-full of data, as I believe is
 the case with postfix).
-
-Make the tie function overridable from the config file?
 
 Factor out the $pats as much as possible.
 

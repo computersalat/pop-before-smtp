@@ -29,7 +29,7 @@ ulimit -S -c 0 >/dev/null 2>&1
 # See how we were called.
 case "$1" in
 start)
-	echo -n "Starting $progname:"
+	echo -n "Starting $progname: "
 	$pgm >/dev/null 2>&1 & echo $! >$pid
 	if test $? -eq 0; then
 		echo_success
@@ -40,7 +40,7 @@ start)
 	touch /var/lock/subsys/$progname
 	;;
 stop)
-	echo -n "Shutting down $progname:"
+	echo -n "Stopping $progname: "
 	killproc $progname
 	rm -f /var/lock/subsys/$progname
 	echo

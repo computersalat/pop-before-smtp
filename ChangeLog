@@ -3,19 +3,25 @@
 	* pop-before-smtp:
 	- Added the ability to override our tie, sync, and flock functions
 	  from the config file.
+	- Allow the value we put into the DB to be configured.
+	- Allow the finding of the mynetwork value to be configured.
 	- Use time2str() for our stdout-log timestamp.
 
 	* pop-before-smtp-conf.pl:
 	- Added a sample BerkeleyDB setup (commented out).
-
-	* TODO:
-	- Removed something done, added something new.
-
-	* COPYING:
-	- Tweaked the Copyright.
+	- Added a commented-out setup for qmail tcprules and Courier SMTP.
+	- Added $dbvalue section.
+	- Added /var/log/mail.log to the list of known watch-log values.
 
 	* README:
 	- Updated the info related to syslog setup.
+	- Changed the notes concerning Courier SMTP and qmail.
+
+	* TODO:
+	- Removed several finished items, added something new.
+
+	* COPYING:
+	- Tweaked the Copyright.
 
 2002-04-13  Wayne Davison  <wayned@users.sourceforge.net>
 

@@ -30,6 +30,8 @@ access from that IP.
 
 =head1 OPTIONS
 
+=over 4
+
 =item --config=FILE
 
 Specify the config file to read instead of /etc/pop-before-smtp-conf.pl.
@@ -82,6 +84,8 @@ you can choose to append a different suffix or no suffix at all.
 Turns on logging to the specified file (use "-" for stdout).
 
 =item --grace=SECONDS
+
+=back
 
 Set the number of seconds that an IP address is authorized after it
 successfully signs in via POP or IMAP.
@@ -286,17 +290,27 @@ Net::Netmask->new($_)->storeNetblock() for @mynets;
 my (%t, @q);
 
 if ($write) {
+    # If we're not re-reading the log file, set the existing DB entries
+    # to expire in $grace seconds from our startup time.
+    my $expire_old_at = $file_tail{'tail'}? 0 : $now + $grace;
     $tie_func->();
     $flock_func->(1);
     foreach (keys %db) {
-	delete $db{$_};
-	$log_func->('debug', "removed old ip=$_ from DB") if $debug;
+	if ($expire_old_at) {
+	    push @q, [$_, $expire_old_at];
+	    $t{$_} = $expire_old_at;
+	    $log_func->('debug', "initialized old ip=$_") if $debug;
+	}
+	else {
+	    delete $db{$_};
+	    $log_func->('debug', "removed old ip=$_ from DB") if $debug;
+	}
     }
     $flock_func->(0);
 }
 
 my $db_changed = 0;
-my $last_expire_check = 0;
+my $expire_check_time = 0;
 
 while (1) {
     $_ = $fi->read;
@@ -338,7 +352,7 @@ while (1) {
     $db_changed = 1;
 }
 continue {
-    if ($db_changed || $now > $last_expire_check + $grace) {
+    if ($db_changed || $now >= $expire_check_time) {
 	while (@q && $q[0][1] <= $now) {
 	    my($ipaddr,$ts) = @{shift @q};
 	    $log_func->('debug', "expiration event for ip=$ipaddr") if $debug;
@@ -357,7 +371,7 @@ continue {
 	    $flock_func->(0);
 	    $db_changed = 0;
 	}
-	$last_expire_check = $now;
+	$expire_check_time = $now + $grace / 2 + 60;
     }
 }
 

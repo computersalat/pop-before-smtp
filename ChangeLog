@@ -1,3 +1,10 @@
+2004-04-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Import more Fcntl symbols, including the SEEK_* symbols
+	  (which we now use) and the F_* symbols (which some optional
+	  code in the config file needs).
+
 2004-04-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

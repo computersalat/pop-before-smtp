@@ -1,7 +1,13 @@
 #!/usr/bin/perl -wT
 use strict;
 
-# pop-before-smtp 1.19 Bennett Todd <bet@rahul.net> Freely Redistributable
+# pop-before-smtp 1.20 Bennett Todd <bet@rahul.net> Freely Redistributable
+# 1.20 2000-09-18 Robert L Mathews pointed out that I'd neglected to
+#                 skip the update of the db file if the client was already
+#                 authorized; this update adds that optimization.
+#                 And Robert L Mathews also gave another optimization,
+#                 hoisting the syncs out of the purge loop and ensuring
+#                 that all updates are covered by a single sync.
 # 1.19 2000-09-18 Robert L Mathews performed benchmarks demonstrating that
 #                 the performance cost of the flocks is negligible, so
 #                 I switched them to default to on.
@@ -356,19 +362,20 @@ while (1) {
 	next if findNetblock($ipaddr);
 	print "\taccepted --- not in mynetworks\n" if $debug;
 	push @q, [$ipaddr, $ts];
+	my $already_enabled = exists($t{$ipaddr});
 	$t{$ipaddr} = $ts;
+	next if $already_enabled;
 	flock(DB_FH, LOCK_EX) or die "$0: flock LOCK_EX failed: $!\n" if $flock;
 	$db{$ipaddr} = "ok" if $write;
-	$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
 	print "\twritten ok\n" if $write and $debug;
 	while ($q[0][1] < time) {
 		print "purging ts=".localtime($q[0][1])." ip=$q[0][0]\n" if $debug;
 		if ($q[0][1] == $t{$q[0][0]}) {
 			delete $t{$q[0][0]};
 			delete $db{$q[0][0]} if $write;
-			$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
 		}
 		shift @q;
 	}
+	$dbh->sync and die "$0: sync $dbfile: $!\n" if $write;
 	flock(DB_FH, LOCK_UN) or die "$0: flock LOCK_UN failed: $!\n" if $flock;
 }

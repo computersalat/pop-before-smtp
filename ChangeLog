@@ -1,3 +1,8 @@
+2003-05-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp-conf.pl:
+	- Added "APOP" to the default $pat value.
+
 2003-04-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

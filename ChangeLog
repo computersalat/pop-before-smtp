@@ -1,3 +1,13 @@
+2002-04-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/init-debian:
+	- A slightly modified version of Debian's init file (taken from their
+	  package).
+
+	* pop-before-smtp.init, contrib/{init-redhat-bet,init-redhat-alex}:
+	- Some minor tweaks to keep the changes small between all our init
+	  files.
+
 2002-04-26  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

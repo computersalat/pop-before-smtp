@@ -14,6 +14,7 @@ use vars qw(
     $pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
     $mynet_func $tie_func $sync_func $flock_func $log_func
+    $tail_init_func $tail_getline_func
 );
 
 #
@@ -80,6 +81,28 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 openlog('pop-before-smtp', 'pid', 'mail');
 $log_func = \&syslog;
 =cut #============================ syslog ===============================END=
+
+=cut #-------------------------- File::Tail ---------------------------START-
+# If you want to use the File::Tail module to read the logfile, comment-out
+# the two surrounding =cut lines.  (By default pop-before-smtp now uses its
+# own, simpler file-tailing functions.)
+
+use File::Tail;
+
+$tail_init_func = \&init_FileTail;
+$tail_getline_func = \&getline_FileTail;
+
+sub init_FileTail
+{
+    $::ft_handle = File::Tail->new(%file_tail);
+}
+
+sub getline_FileTail
+{
+    $::ft_handle->read;
+}
+
+=cut #-------------------------- File::Tail -----------------------------END-
 
 ############################# START OF PATTERNS #############################
 #

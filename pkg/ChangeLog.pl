@@ -35,7 +35,7 @@ s/<LI>\s*<LI>/<LI>/g;
 s/<BR>\s*<BR>/<BR>/g;
 s%(<UL>\s*)</UL>%$1%g;
 
-s%(Upped the version (?:number )?to \S+\.)%<FONT COLOR=red>$1</FONT>%g;
+s%((?:Released version|Upped the version (?:number )?to) \S+)%<FONT COLOR=red>$1</FONT>%g;
 
 print OUT $_, <<EOT;
 </UL></UL>

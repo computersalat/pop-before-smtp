@@ -255,6 +255,10 @@ Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--version] [--dumpconfig] [--list]
 EOT
 
+$sync_func = sub { } if !$write;
+$flock_func = sub { } if !$flock || !$write;
+$log_func = sub { } if !$log_func;
+
 if ($dump_version) {
     print "version: $VERSION\n";
     exit unless $dump_config || $list_ips;
@@ -274,7 +278,7 @@ if ($dump_config) {
 }
 if ($list_ips) {
     $tie_func->();
-    $flock_func->(1) if $flock;
+    $flock_func->(1);
     my @ips = sort keys %db;
     print 'The database holds ', scalar @ips, ' IP';
     if (@ips) {
@@ -282,7 +286,7 @@ if ($list_ips) {
     } else {
 	print "s.\n";
     }
-    $flock_func->(0) if $flock;
+    $flock_func->(0);
     exit;
 }
 if (defined $daemon_pidfile) {
@@ -308,10 +312,6 @@ if (defined $logto) {
     set_output_log($logto);
     $SIG{'HUP'} = sub { set_output_log($logto); }
 }
-
-$sync_func = sub { } if !$write;
-$flock_func = sub { } if !$flock || !$write;
-$log_func = sub { } if !$log_func;
 
 $tail_init_func->();
 
@@ -359,6 +359,11 @@ if ($write) {
 	}
     }
     $flock_func->(0);
+} else {
+    # If we're not writing, make sure that we're using our internal
+    # add/del functions that will only affect the internal %db hash.
+    $add_func = \&add_DB;
+    $del_func = \&del_DB;
 }
 
 my $db_changed = 0;
@@ -377,8 +382,8 @@ while (1) {
 	    if (str2time($1) + $grace >= $now) {
 		$log_func->('debug', "startup log-scan complete") if $debug;
 		$starting_up = 0;
-		$flock_func->(1);
 		foreach my $ip (keys %t) {
+		    $flock_func->(1) unless $db_changed;
 		    $log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
 		    $add_func->($ip);
 		    $log_func->('info', "added $ip to DB");
@@ -430,7 +435,7 @@ while (1) {
     }
     next if $already_enabled;
 
-    $flock_func->(1);
+    $flock_func->(1) unless $db_changed;
     $add_func->($ipaddr);
     $log_func->('info', "added $ipaddr to DB");
     $db_changed = 1;

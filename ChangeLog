@@ -1,6 +1,8 @@
 2005-07-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:
+	- Added method functions for the adding/deleting of items
+	  to/from the DB.
 	- Make sure that the startup-scan can't leave the DB locked.
 	- Make sure that we don't call the the flock function more than
 	  once in a row with the same "1" (or "0") parameter (which was
@@ -8,17 +10,14 @@
 	- Moved some function-pointer-init code so that the code that
 	  implements the --list option can depend on its effects.
 	- If --nowrite is specified, override the user's add_/del_func
-	  pointers.
-
-2005-07-08  Wayne Davison  <wayned@users.sourceforge.net>
-
-	* pop-before-smtp:
-	- Added method functions for the adding/deleting of items
-	  to/from the DB.
+	  pointers with no-op functions.
+	- Release the flock in the --list code prior to starting the
+	  output.
 
 	* pop-before-smtp-conf.pl:
 	- Added $add_func and $del_func to the used variables list.
 	- Some minor improvements to the locking functions.
+	- Tweaked a couple comments.
 
 2005-05-13  Wayne Davison  <wayned@users.sourceforge.net>
 

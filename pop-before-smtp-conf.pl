@@ -332,7 +332,7 @@ $flock = 0;
 
 sub mynet_tcprules
 {
-    # You'll want to edit this value.
+    # You'll probably want to edit this (it specifies IP ranges to ignore).
     '127.0.0.0/8 192.168.1.1/24';
 }
 
@@ -449,7 +449,7 @@ if ($signal_sendmail) {
 
 sub mynet_sendmail
 {
-    # You'll want to edit this value.
+    # You'll probably want to edit this (it specifies IP ranges to ignore).
     '127.0.0.0/8 192.168.1.1/24';
 }
 

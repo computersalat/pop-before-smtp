@@ -177,8 +177,8 @@ use POSIX qw(setsid);
 use vars qw(
     $pat $out_pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
-    $mynet_func $tie_func $sync_func $flock_func $log_func
-    $tail_init_func $tail_getline_func
+    $mynet_func $tie_func $flock_func $add_func $del_func $sync_func
+    $tail_init_func $tail_getline_func $log_func
 );
 
 # Default values, possibly overridden in the config file.
@@ -197,8 +197,10 @@ my($daemon_pidfile, $dump_version, $dump_config, $list_ips);
 
 $mynet_func = \&mynet_postfix;
 $tie_func = \&tie_DB;
-$sync_func = \&sync_DB;
 $flock_func = \&flock_DB;
+$add_func = \&add_DB;
+$del_func = \&del_DB;
+$sync_func = \&sync_DB;
 $tail_init_func = \&tail_init;
 $tail_getline_func = \&tail_getline;
 
@@ -352,7 +354,7 @@ if ($write) {
 	    $t{$_} = $expire_old_at;
 	    $log_func->('debug', "initialized old ip=$_") if $debug;
 	} else {
-	    delete $db{$_};
+	    $del_func->($_);
 	    $log_func->('debug', "removed old ip=$_ from DB") if $debug;
 	}
     }
@@ -378,7 +380,7 @@ while (1) {
 		$flock_func->(1);
 		foreach my $ip (keys %t) {
 		    $log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
-		    $db{$ip} = $dbvalue;
+		    $add_func->($ip);
 		    $log_func->('info', "added $ip to DB");
 		    $db_changed = 1;
 		}
@@ -429,7 +431,7 @@ while (1) {
     next if $already_enabled;
 
     $flock_func->(1);
-    $db{$ipaddr} = $dbvalue;
+    $add_func->($ipaddr);
     $log_func->('info', "added $ipaddr to DB");
     $db_changed = 1;
 } continue {
@@ -443,7 +445,7 @@ while (1) {
 		    $db_changed = 1;
 		}
 		delete $t{$ipaddr};
-		delete $db{$ipaddr};
+		$del_func->($ipaddr);
 		$log_func->('info', "removed $ipaddr from DB");
 	    }
 	}
@@ -514,15 +516,28 @@ sub tie_DB
     }
 }
 
+sub flock_DB
+{
+    my($locking) = @_;
+    flock(DB_FH, $locking ? LOCK_EX : LOCK_UN)
+	or die "$0: flock_DB($locking) failed: $!\n";
+}
+
+sub add_DB
+{
+    my($ip) = @_;
+    $db{$ip} = $dbvalue;
+}
+
+sub del_DB
+{
+    my($ip) = @_;
+    delete $db{$ip};
+}
+
 sub sync_DB
 {
     $dbh->sync and die "$0: sync $dbfile: $!\n";
-}
-
-sub flock_DB
-{
-    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
-	or die "$0: flock_DB($_[0]) failed: $!\n";
 }
 
 # --- END --- The default Postfix/DB_File support functions

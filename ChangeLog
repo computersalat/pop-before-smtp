@@ -1,3 +1,13 @@
+2005-07-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Added method functions for the adding/deleting of items
+	  to/from the DB.
+
+	* pop-before-smtp-conf.pl:
+	- Added $add_func and $del_func to the used variables list.
+	- Some minor improvements to the locking functions.
+
 2005-05-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

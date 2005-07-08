@@ -255,7 +255,7 @@ Usage: $0 [--config=FILE] [--[no]write] [--[no]debug]
     [--version] [--dumpconfig] [--list]
 EOT
 
-$sync_func = sub { } if !$write;
+$add_func = $del_func = $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;
 $log_func = sub { } if !$log_func;
 
@@ -280,13 +280,13 @@ if ($list_ips) {
     $tie_func->();
     $flock_func->(1);
     my @ips = sort keys %db;
+    $flock_func->(0);
     print 'The database holds ', scalar @ips, ' IP';
     if (@ips) {
 	print @ips == 1? '' : 's', ":\n\t", join("\n\t", @ips), "\n";
     } else {
 	print "s.\n";
     }
-    $flock_func->(0);
     exit;
 }
 if (defined $daemon_pidfile) {
@@ -359,11 +359,6 @@ if ($write) {
 	}
     }
     $flock_func->(0);
-} else {
-    # If we're not writing, make sure that we're using our internal
-    # add/del functions that will only affect the internal %db hash.
-    $add_func = \&add_DB;
-    $del_func = \&del_DB;
 }
 
 my $db_changed = 0;

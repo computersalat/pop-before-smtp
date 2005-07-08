@@ -14,8 +14,8 @@ use strict;
 use vars qw(
     $pat $out_pat $write $flock $debug $reprocess $grace $logto %file_tail
     @mynets %db $dbfile $dbvalue
-    $mynet_func $tie_func $sync_func $flock_func $log_func
-    $tail_init_func $tail_getline_func
+    $mynet_func $tie_func $flock_func $add_func $del_func $sync_func
+    $tail_init_func $tail_getline_func $log_func
     $PID_pat $IP_pat $OK_pat $FAIL_pat $OUT_pat
 );
 
@@ -405,8 +405,9 @@ sub tie_courier
 
 sub flock_courier
 {
-    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
-	or die "$0: flock_DB($_[0]) failed: $!\n";
+    my($locking) = @_;
+    flock(DB_FH, $locking ? LOCK_EX : LOCK_UN)
+	or die "$0: flock_courier($locking) failed: $!\n";
 }
 
 sub sync_courier
@@ -482,17 +483,20 @@ sub sync_sendmail
     }
 }
 
+# Only 1 of these 2 locking functions is used (look for $flock_func above).
 sub flock_sendmail
 {
-    flock(DB_FH, $_[0]? LOCK_EX : LOCK_UN)
-	or die "$0: flock_DB($_[0]) failed: $!\n";
+    my($locking) = @_;
+    flock(DB_FH, $locking ? LOCK_EX : LOCK_UN)
+	or die "$0: flock_sendmail($locking) failed: $!\n";
 }
 
 sub fcntl_sendmail
 {
-    my $lock = pack('s s l l i', $_[0]? F_WRLCK : F_UNLCK, SEEK_SET, 0, 0, 0);
+    my($locking) = @_;
+    my $lock = pack('s s l l i', $locking ? F_WRLCK : F_UNLCK, SEEK_SET, 0, 0, 0);
     fcntl(DB_FH, F_SETLKW, $lock)
-	or die "$0: flock_DB($_[0]) failed: $!\n";
+	or die "$0: fcntl_sendmail($locking) failed: $!\n";
 }
 =cut #------------------------- Sendmail SMTP ---------------------------END-
 
@@ -559,8 +563,7 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
 	    my($ts, $pid) = ($1, $2);
 	    if (/$IP_pat/o) {
 		$popIPs{$pid} = $3;
-	    }
-	    else {
+	    } else {
 		my $ip = $popIPs{$pid};
 		if (defined $ip) {
 		    if ($popConnected{$pid}) {

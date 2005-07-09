@@ -349,14 +349,14 @@ if ($write) {
     $tie_func->();
     $flock_func->(1);
     foreach (keys %db) {
-	($_) = /^(\d+\.\d+\.\d+\.\d+)$/; # Detaint.
+	my($ip) = /^(\d+\.\d+\.\d+\.\d+)$/; # De-taint.
 	if ($expire_old_at) {
-	    push @q, [$_, $expire_old_at];
-	    $t{$_} = $expire_old_at;
-	    $log_func->('debug', "initialized old ip=$_") if $debug;
+	    push @q, [$ip, $expire_old_at];
+	    $t{$ip} = $expire_old_at;
+	    $log_func->('debug', "initialized old ip=$ip") if $debug;
 	} else {
-	    $del_func->($_);
-	    $log_func->('debug', "removed old ip=$_ from DB") if $debug;
+	    $del_func->($ip);
+	    $log_func->('debug', "removed old ip=$ip from DB") if $debug;
 	}
     }
     $flock_func->(0);
@@ -466,7 +466,7 @@ sub cleanup_nets
 {
     my @nets;
     foreach (@_) {
-	# Detaint.  Also remove leading/trailing spaces.
+	# De-taint.  Also remove leading/trailing spaces.
 	($_) = /^\s*(.*?)\s*$/s;
 	foreach (split /[,\s]+/) {
 	    if (m#^/#) {

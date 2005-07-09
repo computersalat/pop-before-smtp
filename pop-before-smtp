@@ -349,6 +349,7 @@ if ($write) {
     $tie_func->();
     $flock_func->(1);
     foreach (keys %db) {
+	($_) = /^(\d+\.\d+\.\d+\.\d+)$/; # Detaint.
 	if ($expire_old_at) {
 	    push @q, [$_, $expire_old_at];
 	    $t{$_} = $expire_old_at;

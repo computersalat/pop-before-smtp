@@ -18,8 +18,8 @@ cd ..
 
 mv popbsmtp pop-before-smtp-$ver
 if test -f pop-before-smtp-$ver.tar.gz; then
-    tar cvfz pop-before-smtp-cvs.tar.gz pop-before-smtp-$ver
+    fakeroot tar cvfz pop-before-smtp-cvs.tar.gz pop-before-smtp-$ver
 else
-    tar cvfz pop-before-smtp-$ver.tar.gz pop-before-smtp-$ver
+    fakeroot tar cvfz pop-before-smtp-$ver.tar.gz pop-before-smtp-$ver
 fi
 rm -rf pop-before-smtp-$ver

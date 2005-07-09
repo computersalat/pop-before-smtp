@@ -1,3 +1,13 @@
+2005-07-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Detaint IP values that come from the DB at startup.
+
+	* ip-blocking-conf.pl:
+	- A new, alternate config file that finds attacking IPs in a
+	  log file and blocks the IPs using iptables (or ipchains).
+	  (Based on an implementation by Anton V. Popivnenko.)
+
 2005-07-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

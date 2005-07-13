@@ -1,3 +1,8 @@
+2005-07-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.38.
+
 2005-07-09  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

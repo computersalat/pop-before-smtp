@@ -9,7 +9,7 @@ use strict;
 # Also Copyright (C) 2002, 2003, 2004, 2005 Wayne Davison.
 # Freely Redistributable.  See the file COPYING for details.
 
-my $VERSION = '1.37';
+my $VERSION = '1.38';
 
 =head1 NAME
 

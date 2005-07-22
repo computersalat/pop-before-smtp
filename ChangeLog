@@ -1,3 +1,12 @@
+2005-07-22  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Don't allow an $out_pat match to insert an IP that wasn't
+	  already inserted by a $pat match.
+
+	* pop-before-smtp-conf.pl:
+	- Handle latest Courier POP/IMAP non-SSL log lines.
+
 2005-07-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

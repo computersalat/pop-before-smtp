@@ -160,7 +160,7 @@ sub getline_FileTail
 #    'login: [^[\s]*\s*\[[:f]*(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
-#$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:d|d-ssl): ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:d|d-ssl|login): ' .
 #    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 #$out_pat = '^(... .. ..:..:..) \S+ (?:courier)?(?:pop3|imap)(?:d|d-ssl): ' .
 #    '(?:LOGOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';

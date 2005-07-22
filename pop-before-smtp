@@ -421,6 +421,7 @@ while (1) {
 	    delete $t{$ipaddr} if $already_enabled;
 	    next;
 	}
+	next if !$already_enabled && $increment < 0;
 	push @q, [$ipaddr, $ts] if !$already_enabled || $ts > $t{$ipaddr};
 	$t{$ipaddr} = $ts;
 	$log_func->('debug', "setting expiration time for ip=$ipaddr to $ts") if $debug;

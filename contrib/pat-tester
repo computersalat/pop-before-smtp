@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+my $patfile = shift;
+die "Usage: $0 PATFILE [LOGFILE...]\n" unless defined $patfile;
+
+eval `cat $patfile`;
+die "The PATFILE must define a \$pat variable (and maybe an $out_pat var).\n"
+    unless defined $pat;
+$pat = qr/$pat/;
+$out_pat = qr/$out_pat/ if defined $out_pat;
+
+while (<>) {
+    if (defined($out_pat) && /$out_pat/) {
+	print "$ARGV:$.: time($1) ip($2) OUT\n";
+    } elsif (/$pat/) {
+	print "$ARGV:$.: time($1) ip($2)\n";
+    }
+} continue {
+    close ARGV if eof; # Reset the $. line numbers for each file.
+}

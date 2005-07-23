@@ -1,3 +1,10 @@
+2005-07-23  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/pat-tester:
+	- Added a simple debug program that makes it easy to test a
+	  $pat (and optionally an $out_pat) value against one or more
+	  log files.
+
 2005-07-22  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

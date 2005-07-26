@@ -156,7 +156,7 @@ sub getline_FileTail
 #    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
 
 # For Cyrus (including a tweak for IP addrs that don't resolve):
-#$pat = '^(... .. ..:..:..) \S+ (?:pop3|imap)[ds]?\[\d+\]: ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:cyrus/)?(?:pop3|imap)[ds]?\[\d+\]: ' .
 #    'login: [^[\s]*\s*\[[:f]*(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
@@ -210,9 +210,17 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ teapop\[\d+\]: ' .
 #    'Successful login for \S+ .+ \[(\d+\.\d+\.\d+\.\d+)\]$';
 
-# For Dovecot POP3/IMAP
+# For Dovecot POP3/IMAP when using syslog.
 #$pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
 #    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#$out_pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
+#    'Disconnected.* \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+
+# For Dovecot POP3/IMAP when it does its own logging.
+#$pat = '^(?:imap|pop3)-login: (... .. ..:..:..) Info: ' .
+#    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#$out_pat = '^(?:imap|pop3)-login: (... .. ..:..:..) Info: ' .
+#    'Disconnected.* \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server
 #$pat = '^(... .. .... ..:..:..).* IMAP ' .

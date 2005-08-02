@@ -2,9 +2,9 @@
 #
 # Usage: ./maketar [-rTAG]
 
-cvs co -P $* popbsmtp
+cvs co -P "$@" popbsmtp
 
-cd popbsmtp
+cd popbsmtp || exit 1
 
 # Support making the tar file with a temporary patch.
 if test -f ../patch ; then

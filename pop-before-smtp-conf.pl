@@ -125,10 +125,12 @@ sub getline_FileTail
 #
 ############################# START OF PATTERNS #############################
 
-# For UW ipop3d/imapd and their secure versions. This is the DEFAULT.
+# For UW POP/IMAP. This is the DEFAULT $pat (without an $out_pat, by default).
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
 #    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+#$out_pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+#    'Logout user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # Some folks need a little different match for UW ipop3d/imapd:
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .

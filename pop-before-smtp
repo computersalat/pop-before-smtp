@@ -6,7 +6,7 @@ use strict;
 # help at <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 #
 # Copyright (C) 1999, 2000, 2001 Bennett Todd.
-# Also Copyright (C) 2002, 2003, 2004, 2005 Wayne Davison.
+# Copyright (C) 2002, 2003, 2004, 2005 Wayne Davison.
 # Freely Redistributable.  See the file COPYING for details.
 
 my $VERSION = '1.38';
@@ -351,7 +351,7 @@ if ($write) {
     foreach (keys %db) {
 	my($ip) = /^(\d+\.\d+\.\d+\.\d+)$/; # De-taint.
 	if ($expire_old_at) {
-	    push @q, [$ip, $expire_old_at];
+	    unshift @q, [$ip, $expire_old_at];
 	    $t{$ip} = $expire_old_at;
 	    $log_func->('debug', "initialized old ip=$ip") if $debug;
 	} else {
@@ -413,8 +413,8 @@ while (1) {
     }
     $log_func->('debug', "found ip=$ipaddr ($increment)") if $debug && !$starting_up;
     my $already_enabled = exists($t{$ipaddr});
-    my $cnt = $already_enabled ? -$t{$ipaddr} : 0;
-    $cnt = 0 if $cnt < 0;
+    my $prev_ts = $already_enabled ? $t{$ipaddr} : 0;
+    my $cnt = $prev_ts < 0 ? -$prev_ts : 0;
     $cnt += $increment;
     if ($cnt <= 0) {
 	if ($starting_up) {
@@ -422,7 +422,16 @@ while (1) {
 	    next;
 	}
 	next if !$already_enabled && $increment < 0;
-	push @q, [$ipaddr, $ts] if !$already_enabled || $ts > $t{$ipaddr};
+	if ($prev_ts < 0) {
+	    foreach (@q) {
+		last unless $ts == $$_[1];
+		if ($ipaddr eq $$_[0]) {
+		    $prev_ts = $ts;
+		    last;
+		}
+	    }
+	}
+	unshift @q, [$ipaddr, $ts] if !$already_enabled || $ts > $prev_ts;
 	$t{$ipaddr} = $ts;
 	$log_func->('debug', "setting expiration time for ip=$ipaddr to $ts") if $debug;
     } else {
@@ -438,8 +447,8 @@ while (1) {
     $db_changed = 1;
 } continue {
     if ($db_changed || $now >= $expire_check_time) {
-	while (@q && $q[0][1] <= $now) {
-	    my($ipaddr,$ts) = @{shift @q};
+	while (@q && $q[-1][1] <= $now) {
+	    my($ipaddr,$ts) = @{pop @q};
 	    #$log_func->('debug', "expiration event for ip=$ipaddr ($ts)") if $debug;
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {

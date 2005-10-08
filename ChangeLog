@@ -1,3 +1,8 @@
+2005-10-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Improved the $out_pat for UW POP/IMAP.
+
 2005-08-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

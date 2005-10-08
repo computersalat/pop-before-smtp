@@ -130,7 +130,7 @@ sub getline_FileTail
 #    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 #$out_pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
-#    'Logout user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
+#    '(?:Logout|Autologout|Command stream end of file.*?) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # Some folks need a little different match for UW ipop3d/imapd:
 #$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .

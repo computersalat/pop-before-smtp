@@ -1,4 +1,10 @@
-2005-10-07  Wayne Davison  <wayned@users.sourceforge.net>
+2005-10-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Reverse the order of the @q array that holds the expiration
+	  queue.
+	- When $out_pat is in use, we need to take extra care to avoid
+	  adding a duplicate expiration event for an IP.
 
 	* pop-before-smtp-conf.pl:
 	- Improved the $out_pat for UW POP/IMAP.

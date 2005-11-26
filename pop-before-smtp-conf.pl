@@ -119,9 +119,13 @@ sub getline_FileTail
 # (e.g. Thunderbird caches open IMAP connections).
 #
 # Note also that the servers that require multiple log lines be read to
-# get all the needed info have a setup with 3 *_pat variables instead of
-# a single "$pat" variable.  Uncomment all 3 and we'll define a multi-
+# get all the needed info have a setup with 3 $NAME_pat variables instead
+# of a single "$pat" variable.  Uncomment all 3 and we'll define a multi-
 # line-matching custom_match() subroutine for you.
+#
+# Technical:  if you want to define a new $pat regex, make sure that the
+# 1st value returned (by the parens) must be the date+time, and the 2nd
+# value returned must be the IP number.
 #
 ############################# START OF PATTERNS #############################
 
@@ -142,12 +146,12 @@ sub getline_FileTail
 #    'User .+ logged in with mailbox .+ from (\d+\.\d+\.\d+\.\d+)$';
 
 # A fairly modern Qpopper pattern, when using syslog.
-#$pat = '^(... .. ..:..:..) \S+ (?:in\.)?qpopper[^[]*\[\d+\]: \([^)]*\) ' .
+#$pat = '^(... .. ..:..:..) \S+ (?:in\.q|q)?popper[^[]*\[\d+\]: \([^)]*\) ' .
 #    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # The same Qpopper pattern as above, but matches Qpopper's own logging.
 #$pat = '^(... .. ..:..:..) \[popper\] \([^)]*\) ' .
-#    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
+#    'POP login by user (?:"[^"]+"|\S+) at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # For Qpopper POP/APOP Server (matches in.qpopper, qpopper, and popper).
 #$pat = '^(... .. ..:..:..) \S+ (?:in\.q|q)?popper\[\d+\]: Stats: \S+ ' .

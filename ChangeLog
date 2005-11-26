@@ -1,3 +1,10 @@
+2005-11-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added a comment explaining what values get returned by the
+	  $pat regex.
+	- Improved the qpopper regex.
+
 2005-10-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp:

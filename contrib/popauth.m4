@@ -39,7 +39,7 @@ Kpopauth ifelse(defn(`_ARG_'), `',
 ifdef(`CF_LEVEL', `dnl has been introduced in 8.10
 dnl this can be used to add a tag to entries in the map
 dnl to restrict the access
-ifdef(`POP_B4_SMTP_TAG',, `define(`POP_B4_SMTP_TAG', `')')
+ifdef(`POP_B4_SMTP_TAG',, `define(`POP_B4_SMTP_TAG', `POP:')')
 ')dnl
 
 LOCAL_RULESETS
@@ -62,3 +62,15 @@ SLocal_check_relay
 R$*		$: $1 $| $>Is_popauth_ok
 R$* $| YES	$: $# OK
 R$* $| NO	$: $1
+
+
+ifdef(`POP_B4_SMTP_ISAUTH', `dnl
+dnl This is needed because sendmail wipes the macro environment at
+dnl STARTTLS time which is *after* check_relay, but *before* the milter gets
+dnl to see the macroes. So we have to set auth_authen again in check_mail
+SLocal_check_mail
+R$*		$: $1 $| $>Is_popauth_ok
+R$* $| YES	$: $1
+R$* $| NO	$: $1
+')dnl
+

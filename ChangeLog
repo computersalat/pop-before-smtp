@@ -1,5 +1,8 @@
 2006-01-07  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.39.
+
 	* contrib/popauth.m4:
 	- A fix from Alain Knaff that is needed for a sendmail setup
 	  that uses TLS with SMTP.

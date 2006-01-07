@@ -6,10 +6,10 @@ use strict;
 # help at <URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
 #
 # Copyright (C) 1999, 2000, 2001 Bennett Todd.
-# Copyright (C) 2002, 2003, 2004, 2005 Wayne Davison.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Wayne Davison.
 # Freely Redistributable.  See the file COPYING for details.
 
-my $VERSION = '1.38';
+my $VERSION = '1.39';
 
 =head1 NAME
 

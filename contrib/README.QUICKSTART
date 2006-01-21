@@ -13,8 +13,7 @@ For a Debian system, you can install the dependencies this way:
 % apt-get update
 % apt-get install libtimedate-perl libnet-netmask-perl libberkeleydb-perl
 
-Debian has the script itself as a package, but it depends on the postfix
-mail server.  Depending on your setup, you might be able to just do this:
+Debian has the script as a package, so you should be able to just do this:
 
 % apt-get install pop-before-smtp
 
@@ -186,19 +185,20 @@ The one that the sendmail folks themselves suggest using is found here:
 
     http://www.sendmail.org/~ca/email/rules/popauth.m4
 
-A modified version of this file that Alain Knaff tweaked to add some SPF
+A modified version of popauth.m4 that Alain Knaff tweaked to add some SPF
 compatibility is found in the contrib dir of the source.  (See its comments
 for its added POP_B4_SMTP_ISAUTH option.)
 
 To use either of these macro files, put a copy in the hack dir on your
-system and then add this line to your sendmail.mc file:
+system and then add these lines to your sendmail.mc file:
 
+    define(`POP_B4_SMTP_TAG', `')dnl
     HACK(`popauth')dnl
 
 Note that these rules expect the database to be /etc/mail/popauth, so be
 sure to set that as the dbfile in your pop-before-smtp-conf.pl file.
 
-For other SMTP software:
+For Other SMTP Software:
 ========================
 
 Please let me know what it requires so I can include it here.
@@ -241,4 +241,5 @@ You'll see the test output scroll by, and at the end you should see a
 summary of "System appeared to reject relay attempts" if everything is OK.
 
 These tests do NOT blacklist you if you are "open", so no worries about
-being RBL'ed if it is found that you are running as an open-relay.
+being RBL'ed if it is found that you are running as an open-relay -- just
+fix the problem and re-run the tests.

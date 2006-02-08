@@ -220,13 +220,19 @@ sub getline_FileTail
 #$pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
 #    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 #$out_pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Disconnected.* \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'Disconnected.*? \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Dovecot POP3/IMAP when it does its own logging.
+#$pat = '^dovecot: ((?:... ..|....-..-..) ..:..:..) Info: ' .
+#    '(?:imap|pop3)-login: Login: .+? rip=[:f]*(\d+\.\d+\.\d+\.\d+),';
+#$out_pat = '^dovecot: ((?:... ..|....-..-..) ..:..:..) Info: ' .
+#    '(?:imap|pop3)-login: Disconnected.*? rip=[:f]*(\d+\.\d+\.\d+\.\d+),';
+
+# For older Dovecot POP3/IMAP when it does its own logging.
 #$pat = '^(?:imap|pop3)-login: (... .. ..:..:..) Info: ' .
 #    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 #$out_pat = '^(?:imap|pop3)-login: (... .. ..:..:..) Info: ' .
-#    'Disconnected.* \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'Disconnected.*? \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server
 #$pat = '^(... .. .... ..:..:..).* IMAP ' .

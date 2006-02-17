@@ -1,3 +1,9 @@
+2006-02-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Improved the syslog dovecot pattern to work with the latest
+	  dovecot version.
+
 2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* contrib/pat-tester:

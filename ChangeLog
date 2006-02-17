@@ -1,3 +1,9 @@
+2006-02-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/pat-tester:
+	- Skip our custom_match function if the user supplied one.
+	- Make Date::Format and Date::Parse available, just in case.
+
 2006-02-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

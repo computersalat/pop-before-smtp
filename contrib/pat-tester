@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+use Date::Parse;
+use Date::Format;
+
 use vars qw( $pat $PID_pat );
 
 my $patfile = shift;
@@ -20,7 +23,8 @@ The PATFILE must define a \$pat variable (and maybe an \$out_pat var)
 OR the \$PID_pat, \$IP_pat, \$OK_pat, etc. variables.
 EOT
     }
-    eval <<'EOT';
+    if (!defined(&custom_match)) {
+	eval <<'EOT';
  sub custom_match
  {
     if (defined $out_pat && /$out_pat/o) {
@@ -31,6 +35,7 @@ EOT
     ( );
  }
 EOT
+    }
 }
 
 while (<>) {

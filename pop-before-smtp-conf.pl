@@ -218,9 +218,9 @@ sub getline_FileTail
 
 # For Dovecot POP3/IMAP when using syslog.
 #$pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'Login: .*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
 #$out_pat = '^(... .. ..:..:..) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Disconnected.*? \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'Disconnected.*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
 
 # For Dovecot POP3/IMAP when it does its own logging.
 #$pat = '^dovecot: ((?:... ..|....-..-..) ..:..:..) Info: ' .

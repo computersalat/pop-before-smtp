@@ -376,10 +376,10 @@ while (1) {
     if ($reprocess) {
 	# To assist with debugging, pretend the current time is when this
 	# line's event happened.
-	/^($logtime_pat)/o and $now = str2time($1);
+	/($logtime_pat)/o and $now = str2time($1);
     } else {
 	$now = time;
-	if ($starting_up && /^($logtime_pat)/o) {
+	if ($starting_up && /($logtime_pat)/o) {
 	    if (str2time($1) + $grace >= $now) {
 		$log_func->('debug', "startup log-scan complete") if $debug;
 		$starting_up = 0;

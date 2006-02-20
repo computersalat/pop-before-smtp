@@ -183,7 +183,7 @@ use vars qw(
 
 # Default values, possibly overridden in the config file.
 
-$logtime_pat = '^(\w\w\w \d+ \d+:\d+:\d+)';
+$logtime_pat = '(\w\w\w \d+ \d+:\d+:\d+)';
 $pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
@@ -260,7 +260,8 @@ $add_func = $del_func = $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;
 $log_func = sub { } if !$log_func;
 
-$logtime_pat =~ /\(.*?\)/ or die "\$logtime_pat does not contain parentheses: \"$logtime_pat\"\n";
+$logtime_pat =~ /\([^?].*?\)/
+    or die "\$logtime_pat does not contain value-returning parentheses:\n\"$logtime_pat\"\n";
 
 if ($dump_version) {
     print "version: $VERSION\n";

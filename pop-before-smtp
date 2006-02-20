@@ -183,8 +183,8 @@ use vars qw(
 
 # Default values, possibly overridden in the config file.
 
-$logtime_pat = '\w\w\w \d+ \d+:\d+:\d+';
-$pat = '^([LOGTIME]) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+$logtime_pat = '^(\w\w\w \d+ \d+:\d+:\d+)';
+$pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 $write = 1; # open and change the DB
@@ -260,6 +260,8 @@ $add_func = $del_func = $sync_func = sub { } if !$write;
 $flock_func = sub { } if !$flock || !$write;
 $log_func = sub { } if !$log_func;
 
+$logtime_pat =~ /\(.*?\)/ or die "\$logtime_pat does not contain parentheses: \"$logtime_pat\"\n";
+
 if ($dump_version) {
     print "version: $VERSION\n";
     exit unless $dump_config || $list_ips;
@@ -326,8 +328,9 @@ $| = 1;
 my $now = time;
 $log_func->('info', 'starting up');
 
-$pat =~ s/\[LOGTIME\]/$logtime_pat/g;
-$out_pat =~ s/\[LOGTIME\]/$logtime_pat/g if defined $out_pat;
+foreach ($pat, $out_pat) {
+    s/\[LOGTIME\]/$logtime_pat/g;
+}
 
 @mynets = cleanup_nets($mynet_func->());
 if ($debug) {
@@ -376,10 +379,10 @@ while (1) {
     if ($reprocess) {
 	# To assist with debugging, pretend the current time is when this
 	# line's event happened.
-	/($logtime_pat)/o and $now = str2time($1);
+	m/$logtime_pat/o and $now = str2time($1);
     } else {
 	$now = time;
-	if ($starting_up && /($logtime_pat)/o) {
+	if ($starting_up && m/$logtime_pat/o) {
 	    if (str2time($1) + $grace >= $now) {
 		$log_func->('debug', "startup log-scan complete") if $debug;
 		$starting_up = 0;

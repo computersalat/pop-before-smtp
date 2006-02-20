@@ -123,131 +123,133 @@ sub getline_FileTail
 # of a single "$pat" variable.  Uncomment all 3 and we'll define a multi-
 # line-matching custom_match() subroutine for you.
 #
-# Technical:  if you want to define a new $pat regex, make sure that the
-# 1st value returned (by the parens) must be the date+time, and the 2nd
-# value returned must be the IP number.  Every appearance of the string
-# "[LOGTIME]" in a pattern will be replaced by the final value of the
-# variable $logtime_pat, which defaults to "\w\w\w \d+ \d+:\d+:\d+".
+# Technical:  if you want to define a new $pat regex, make sure that you
+# include the string "[LOGTIME]" near the start because this string will
+# be replaced by the value of the $logtime_pat variable, and this will
+# return the first value that the code needs: the timestamp.  There must
+# also be a 2nd value returned from the regular expression: the IP number.
+# The $logtime_pat variable defaults to "^(\w\w\w \d+ \d+:\d+:\d+)".
 #
 ############################# START OF PATTERNS #############################
 
 # If your logfile has a non-standard time-stamp, you may need to define this
 # value.  Known variations are included next to the relevant patterns.
 
-#$logtime_pat = '\w\w\w \d+ \d+:\d+:\d+';
-#$logtime_pat = '\d\d\d\d-\d\d-\d\d \d+:\d+:\d+';
+#$logtime_pat = '^(\w\w\w \d+ \d+:\d+:\d+)';
+#$logtime_pat = '^(\d\d\d\d-\d\d-\d\d \d+:\d+:\d+)';
 
 # For UW POP/IMAP. This is the DEFAULT $pat (without an $out_pat, by default).
-#$pat = '^([LOGTIME]) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
 #    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
-#$out_pat = '^([LOGTIME]) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+#$out_pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
 #    '(?:Logout|Autologout|Killed.*?|Command stream end of file.*?) user=\S+ host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # Some folks need a little different match for UW ipop3d/imapd:
-#$pat = '^([LOGTIME]) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .
+#$pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: \[[^]]+\]' .
 #    '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
 #    'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 
 # For GNU pop3d
-#$pat = '^([LOGTIME]) \S+ gnu-pop3d\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ gnu-pop3d\[\d+\]: ' .
 #    'User .+ logged in with mailbox .+ from (\d+\.\d+\.\d+\.\d+)$';
 
 # A fairly modern Qpopper pattern, when using syslog.
-#$pat = '^([LOGTIME]) \S+ (?:in\.q|q)?popper[^[]*\[\d+\]: \([^)]*\) ' .
+#$pat = '^[LOGTIME] \S+ (?:in\.q|q)?popper[^[]*\[\d+\]: \([^)]*\) ' .
 #    'POP login by user "[^"]+" at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # The same Qpopper pattern as above, but matches Qpopper's own logging.
-#$pat = '^([LOGTIME]) \[popper\] \([^)]*\) ' .
+#$pat = '^[LOGTIME] \[popper\] \([^)]*\) ' .
 #    'POP login by user (?:"[^"]+"|\S+) at \([^)]+\) (\d+\.\d+\.\d+\.\d+)';
 
 # For Qpopper POP/APOP Server (matches in.qpopper, qpopper, and popper).
-#$pat = '^([LOGTIME]) \S+ (?:in\.q|q)?popper\[\d+\]: Stats: \S+ ' .
+#$pat = '^[LOGTIME] \S+ (?:in\.q|q)?popper\[\d+\]: Stats: \S+ ' .
 #    '\d+ \d+ \d+ \d+ (?:\S+ )?(\d+\.\d+\.\d+\.\d+)';
 
 # Chris D.Halverson's pattern for Qpopper 3.0b29 on Solaris 2.6
-#$pat = '^([LOGTIME]) \[\d+\] ' .
+#$logtime_pat = '^... ... .. \d+:\d+:\d+ \d{4}';
+#$pat = '^[LOGTIME] \[\d+\] ' .
 #    ' Stats:\s+\w+ \d \d \d \d [\w\.]+ (\d+\.\d+\.\d+\.\d+)';
-#$logtime_pat = '... ... .. \d+:\d+:\d+ \d{4}';
 
 # For Cyrus (including a tweak for IP addrs that don't resolve):
-#$pat = '^([LOGTIME]) \S+ (?:cyrus/)?(?:pop3|imap)[ds]?\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ (?:cyrus/)?(?:pop3|imap)[ds]?\[\d+\]: ' .
 #    'login: [^[\s]*\s*\[[:f]*(\d+\.\d+\.\d+\.\d+)\] \S+ \S+';
 
 # For Courier-POP3 and Courier-IMAP:
-#$pat = '^([LOGTIME]) (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
+#$pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
 #    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
-#$out_pat = '^([LOGTIME]) (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
+#$out_pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
 #    '(?:LOGOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For qmail's pop3d:
-#$pat = '^([LOGTIME]) \S+ vpopmail\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ vpopmail\[\d+\]: ' .
 #    'vchkpw: login \[\S+\] from (\d+\.\d+\.\d+\.\d+)';
 
 # For cucipop, matching a sample from Daniel Roesen:
-#$pat = '^([LOGTIME]) \S+ cucipop\[\d+\]: \S+ ' .
+#$pat = '^[LOGTIME] \S+ cucipop\[\d+\]: \S+ ' .
 #    '(\d+\.\d+\.\d+\.\d+) \d+, \d+ \(\d+\), \d+ \(\d+\)';
 
 # A Modern vm-pop3d can use a normal, 1-line pattern:
-#$pat = '^([LOGTIME]) \S+ vm-pop3d\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ vm-pop3d\[\d+\]: ' .
 #    'User .+ logged in from (\d+\.\d+\.\d+\.\d+)';
 
 # Older vm-pop3d -- needs to match 2 log entries (uncomment all 3 *_pat lines).
-#$PID_pat = '^([LOGTIME]) \S+ vm-pop3d\[(\d+)\]: ';
+#$PID_pat = '^[LOGTIME] \S+ vm-pop3d\[(\d+)\]: ';
 #$IP_pat = $PID_pat . 'Connect from (\d+\.\d+\.\d+\.\d+)$';
 #$OK_pat = $PID_pat . 'User .+ logged in';
 
 # For popa3d -- needs to match 2 log entries (uncomment all 3 *_pat lines).
-#$PID_pat = '^([LOGTIME]) \S+ popa3d\[(\d+)\]: ';
+#$PID_pat = '^[LOGTIME] \S+ popa3d\[(\d+)\]: ';
 #$IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)$';
 #$OK_pat = $PID_pat . 'Authentication passed for ';
 
 # For *patched* popa3d (see the patch in the contrib/popa3d dir).
-#$pat = '^([LOGTIME]) \S+ popa3d\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ popa3d\[\d+\]: ' .
 #    'Authentication passed for \S+ -- \[(\d+\.\d+\.\d+\.\d+)\]';
 
 # A Perdition pattern.
-#$pat = '^([LOGTIME]) \S+ perdition\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ perdition\[\d+\]: ' .
 #    'Auth: (\d+\.\d+\.\d+\.\d+)\-\>\d+\.\d+\.\d+\.\d+ ' .
 #    'user=\"\S+\" server=\"\S+\" port=\"\S+\" status=\"ok\"';
 
 # For solidpop3d (known as spop3d).  ** If you configured
 # solidpop3d with --enable-logextend! **
-#$pat = '^([LOGTIME]) \S+ spop3d\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ spop3d\[\d+\]: ' .
 #    'user \S+ authenticated - (\d+\.\d+\.\d+\.\d+)';
 
 # For spop3d w/o --enabled-logextend (uncomment all 3 *_pat lines).
-#$PID_pat = '^([LOGTIME]) \S+ spop3d\[(\d+)\]: ';
+#$PID_pat = '^[LOGTIME] \S+ spop3d\[(\d+)\]: ';
 #$IP_pat = $PID_pat . 'connect from (\d+\.\d+\.\d+\.\d+)';
 #$OK_pat = $PID_pat . 'user \S+ authenticated';
 
 # Pattern for teapop (http://www.toontown.org/teapop/) by Patrick Prasse.
-#$pat = '^([LOGTIME]) \S+ teapop\[\d+\]: ' .
+#$pat = '^[LOGTIME] \S+ teapop\[\d+\]: ' .
 #    'Successful login for \S+ .+ \[(\d+\.\d+\.\d+\.\d+)\]$';
 
 # For Dovecot POP3/IMAP when using syslog.
-#$pat = '^([LOGTIME]) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
+#$pat = '^[LOGTIME] \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
 #    'Login: .*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
-#$out_pat = '^([LOGTIME]) \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
+#$out_pat = '^[LOGTIME] \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
 #    'Disconnected.*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
 
 # For Dovecot POP3/IMAP when it does its own logging.
-#$pat = '^dovecot: ([LOGTIME]) Info: (?:imap|pop3)-login: ' .
+#$logtime_pat = '^dovecot: (\w\w\w \d+ \d+:\d+:\d+)';
+##$logtime_pat = '^dovecot: (\d\d\d\d-\d+-\d+ \d+:\d+:\d+)';
+#$pat = '^[LOGTIME] Info: (?:imap|pop3)-login: ' .
 #    'Login: .+? rip=[:f]*(\d+\.\d+\.\d+\.\d+),';
-#$out_pat = '^dovecot: ([LOGTIME]) Info: (?:imap|pop3)-login: ' .
+#$out_pat = '^[LOGTIME] Info: (?:imap|pop3)-login: ' .
 #    'Disconnected.*? rip=[:f]*(\d+\.\d+\.\d+\.\d+),';
-#$logtime_pat = '\d\d\d\d-\d+-\d+ \d+:\d+:\d+';
 
 # For older Dovecot POP3/IMAP when it does its own logging.
-#$pat = '^(?:imap|pop3)-login: ([LOGTIME]) Info: ' .
+#$pat = '^(?:imap|pop3)-login: [LOGTIME] Info: ' .
 #    'Login: \S+ \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
-#$out_pat = '^(?:imap|pop3)-login: ([LOGTIME]) Info: ' .
+#$out_pat = '^(?:imap|pop3)-login: [LOGTIME] Info: ' .
 #    'Disconnected.*? \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server
-#$pat = '^([LOGTIME]).* IMAP ' .
+#$logtime_pat = '^\w\w\w \d+ \d\d\d\d \d+:\d+:\d+';
+#$pat = '^[LOGTIME].* IMAP ' .
 #    'User "[^"]+" log on successful from (\d+\.\d+\.\d+\.\d+)';
-#$logtime_pat = '... .. .... \d+:\d+:\d+';
 
 ############################## END OF PATTERNS ##############################
 

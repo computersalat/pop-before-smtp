@@ -329,7 +329,7 @@ my $now = time;
 $log_func->('info', 'starting up');
 
 foreach ($pat, $out_pat) {
-    s/\[LOGTIME\]/$logtime_pat/g;
+    s/\[LOGTIME\]/$logtime_pat/g if defined $_;
 }
 
 @mynets = cleanup_nets($mynet_func->());

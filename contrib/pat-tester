@@ -3,11 +3,12 @@
 use Date::Parse;
 use Date::Format;
 
-use vars qw( $pat $PID_pat );
+use vars qw( $pat $out_pat $PID_pat $logtime_pat );
 
 my $patfile = shift;
 die "Usage: $0 PATFILE [LOGFILE...]\n" unless defined $patfile;
 
+$logtime_pat = '^(\w\w\w \d+ \d+:\d+:\d+)';
 eval `cat $patfile`;
 if (defined $PID_pat) {
     if (!-f 'pop-before-smtp-conf.pl') {
@@ -22,6 +23,9 @@ EOT
 The PATFILE must define a \$pat variable (and maybe an \$out_pat var)
 OR the \$PID_pat, \$IP_pat, \$OK_pat, etc. variables.
 EOT
+    }
+    foreach ($pat, $out_pat) {
+	s/\[LOGTIME\]/$logtime_pat/g if defined $_;
     }
     if (!defined(&custom_match)) {
 	eval <<'EOT';

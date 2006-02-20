@@ -127,7 +127,7 @@ sub getline_FileTail
 # 1st value returned (by the parens) must be the date+time, and the 2nd
 # value returned must be the IP number.  Every appearance of the string
 # "[LOGTIME]" in a pattern will be replaced by the final value of the
-# variable $logtime_pat (which defaults to "\w\w\w \d+ \d+:\d+:\d+").
+# variable $logtime_pat, which defaults to "\w\w\w \d+ \d+:\d+:\d+".
 #
 ############################# START OF PATTERNS #############################
 

@@ -176,14 +176,15 @@ use POSIX qw(setsid);
 
 use vars qw(
     $pat $out_pat $write $flock $debug $reprocess $grace $logto %file_tail
-    @mynets %db $dbfile $dbvalue
+    @mynets %db $dbfile $dbvalue $logtime_pat
     $mynet_func $tie_func $flock_func $add_func $del_func $sync_func
     $tail_init_func $tail_getline_func $log_func
 );
 
 # Default values, possibly overridden in the config file.
 
-$pat = '^(... .. ..:..:..) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
+$logtime_pat = '\w\w\w \d+ \d+:\d+:\d+';
+$pat = '^([LOGTIME]) \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';
 $write = 1; # open and change the DB
@@ -271,9 +272,10 @@ if ($dump_config) {
     if (defined(&custom_match)) {
 	print "Using custom_match() subroutine for watchlog matching.\n";
     } else {
-	print "pat: $pat\n";
-	print "out_pat: $out_pat\n" if defined $out_pat;
+	print "pat: \"$pat\"\n";
+	print "out_pat: \"$out_pat\"\n" if defined $out_pat;
     }
+    print "logtime_pat: \"$logtime_pat\"\n";
     exit unless $list_ips;
 }
 if ($list_ips) {
@@ -324,6 +326,9 @@ $| = 1;
 my $now = time;
 $log_func->('info', 'starting up');
 
+$pat =~ s/\[LOGTIME\]/$logtime_pat/g;
+$out_pat =~ s/\[LOGTIME\]/$logtime_pat/g if defined $out_pat;
+
 @mynets = cleanup_nets($mynet_func->());
 if ($debug) {
     my $cnt = @mynets;
@@ -371,10 +376,10 @@ while (1) {
     if ($reprocess) {
 	# To assist with debugging, pretend the current time is when this
 	# line's event happened.
-	/^(... .. ..:..:..)/ and $now = str2time($1);
+	/^($logtime_pat)/o and $now = str2time($1);
     } else {
 	$now = time;
-	if ($starting_up && /^(... .. ..:..:..)/) {
+	if ($starting_up && /^($logtime_pat)/o) {
 	    if (str2time($1) + $grace >= $now) {
 		$log_func->('debug', "startup log-scan complete") if $debug;
 		$starting_up = 0;

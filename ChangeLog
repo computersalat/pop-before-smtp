@@ -1,3 +1,12 @@
+2006-02-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp-conf.pl:
+	- Added a new configure variable: $logtime_pat.  This variable
+	  lets the user change the default regex that is used to find
+	  the time for each line of a logfile, something that the code
+	  in pop-before-smtp was doing several places using hard-wired
+	  regex values.
+
 2006-02-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

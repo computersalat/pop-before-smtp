@@ -200,7 +200,7 @@ sub getline_FileTail
 
 # For popa3d -- needs to match 2 log entries (uncomment all 3 *_pat lines).
 #$PID_pat = '^[LOGTIME] \S+ popa3d\[(\d+)\]: ';
-#$IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)$';
+#$IP_pat = $PID_pat . 'Session from (\d+\.\d+\.\d+\.\d+)';
 #$OK_pat = $PID_pat . 'Authentication passed for ';
 
 # For *patched* popa3d (see the patch in the contrib/popa3d dir).
@@ -588,7 +588,7 @@ if (defined($PID_pat) && defined($IP_pat) && defined($OK_pat)) {
     my(%popIPs, %popConnected);
 
     $FAIL_pat = '.' if !defined $FAIL_pat;
-    foreach ($PID_pat $IP_pat $OK_pat $FAIL_pat $OUT_pat) {
+    foreach ($PID_pat, $IP_pat, $OK_pat, $FAIL_pat, $OUT_pat) {
 	s/\[LOGTIME\]/$logtime_pat/g if defined $_;
     }
 

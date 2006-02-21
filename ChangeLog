@@ -1,4 +1,12 @@
+2006-02-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.40.
+
 2006-02-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* contrib/popa3d/popa3d-1.0.patch:
+	- Added a patch for the 1.0 release of popa3d.
 
 	* pop-before-smtp, pop-before-smtp-conf.pl:
 	- Added a new configure variable: $logtime_pat.  This variable

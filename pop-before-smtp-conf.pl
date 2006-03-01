@@ -136,7 +136,7 @@ sub getline_FileTail
 # $logtime_pat value here, or use one of the known variations included next
 # to the relevant patterns.  The value should include parentheses, and (for
 # maximum flexibility) should be able to match the time on any log line.
-# This defaults to "(\w\w\w \d+ \d+:\d+:\d+)" if left undefined.
+# This defaults to "(\w\w\w +\d+ \d+:\d+:\d+)" if left undefined.
 
 #$logtime_pat = '(\d\d\d\d-\d\d-\d\d \d+:\d+:\d+)';
 
@@ -247,7 +247,7 @@ sub getline_FileTail
 #    'Disconnected.*? \[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For Apple IMAP MAIL Server
-#$logtime_pat = '(\w\w\w \d+ \d\d\d\d \d+:\d+:\d+)';
+#$logtime_pat = '(\w\w\w +\d+ \d\d\d\d \d+:\d+:\d+)';
 #$pat = '^[LOGTIME].* IMAP User "[^"]+" ' .
 #    'log on successful from (\d+\.\d+\.\d+\.\d+)';
 

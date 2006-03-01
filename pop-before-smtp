@@ -183,7 +183,7 @@ use vars qw(
 
 # Default values, possibly overridden in the config file.
 
-$logtime_pat = '(\w\w\w \d+ \d+:\d+:\d+)';
+$logtime_pat = '(\w\w\w +\d+ \d+:\d+:\d+)';
 $pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .
     '(?:Login|Authenticated|Auth|APOP) user=\S+ ' .
     'host=(?:\S+ )?\[(\d+\.\d+\.\d+\.\d+)\]';

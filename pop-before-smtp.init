@@ -5,11 +5,12 @@
 progname=pop-before-smtp
 pgm=/usr/sbin/$progname
 pid=/var/adm/$progname.pid
+conf=/etc/$progname-conf.pl
 test -d /var/run && pid=/var/run/$progname.pid
 
-if test -f /etc/$progname-conf.pl; then
+if test -f $conf; then
 	# If there is a config file, let it do its job.
-	:
+	conf=--config=$conf
 else
 	# Without a config file, try to intuit the proper options.
 	db=/etc/postfix/pop-before-smtp
@@ -22,6 +23,7 @@ else
 	log=/var/adm/$progname
 	test -f /var/log/messages && log=/var/log/$progname
 	logto=--logto=$log
+	conf=''
 fi
 
 die(){ echo "$progname: $*">&2; exit 1; }
@@ -29,7 +31,7 @@ die(){ echo "$progname: $*">&2; exit 1; }
 case "$1" in
 start)
 	echo -n "Starting $progname: "
-	$pgm $dbfile $watchlog $logto --daemon=$pid
+	$pgm $conf $dbfile $watchlog $logto --daemon=$pid
 	if test $? -eq 0; then
 		echo done
 	else

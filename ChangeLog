@@ -1,5 +1,8 @@
 2006-03-01  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.41.
+
 	* pop-before-smtp, pop-before-smtp-conf.pl:
 	- Fixed a problem with the new $logtime_pat not handling a
 	  space-padded day of the month.

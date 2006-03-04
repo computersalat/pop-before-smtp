@@ -8,7 +8,7 @@ use vars qw( $pat $out_pat $PID_pat $logtime_pat );
 my $patfile = shift;
 die "Usage: $0 PATFILE [LOGFILE...]\n" unless defined $patfile;
 
-$logtime_pat = '^(\w\w\w \d+ \d+:\d+:\d+)';
+$logtime_pat = '^(\w\w\w +\d+ \d+:\d+:\d+)';
 eval `cat $patfile`;
 if (defined $PID_pat) {
     if (!-f 'pop-before-smtp-conf.pl') {

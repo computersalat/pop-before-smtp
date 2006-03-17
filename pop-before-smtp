@@ -327,7 +327,7 @@ $SIG{__DIE__} = \&mydie;
 $| = 1;
 
 my $now = time;
-$log_func->('info', 'starting up');
+$log_func->('info', "starting up (v$VERSION)");
 
 foreach ($pat, $out_pat) {
     s/\[LOGTIME\]/$logtime_pat/g if defined $_;

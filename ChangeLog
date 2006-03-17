@@ -1,3 +1,8 @@
+2006-03-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Include the version number in the starting-up log message.
+
 2006-03-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

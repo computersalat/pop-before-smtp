@@ -106,6 +106,30 @@ sub getline_FileTail
 
 =cut #-------------------------- File::Tail -----------------------------END-
 
+=cut #----------------------- Read log on stdin -----------------------START-
+# If you want to have syslog run pop-before-smtp and send it log lines via
+# stdin, comment-out the two surrounding =cut lines and setup your syslog
+# to have an entry like this:
+#
+#    mail.info                     | exec /usr/local/sbin/pop-before-smtp
+#
+# Also, make sure there's not a pop-before-smtp init script installed.
+
+$file_tail{'name'} = '-';   # Just for the sake of --dumpconfig
+
+$tail_init_func = sub { };
+$tail_getline_func = \&getline_stdin;
+
+sub getline_stdin
+{
+    my $line = <STDIN>;
+    if (!defined $line) {
+        die "EOF on stdin -- exiting\n";
+    }
+    $line;
+}
+=cut #----------------------- Read log on stdin -------------------------END-
+
 ############################# START OF PATTERNS #############################
 #
 # Pick one of these values for the $pat variable OR define a subroutine

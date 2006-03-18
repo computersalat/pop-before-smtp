@@ -1,5 +1,10 @@
 2006-03-17  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp-conf.pl:
+	- Added a new sample section that shows how to configure
+	  pop-before-smtp to read its log data on stdin.  Also show
+	  how to make syslog run the script and pipe it data.
+
 	* pop-before-smtp:
 	- Include the version number in the starting-up log message.
 

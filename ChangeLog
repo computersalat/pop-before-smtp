@@ -1,3 +1,9 @@
+2006-03-24  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- Added a couple debug log messages to the sync_sendmail()
+	  function in the Sendmail SMTP section.
+
 2006-03-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

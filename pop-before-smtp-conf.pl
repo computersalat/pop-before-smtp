@@ -528,7 +528,9 @@ sub sync_sendmail
 {
     $dbh->sync and die "$0: sync $dbfile: $!\n";
 
-    while ($signal_sendmail && !kill(1, $sendmail_pid)) {
+    while ($signal_sendmail) {
+	$log_func->('debug', "about to signal $sendmail_pid") if $debug;
+	last if kill(1, $sendmail_pid);
 	open(PID, $pid_file) || die "Unable to open $pid_file: $!";
 	$_ = <PID>;
 	my($new_pid) = /(\d+)/;
@@ -536,6 +538,7 @@ sub sync_sendmail
 	if ($new_pid == $sendmail_pid) {
 	    die "Unable to signal sendmail to reread the database.\n";
 	}
+	$log_func->('debug', "discovered new sendmail_pid: $new_pid") if $debug;
 	$sendmail_pid = $new_pid;
     }
 }

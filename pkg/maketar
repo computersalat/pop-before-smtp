@@ -2,9 +2,12 @@
 #
 # Usage: ./maketar [-rTAG]
 
-cvs co -P "$@" popbsmtp
+PROJECT_NAME=popbsmtp
+TAR_NAME=pop-before-smtp
 
-cd popbsmtp || exit 1
+cvs co -P "$@" $PROJECT_NAME
+
+cd $PROJECT_NAME || exit 1
 
 # Support making the tar file with a temporary patch.
 if test -f ../patch ; then
@@ -12,14 +15,15 @@ if test -f ../patch ; then
 fi
 
 ver=`sed -ne "s/^my .VERSION = '\([^']*\).*/\1/p" pop-before-smtp`
+
 rm -rf pkg CVS */CVS */*/CVS .cvsignore */.cvsignore */*/.cvsignore
 
 cd ..
 
-mv popbsmtp pop-before-smtp-$ver
-if test -f pop-before-smtp-$ver.tar.gz; then
-    fakeroot tar cvfz pop-before-smtp-cvs.tar.gz pop-before-smtp-$ver
+mv $PROJECT_NAME $TAR_NAME-$ver
+if test -f $TAR_NAME-$ver.tar.gz; then
+    fakeroot tar cvfz $TAR_NAME-cvs.tar.gz $TAR_NAME-$ver
 else
-    fakeroot tar cvfz pop-before-smtp-$ver.tar.gz pop-before-smtp-$ver
+    fakeroot tar cvfz $TAR_NAME-$ver.tar.gz $TAR_NAME-$ver
 fi
-rm -rf pop-before-smtp-$ver
+rm -rf $TAR_NAME-$ver

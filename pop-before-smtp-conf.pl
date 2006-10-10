@@ -298,6 +298,7 @@ $login[1] = '... define an extra login pattern here ...';
 
 foreach (@login, @logout) {
     next unless defined $_;
+    s/\[LOGTIME\]/$logtime_pat/g;
     $_ = qr/$_/;	# Pre-compile the regular expressions.
 }
 

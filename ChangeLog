@@ -1,3 +1,9 @@
+2006-10-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp-conf.pl:
+	- The "Match Many Patterns" section now properly interprets
+	  the [LOGTIME] string in the patterns it is given.
+
 2006-03-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

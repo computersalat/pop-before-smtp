@@ -375,12 +375,23 @@ my $db_changed = 0;
 my $expire_check_time = 0;
 my $starting_up = $file_tail{'tail'} < 0;
 
+if ($reprocess) {
+    $SIG{ALRM} = sub {
+	$log_func->('info', '------ reached end of log file ------');
+	$log_func->('err', '$logtime_pat did not match a timestamp') unless $now;
+    };
+    alarm(5);
+    $now = 0;
+}
+
 while (1) {
     $_ = $tail_getline_func->();
     if ($reprocess) {
+	alarm(5);
 	# To assist with debugging, pretend the current time is when this
 	# line's event happened.
 	m/$logtime_pat/o and $now = str2time($1);
+	next unless $now;
     } else {
 	$now = time;
     }

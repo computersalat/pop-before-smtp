@@ -1,3 +1,13 @@
+2007-06-06  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* pop-before-smtp:
+	- Don't short-circuit the starting_up code when using --reprocess so
+	  that a test run ensures that the $logtime_pat variable is working.
+
+	* pop-before-smtp-conf.pl:
+	- Made the Cyrus pattern only match a successful login line.
+	- Made the Courier-POP3 pattern match a TIMEOUT line in the $out_pat.
+
 2006-10-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp-conf.pl:

@@ -1,5 +1,10 @@
 2007-06-06  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* pop-before-smtp, pop-before-smtp.spec:
+	- Upped the version to 1.42.
+
+2007-06-06  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* pop-before-smtp:
 	- Verify that the $logtime_pat variable is working in --reprocess
 	  mode, and output a warning if it is not.

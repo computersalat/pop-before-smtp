@@ -199,13 +199,13 @@ sub getline_stdin
 
 # For Cyrus (including a tweak for IP addrs that don't resolve):
 #$pat = '^[LOGTIME] \S+ (?:cyrus/)?(?:pop3|imap)[ds]?\[\d+\]: ' .
-#    'login: .*?\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'login: .*?\[[:f]*(\d+\.\d+\.\d+\.\d+)\] .* User logged in';
 
 # For Courier-POP3 and Courier-IMAP:
 #$pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
 #    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 #$out_pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
-#    '(?:LOGOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    '(?:LOGOUT|TIMEOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
 
 # For qmail's pop3d:
 #$pat = '^[LOGTIME] \S+ vpopmail\[\d+\]: vchkpw: ' .

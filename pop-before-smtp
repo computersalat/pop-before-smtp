@@ -373,7 +373,7 @@ if ($write) {
 
 my $db_changed = 0;
 my $expire_check_time = 0;
-my $starting_up = $file_tail{'tail'} < 0 && !$reprocess;
+my $starting_up = $file_tail{'tail'} < 0;
 
 while (1) {
     $_ = $tail_getline_func->();
@@ -383,17 +383,18 @@ while (1) {
 	m/$logtime_pat/o and $now = str2time($1);
     } else {
 	$now = time;
-	if ($starting_up && m/$logtime_pat/o) {
-	    if (str2time($1) + $grace >= $now) {
-		$log_func->('debug', "startup log-scan complete") if $debug;
-		$starting_up = 0;
-		foreach my $ip (keys %t) {
-		    $flock_func->(1) unless $db_changed;
-		    $log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
-		    $add_func->($ip);
-		    $log_func->('info', "added $ip to DB");
-		    $db_changed = 1;
-		}
+    }
+
+    if ($starting_up && m/$logtime_pat/o) {
+	if (str2time($1) + $grace >= $now) {
+	    $log_func->('debug', "startup log-scan complete") if $debug;
+	    $starting_up = 0;
+	    foreach my $ip (keys %t) {
+		$flock_func->(1) unless $db_changed;
+		$log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
+		$add_func->($ip);
+		$log_func->('info', "added $ip to DB");
+		$db_changed = 1;
 	    }
 	}
     }

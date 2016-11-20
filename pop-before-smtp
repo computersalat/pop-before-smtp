@@ -167,6 +167,7 @@ currently being maintained by Wayne Davison <wayned@users.sourceforge.net>.
 =cut
 
 use DB_File;
+use Net::IP::Lite;
 use Net::Netmask;
 use Date::Parse;
 use Date::Format;
@@ -357,8 +358,17 @@ if ($write) {
     my $expire_old_at = $file_tail{'tail'}? 0 : $now + $grace;
     $tie_func->();
     $flock_func->(1);
-    foreach (keys %db) {
-	my($ip) = /^(\d+\.\d+\.\d+\.\d+)$/; # De-taint.
+    foreach my $ip (keys %db) {
+    #my($ip) = /^(\d+\.\d+\.\d+\.\d+)$/; # De-taint.
+    # Get embedded IPv4 of IPv6 address, e.g. ::ffff:1.2.3.4 -> 1.2.3.4
+    $log_func->('debug', "found IP address: '".$ip."'") if $debug;
+    my $ipLite = Net::IP::Lite->new($ip);
+    if ($ipLite->is_ipv6ipv4) {
+        $ipLite = ip_transform($ipLite->address, {
+            convert_to => 'ipv4'
+        });
+        $ip = $ipLite;
+    }
 	if ($expire_old_at) {
 	    unshift @q, [$ip, $expire_old_at];
 	    $t{$ip} = $expire_old_at;
@@ -401,6 +411,15 @@ while (1) {
 	    $log_func->('debug', "startup log-scan complete") if $debug;
 	    $starting_up = 0;
 	    foreach my $ip (keys %t) {
+        $log_func->('debug', "  showing IP: $ip") if $debug;
+        # Get embedded IPv4 of IPv6 address, e.g. ::ffff:1.2.3.4 -> 1.2.3.4
+        my $ipLite = Net::IP::Lite->new($ip);
+        if ($ipLite->is_ipv6ipv4) {
+            $ipLite = ip_transform($ipLite->address, {
+                convert_to => 'ipv4'
+            });
+            $ip = $ipLite;
+        }
 		$flock_func->(1) unless $db_changed;
 		$log_func->('debug', "connection count for ip=$ip starts at " . (-$t{$ip})) if $debug;
 		$add_func->($ip);
@@ -427,6 +446,15 @@ while (1) {
     my $ts = str2time($timestamp) or next;
     $ts += $grace;
     next if $starting_up && !defined $out_pat;
+
+    # Get embedded IPv4 of IPv6 address, e.g. ::ffff:1.2.3.4 -> 1.2.3.4
+    my $ipLiteaddr = Net::IP::Lite->new($ipaddr);
+    if ($ipLiteaddr->is_ipv6ipv4) {
+        $ipLiteaddr = ip_transform($ipLiteaddr->address, {
+            convert_to => 'ipv4'
+        });
+        $ipaddr = $ipLiteaddr;
+    }
 
     if (findNetblock($ipaddr)) {
 	$log_func->('debug', "ignoring local-net ip=$ipaddr") if $debug && !$starting_up;
@@ -470,7 +498,15 @@ while (1) {
     if ($db_changed || $now >= $expire_check_time) {
 	while (@q && $q[-1][1] <= $now) {
 	    my($ipaddr,$ts) = @{pop @q};
-	    #$log_func->('debug', "expiration event for ip=$ipaddr ($ts)") if $debug;
+	    $log_func->('debug', "expiration event for ip=$ipaddr ($ts)") if $debug;
+        # Get embedded IPv4 of IPv6 address, e.g. ::ffff:1.2.3.4 -> 1.2.3.4
+        my $ipLiteaddr = Net::IP::Lite->new($ipaddr);
+        if ($ipLiteaddr->is_ipv6ipv4) {
+            $ipLiteaddr = ip_transform($ipLiteaddr->address, {
+                convert_to => 'ipv4'
+            });
+            $ipaddr = $ipLiteaddr;
+        }
 	    if ($ts == $t{$ipaddr}) {
 		if (!$db_changed) {
 		    $flock_func->(1);

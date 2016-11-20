@@ -204,9 +204,9 @@ sub getline_stdin
 
 # For Courier-POP3 and Courier-IMAP:
 #$pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
-#    'LOGIN, user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    'LOGIN, user=\S+, ip=\[(.*)\], port=';
 #$out_pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
-#    '(?:LOGOUT|TIMEOUT|DISCONNECTED), user=\S+, ip=\[[:f]*(\d+\.\d+\.\d+\.\d+)\]';
+#    '(?:LOGOUT|TIMEOUT|DISCONNECTED), user=\S+, ip=\[(.*)\], ';
 
 # For qmail's pop3d:
 #$pat = '^[LOGTIME] \S+ vpopmail\[\d+\]: vchkpw: ' .
@@ -252,11 +252,9 @@ sub getline_stdin
 #$pat = '^[LOGTIME] \S+ teapop\[\d+\]: ' .
 #    'Successful login for .+? \[(\d+\.\d+\.\d+\.\d+)\]';
 
-# For Dovecot POP3/IMAP when using syslog.
-#$pat = '^[LOGTIME] \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Login: .*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
-#$out_pat = '^[LOGTIME] \S+ (?:dovecot: )?(?:imap|pop3)-login: ' .
-#    'Disconnected.*? (?:\[|rip=)[:f]*(\d+\.\d+\.\d+\.\d+)[],]';
+# For Dovecot 2.2 POP3/IMAP when using syslog.
+#$pat = '^[LOGTIME] \S+ dovecot: (?:imap|pop3)-login: ' .
+#    'Login: user=\S+, method=\S+, rip=(.*), lip=';
 
 # For Dovecot POP3/IMAP when it does its own logging.
 ##$logtime_pat = '(\d\d\d\d-\d+-\d+ \d+:\d+:\d+)';

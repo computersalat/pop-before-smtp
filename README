@@ -1,5 +1,9 @@
-NB for support, subscribe to the mailing list at
-<URL:http://lists.sourceforge.net/lists/listinfo/popbsmtp-users>
+Import of the official project from SourceForge:
+<URL:http://popbsmtp.sourceforge.net/>
+
+AFAIK a MaillingList is not available here on github, but you can make
+  use of the issue System here if you have a problem.
+  If you want to contribute code, then please make use of PullRequests.
 
 PLATFORM-SPECIFIC NOTES (up front so you can comfortably ignore the
 stuff if it doesn't apply to you:-)

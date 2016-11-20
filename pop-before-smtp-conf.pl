@@ -163,6 +163,7 @@ sub getline_stdin
 # This defaults to "(\w\w\w +\d+ \d+:\d+:\d+)" if left undefined.
 
 #$logtime_pat = '(\d\d\d\d-\d\d-\d\d \d+:\d+:\d+)';
+#$logtime_pat = '(\d\d\d\d-\d\d-\d\dT\d+:\d+:\d+)';
 
 # For UW POP/IMAP. This is the DEFAULT $pat (without an $out_pat, by default).
 #$pat = '^[LOGTIME] \S+ (?:ipop3s?d|imaps?d)\[\d+\]: ' .

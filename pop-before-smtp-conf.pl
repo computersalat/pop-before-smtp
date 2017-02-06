@@ -206,7 +206,7 @@ sub getline_stdin
 #$pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
 #    'LOGIN, user=\S+, ip=\[(.*)\], port=';
 #$out_pat = '^[LOGTIME] (?:\[|\S+ )(?:pop3|imap|couriertcp)(?:d|d-ssl|login)\]?: ' .
-#    '(?:LOGOUT|TIMEOUT|DISCONNECTED), user=\S+, ip=\[(.*)\], ';
+#    '(?:LOGOUT|TIMEOUT|DISCONNECTED), user=\S+, ip=\[(.*)\], [port|headers]=';
 
 # For qmail's pop3d:
 #$pat = '^[LOGTIME] \S+ vpopmail\[\d+\]: vchkpw: ' .

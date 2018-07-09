@@ -1,3 +1,8 @@
+2018-07-09  Christian Wittmer <chris@computersalat.de>
+
+    * pop-before-smtp, pop-before-smtp.spec:
+    - Upped the version to 1.50.
+
 2017-02-06  Christian Wittmer <chris@computersalat.de>
 
     * pop-before-smtp, pop-before-smtp-conf.pl:

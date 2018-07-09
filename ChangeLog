@@ -1,3 +1,8 @@
+2017-02-06  Christian Wittmer <chris@computersalat.de>
+
+    * pop-before-smtp, pop-before-smtp-conf.pl:
+    - add IPv6 support via Net::IP::Lite
+
 2007-06-06  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* pop-before-smtp, pop-before-smtp.spec:

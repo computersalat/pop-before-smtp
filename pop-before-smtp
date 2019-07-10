@@ -1,4 +1,4 @@
-#!/usr/bin/perl -wT
+#!/usr/bin/perl -w
 use strict;
 
 # Check the website <URL:http://popbsmtp.sourceforge.net/> for the latest
